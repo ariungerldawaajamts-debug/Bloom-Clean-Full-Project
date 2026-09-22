@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Bloom Coffee House - цэцэг ба кофе">
+<title>Bloom Coffee House | Цэцэг ба кофе</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="announcement">Шинэхэн цэцэг, дулаахан кофе · Дархан хотод өдөр бүр хүргэлттэй
+
+</div>
+<header class="site-header">
+    <a class="brand" href="#home">
+        <span class="brand-mark">✿</span>
+        <span><b>Bloom</b><small>coffee house</small></span></a>
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <nav id="mainNav"><a href="#home">Нүүр</a>
+            <a href="#flowers">Цэцэг</a><a href="#coffee">Кофе</a>
+            <a href="#delivery">Хүргэлт</a><a href="#orders">Миний захиалга</a>
+            <a href="#wishlist">Хүслийн жагсаалт</a>
+            <a href="#about">Бидний тухай</a>
+        </nav><div class="header-actions">
+            <button class="text-button" id="authButton">Нэвтрэх</button>
+            <button class="round-button" id="wishlistButton">♡<i id="wishlistCount">0</i>
+            </button><button class="cart-button" id="cartButton">Сагс <i id="cartCount">0</i>
+            </button></div></header>
+<main id="home">
+<section class="hero">
+    <div class="hero-copy">
+        <p class="eyebrow">Цэцэгсийн жижигхэн ертөнц</p>
+        <h1>Цэцэгсийн гоо үзэсгэлэн,<br><em>кофены дулаан мэдрэмж</em>
+        </h1>
+        <p>Bloom Coffee House-д шинэхэн баглаа, гараар бэлтгэсэн кофе, хайр шингэсэн бэлэг нэг дор уулздаг.</p>
+        <div class="hero-actions">
+            <a class="button primary" href="#flowers">Цэцгийн баглаа үзэх</a>
+            <a class="button ghost" href="#coffee">Кофе сонгох</a></div>
+            <div class="hero-note">Өдөр бүр 09:00–21:00 · Дархан хот</div>
+        </div><div class="hero-art" id="heroArt"></div>
+    </section>
+<div class="promise">
+    <span>✿ Шинэхэн цэцэг</span>
+    <span>☕ Чанартай кофе</span>
+    <span>♡ Сэтгэлтэй хүргэлт</span>
+</div>
+<section class="section" id="flowers">
+    <div class="section-heading"><div>
+        <p class="eyebrow">Bloom-ийн сонголт</p>
+        <h2>Таны сэтгэлийг хэлэх <em>баглаа</em></h2>
+    </div><p>Өнгө, хэмжээ, зориулалтаар нь сонгож, хайртай хүндээ илгээгээрэй.</p>
+</div><div class="toolbar"><div class="tabs" id="flowerTabs">
+    <button class="active" data-flower-filter="all">Бүгд</button>
+    <button data-flower-filter="romance">Хайртдаа</button>
+    <button data-flower-filter="birthday">Төрсөн өдөрт</button>
+    <button data-flower-filter="mom">Ээждээ</button>
+    <button data-flower-filter="mini">Mini баглаа</button>
+    <button data-flower-filter="featured">Онцлох</button>
+</div><label class="sort">Эрэмбэ <select id="flowerSort">
+    <option value="default">Сонгох</option>
+    <option value="low">Үнэ өсөхөөр</option>
+    <option value="high">Үнэ буурахаар</option>
+    <option value="name">Нэрээр</option>
+</select>
+</label>
+<div class="advanced-search"><input id="productSearch" type="search" placeholder="Цэцэг, кофе, бэлгийн багц хайх"><input id="minPrice" type="number" min="0" placeholder="Доод үнэ"><input id="maxPrice" type="number" min="0" placeholder="Дээд үнэ"><button id="clearFilters" type="button">Шүүлтүүр цэвэрлэх</button></div><p class="result-count" id="flowerCount"></p>
+<div class="product-grid" id="flowerGrid"></div>
+</section>
+<section class="story">
+    <div><p class="eyebrow">Нэг аяга, нэг баглаа</p>
+        <h2>Өдөр тутмын мөчийг<br><em>илүү зөөлөн болгоно.</em>
+        </h2><p>Бид цэцэгсийн өнгө, кофены үнэр, хүний сайхан сэтгэлийг нэгэн дулаан орон зайд холбосон.</p>
+        <a class="button dark" href="#about">Bloom-ийн тухай</a>
+    </div><div class="story-art" id="storyArt"></div>
+</section>
+<section class="section coffee-section" id="coffee">
+    <div class="section-heading"><div>
+        <p class="eyebrow">Bloom Coffee Corner</p>
+        <h2>Тайвшрах <em>аяга</em></h2></div>
+        <p>Өглөөг сэргээх халуун кофе эсвэл зуны өдөрт зориулсан хүйтэн ундаанаас сонгоно уу.</p>
+    </div><div class="tabs" id="drinkTabs">
+        <button class="active" data-drink-filter="all">Бүгд</button>
+        <button data-drink-filter="hot">Халуун</button>
+        <button data-drink-filter="cold">Хүйтэн</button>
+        <button data-drink-filter="noncoffee">Кофегүй</button>
+    </div><div class="product-grid drink-grid" id="drinkGrid"></div>
+</section>
+<section class="bundle-section" id="bundles">
+    <div class="section-heading"><div>
+        <p class="eyebrow">Bloom-ийн бэлэг</p>
+        <h2>Сэтгэл шингэсэн <em>багц</em></h2>
+    </div><p>Баглаа, кофе, мэндчилгээний картыг нэгэн гоёмсог бэлэг болгон сонгоорой.</p>
+</div><div class="bundle-grid" id="bundleGrid"></div>
+<button class="button dark builder-launch" id="builderButton">Өөрийн бэлгийн багцыг бүтээх</button>
+</section>
+<section class="section tracking-section" id="delivery">
+    <div class="section-heading"><div>
+        <p class="eyebrow">Сэтгэл догдлон хүлээх мөч</p>
+        <h2>Хүргэлтээ <em>мөшгөөрэй</em></h2>
+    </div>
+    <p>Захиалгын төлөв өөрчлөгдөх бүрд энд шууд шинэчлэгдэнэ.</p>
+</div>
+<div id="tracking"></div></section>
+<section class="section pale" id="orders">
+    <div class="section-heading centered">
+        <div><p class="eyebrow">Таны түүх</p>
+            <h2>Миний <em>захиалга</em></h2>
+        </div></div><div class="lookup-box"><p class="eyebrow">Зочин захиалга хайх</p><p>Энэ нь зөвхөн localStorage-д суурилсан демо хайлт.</p><div><input id="lookupOrderId" placeholder="Захиалгын дугаар"><input id="lookupPhone" placeholder="Утасны дугаар"><button class="button dark" id="lookupButton">Хайх</button></div><p class="form-error" id="lookupError"></p></div><div id="orderList"></div>
+    </section>
+<section class="section pale" id="wishlist">
+    <div class="section-heading centered">
+        <div><p class="eyebrow">Хадгалсан сонголт</p>
+            <h2>Хүслийн <em>жагсаалт</em></h2></div>
+        </div><div class="product-grid" id="wishlistGrid"></div>
+    </section>
+<section class="admin-section hidden" id="admin">
+    <div class="section-heading"><div>
+        <p class="eyebrow">Зөвхөн удирдлагад</p>
+        <h2>Захиалга <em>удирдах</em></h2>
+    </div></div><div class="stats" id="adminStats">
+    </div>
+    <div class="admin-tools">
+        <input id="adminSearch" placeholder="Захиалгын дугаар, нэр хайх">
+        <select id="adminStatusFilter"><option value="all">Бүх төлөв</option>
+            <option value="confirmed">Баталгаажсан</option>
+            <option value="preparing">Бэлтгэж байна</option>
+            <option value="out">Хүргэлтэд гарсан</option>
+            <option value="delivered">Хүргэгдсэн</option>
+        </select></div><div class="admin-management"><button class="button dark" id="toggleTracking">Демо tracking: асаалттай</button><button class="button ghost" id="advanceOrder">Сонгосон захиалгыг ахиулах</button><button class="button ghost" id="addDemoProduct">Демо бүтээгдэхүүн нэмэх</button><button class="button ghost" id="manageAvailability">Бүтээгдэхүүний бэлэн байдлыг удирдах</button><button class="button ghost" id="configureDelivery">Хүргэлтийн тариф тохируулах</button><div id="availabilityList" class="availability-list"></div></div><div class="table-wrap"><table>
+            <thead><tr><th>Захиалгын дугаар</th><th>Үйлчлүүлэгч</th>
+                <th>Утас</th><th>Огноо</th>
+                <th>Нийт дүн</th><th>Төлөв</th>
+                <th>Үйлдэл</th></tr></thead>
+                <tbody id="adminTable"></tbody>
+            </table>
+        </div>
+    </section>
+<section class="about" id="about">
+    <div><p class="eyebrow">Бидний тухай</p>
+        <h2>Бэлэг бүрт <em>сэтгэл</em> бий.</h2>
+    </div>
+    <div>
+        <p>Bloom Coffee House бол цэцэг ба кофег нэгэн зөөлөн орон зайд хослуулсан Дархан хотын жижигхэн булан юм. Бид таны өдөр тутмын баяр, талархал, дурсамж бүрийг илүү үзэсгэлэнтэй болгохыг хүсдэг.
+
+        </p>
+        <p>Баглаа бүрийг шинэхэн цэцгээр анхааралтай бэлтгэж, кофены буланд аяга бүрийг тайван мөчид тохируулан урладаг. Таны илгээх бэлэг дулаан, бодолтой, мартагдашгүй байг.</p>
+        <p class="contact">Дархан хот, Дархан-Уул аймаг · Өдөр бүр 09:00–21:00<br>9987 3899 · hello@bloom.mn</p>
+    </div></section>
+</main>
+<footer>
+    <div class="brand">
+        <span class="brand-mark">✿</span>
+        <span><b>Bloom</b><small>coffee house</small>
+        </span></div><p>Цэцэгсийн гоо үзэсгэлэн, кофены дулаан мэдрэмж.</p>
+        <div><a href="#flowers">Цэцэг</a><a href="#coffee">Кофе</a>
+            <a href="#delivery">Хүргэлт</a>
+            <a href="#about">Бидний тухай</a>
+        </div></footer>
+<div class="overlay" id="overlay">
+
+</div><aside class="drawer" id="cartDrawer">
+    <div class="drawer-head"><div><p class="eyebrow">Таны сонголт</p>
+        <h2>Сагс</h2></div><button class="close" data-close>×</button>
+    </div><div id="cartItems"></div><div class="drawer-total">
+        <span>Нийт</span><strong id="cartTotal">0₮</strong>
+        <button class="button dark full" id="checkoutButton">Захиалга баталгаажуулах</button>
+    </div>
+</aside>
+<div class="modal" id="authModal">
+    <div class="modal-card">
+        <button class="close" data-close>×</button>
+        <p class="eyebrow">Bloom-д тавтай морил</p>
+        <div class="auth-tabs"><button class="active" data-auth-tab="login">Нэвтрэх</button>
+            <button data-auth-tab="register">Бүртгүүлэх</button>
+        </div><form id="loginForm">
+            <label>И-мэйл<input id="loginEmail" type="email" required>
+            </label><label>Нууц үг<input id="loginPassword" type="password" required>
+            </label><p class="form-error" id="loginError"></p>
+            <button class="button dark full">Нэвтрэх</button>
+        </form>
+        <form id="registerForm" class="hidden">
+            <label>Нэр<input id="registerName" required>
+            </label>
+            <label>И-мэйл<input id="registerEmail" type="email" required>
+            </label><label>Нууц үг<input id="registerPassword" type="password" minlength="6" required>
+            </label><label>Нууц үг давтах<input id="registerConfirm" type="password" required></label>
+            <p class="form-error" id="registerError">
+            </p><button class="button dark full">Бүртгэл үүсгэх</button>
+        </form><small class="security-note">Энэ бол демо нэвтрэлт. localStorage дахь энгийн нууц үг бодит хэрэглэгчийн мэдээлэлд аюулгүй биш.</small>
+    </div>
+</div>
+<div class="modal" id="checkoutModal">
+    <div class="modal-card"><button class="close" data-close>×</button>
+        <p class="eyebrow">Хүргэлтийн мэдээлэл</p><h2>Захиалга үүсгэх</h2>
+        <div id="checkoutSummary" class="summary"></div>
+        <form id="checkoutForm">
+            <label>Хүлээн авагчийн нэр<input id="customerName" required></label>
+            <label>Утасны дугаар<input id="customerPhone" inputmode="tel" placeholder="9987 3899" required></label>
+            <label>Хүргэлтийн хаяг<input id="customerAddress" required></label><label>Хүргүүлэх өдөр<input id="deliveryDate" type="date" required></label><label>Хүргүүлэх цагийн сонголт<select id="deliveryTime" required><option value="">Сонгох</option><option>09:00–12:00</option><option>12:00–15:00</option><option>15:00–18:00</option><option>18:00–21:00</option></select></label><label>Хүргэлтийн бүс<select id="deliveryArea"><option value="Төв">Төв бүс · 0₮</option><option value="Ойролцоо">Ойролцоо бүс · 5,000₮</option><option value="Алслагдсан">Алслагдсан бүс · 10,000₮</option></select></label><label class="check-row"><input id="surpriseGift" type="checkbox"> Гэнэтийн бэлэг болгон хүргүүлэх</label>
+            <label>Нэмэлт тэмдэглэл<textarea id="customerNote" rows="3">
+
+            </textarea></label><fieldset><legend>Төлбөрийн хэлбэр</legend>
+                <label>
+                    <input type="radio" name="payment" value="Бэлнээр" checked> Бэлнээр</label>
+                    <label><input type="radio" name="payment" value="QPay"> QPay <small>(демо)</small>
+                    </label>
+                    <label>
+                        <input type="radio" name="payment" value="Картаар"> Картаар <small>(демо)</small>
+                    </label>
+                </fieldset><div class="coupon-row"><input id="couponInput" placeholder="Купон код"><button class="button ghost" type="button" id="applyCoupon">Купон хэрэглэх</button></div><div id="priceBreakdown" class="summary"></div><p class="form-error" id="checkoutError"></p>
+                <button class="button dark full">Захиалга үүсгэх</button>
+            </form>
+        </div>
+    </div>
+<div class="modal" id="builderModal">
+    <div class="modal-card builder-card">
+        <button class="close" data-close>×</button>
+        <p class="eyebrow">Өөрийн бэлгээ урлаарай</p>
+        <h2>Бэлгийн <em>багц бүтээгч</em></h2>
+        <form id="builderForm"><label>Цэцгийн баглаа<select id="builderFlower">
+
+        </select>
+    </label><p class="promo-note" id="builderPromo"></p>
+    <label>Мэндчилгээний загвар<select id="builderCard">
+        <option>Хайр</option><option>Төрсөн өдөр</option>
+        <option>Ээждээ</option><option>Баяр хүргэе</option>
+        <option>Энгийн мэндчилгээ</option>
+    </select>
+    </label>
+        <label>Хүлээн авагчийн нэр (заавал биш)<input id="builderRecipient" placeholder="Жишээ: Ээждээ"></label>
+        <label>Хувийн мэндчилгээ<textarea id="builderMessage" rows="3" placeholder="Таны сэтгэлийн үг...">
+
+        </textarea>
+    </label><fieldset>
+        <legend>Бэлгийн кофе</legend>
+        <div id="builderCoffeeOptions">
+
+        </div></fieldset>
+        <label class="check-row">
+            <input type="checkbox" id="builderWrapping"> Дээд зэрэглэлийн бэлгийн боодол <span>+10,000₮</span>
+        </label><div class="builder-preview" id="builderPreview">
+
+        </div><div class="builder-total" id="builderTotal"></div>
+        <button class="button dark full" type="submit">Багцыг сагсанд нэмэх</button>
+    </form>
+</div>
+</div>
+<div class="modal" id="detailModal"><div class="modal-card detail-card"><button class="close" data-close>×</button><div id="detailVisual" class="detail-visual"></div><div class="eyebrow" id="detailCategory"></div><h2 id="detailName"></h2><p id="detailDescription"></p><strong id="detailPrice" class="detail-price"></strong><p id="detailPromotion" class="promo-note"></p><label>Тоо хэмжээ<input id="detailQuantity" type="number" min="1" max="20" value="1"></label><button class="button dark full" id="detailAdd">Сагсанд нэмэх</button></div></div>
+<div class="modal" id="successModal">
+    <div class="modal-card success-card">
+        <span class="success-icon">✿</span>
+        <p class="eyebrow">Баярлалаа</p>
+        <h2>Захиалга хүлээн авлаа.</h2>
+        <p id="successText"></p>
+        <button class="button dark full" data-close>Хаах</button>
+    </div></div><div class="toast" id="toast" role="status">
+        
+    </div>
+<script src="script.js"></script></body></html>
