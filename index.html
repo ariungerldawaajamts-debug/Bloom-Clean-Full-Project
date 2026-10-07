@@ -14,8 +14,8 @@
 <header class="site-header">
     <a class="brand" href="#home">
         <span class="brand-mark">✿</span>
-        <span><b>Bloom</b><small>coffee house</small></span></a>
-        <button class="menu-toggle" id="menuToggle">☰</button>
+        <span><b>Bloom</b><small>Coffee House</small></span></a>
+        <button class="menu-toggle" id="menuToggle" type="button" aria-label="Цэс нээх" aria-controls="mainNav" aria-expanded="false">☰</button>
         <nav id="mainNav"><a href="#home">Нүүр</a>
             <a href="#flowers">Цэцэг</a><a href="#coffee">Кофе</a>
             <a href="#delivery">Хүргэлт</a><a href="#orders">Миний захиалга</a>
@@ -78,7 +78,7 @@
         <p class="eyebrow">Bloom Coffee Corner</p>
         <h2>Тайвшрах <em>аяга</em></h2></div>
         <p>Өглөөг сэргээх халуун кофе эсвэл зуны өдөрт зориулсан хүйтэн ундаанаас сонгоно уу.</p>
-    </div><div class="tabs" id="drinkTabs">
+    </div><div class="tabs aligned-content" id="drinkTabs">
         <button class="active" data-drink-filter="all">Бүгд</button>
         <button data-drink-filter="hot">Халуун</button>
         <button data-drink-filter="cold">Хүйтэн</button>
@@ -116,17 +116,36 @@
 <section class="admin-section hidden" id="admin">
     <div class="section-heading"><div>
         <p class="eyebrow">Зөвхөн удирдлагад</p>
-        <h2>Захиалга <em>удирдах</em></h2>
-    </div></div><div class="stats" id="adminStats">
+        <h2 id="adminSectionTitle">Захиалга <em>удирдах</em></h2>
+    </div></div>
+    <nav class="admin-tabs aligned-content" aria-label="Админ хэсгүүд">
+        <button class="active" type="button" data-admin-tab="orders">Захиалга</button>
+        <button type="button" data-admin-tab="products">Бүтээгдэхүүн</button>
+        <button type="button" data-admin-tab="bundles">Багц</button>
+        <button type="button" data-admin-tab="delivery">Хүргэлт</button>
+        <button type="button" data-admin-tab="settings">Тохиргоо</button>
+    </nav>
+    <p class="admin-demo-note">Энэ нь frontend demo систем бөгөөд мэдээллийг зөвхөн тухайн төхөөрөмжийн localStorage-д хадгална.</p>
+    <section class="admin-product-panel hidden" id="adminProductPanel">
+        <div class="admin-product-heading"><h3 id="adminProductListTitle">Бүтээгдэхүүний жагсаалт</h3><button class="button dark" id="addProductButton" type="button">Бүтээгдэхүүн нэмэх</button></div>
+        <div class="admin-product-filters">
+            <input id="adminProductSearch" type="search" placeholder="Бүтээгдэхүүн хайх">
+            <select id="adminProductType"><option value="all">Бүх төрөл</option><option value="flower">Цэцэг</option><option value="coffee">Кофе</option><option value="bundle">Бэлгийн багц</option></select>
+            <select id="adminProductAvailability"><option value="all">Бүх төлөв</option><option value="available">Бэлэн</option><option value="unavailable">Бэлэн биш</option><option value="inactive">Идэвхгүй</option></select>
+            <select id="adminProductSort"><option value="name">Нэрээр</option><option value="price-asc">Үнэ өсөхөөр</option><option value="price-desc">Үнэ буурахаар</option></select>
+        </div>
+        <div class="admin-product-list" id="adminProductList"></div>
+    </section>
+    <div class="stats" id="adminStats">
     </div>
-    <div class="admin-tools">
+    <div class="admin-tools" id="adminTools">
         <input id="adminSearch" placeholder="Захиалгын дугаар, нэр хайх">
         <select id="adminStatusFilter"><option value="all">Бүх төлөв</option>
             <option value="confirmed">Баталгаажсан</option>
             <option value="preparing">Бэлтгэж байна</option>
             <option value="out">Хүргэлтэд гарсан</option>
             <option value="delivered">Хүргэгдсэн</option>
-        </select></div><div class="admin-management"><button class="button dark" id="toggleTracking">Демо tracking: асаалттай</button><button class="button ghost" id="advanceOrder">Сонгосон захиалгыг ахиулах</button><button class="button ghost" id="addDemoProduct">Демо бүтээгдэхүүн нэмэх</button><button class="button ghost" id="manageAvailability">Бүтээгдэхүүний бэлэн байдлыг удирдах</button><button class="button ghost" id="configureDelivery">Хүргэлтийн тариф тохируулах</button><div id="availabilityList" class="availability-list"></div></div><div class="table-wrap"><table>
+        </select></div><div class="admin-management" id="adminManagement"><button class="button dark" id="toggleTracking">Демо tracking: асаалттай</button><button class="button ghost" id="advanceOrder">Сонгосон захиалгыг ахиулах</button><button class="button ghost" id="addDemoProduct">Демо бүтээгдэхүүн нэмэх</button><button class="button ghost" id="manageAvailability">Бүтээгдэхүүний бэлэн байдлыг удирдах</button><button class="button ghost" id="configureDelivery">Хүргэлтийн тариф тохируулах</button><div id="availabilityList" class="availability-list"></div></div><div class="table-wrap"><table>
             <thead><tr><th>Захиалгын дугаар</th>
                 <th>Үйлчлүүлэгч</th>
                 <th>Утас</th>
@@ -156,7 +175,7 @@
 <footer>
     <div class="brand">
         <span class="brand-mark">✿</span>
-        <span><b>Bloom</b><small>coffee house</small>
+        <span><b>Bloom</b><small>Coffee House</small>
         </span></div><p>Цэцэгсийн гоо үзэсгэлэн, кофены дулаан мэдрэмж.</p>
         <div><a href="#flowers">Цэцэг</a>
             <a href="#coffee">Кофе</a>
@@ -271,6 +290,47 @@
 </div>
 </div>
 <div class="modal" id="detailModal"><div class="modal-card detail-card"><button class="close" data-close>×</button><div id="detailVisual" class="detail-visual"></div><div class="eyebrow" id="detailCategory"></div><h2 id="detailName"></h2><p id="detailDescription"></p><strong id="detailPrice" class="detail-price"></strong><p id="detailPromotion" class="promo-note"></p><label>Тоо хэмжээ<input id="detailQuantity" type="number" min="1" max="20" value="1"></label><button class="button dark full" id="detailAdd">Сагсанд нэмэх</button></div></div>
+<div class="modal" id="productModal">
+    <div class="modal-card product-editor-card">
+        <button class="close" type="button" data-close aria-label="Хаах">×</button>
+        <p class="eyebrow">Админ · бүтээгдэхүүн</p><h2 id="productFormTitle">Бүтээгдэхүүн нэмэх</h2>
+        <form id="adminProductForm">
+            <label>Төрөл<select id="productType" required><option value="flower">Цэцэг</option><option value="coffee">Кофе</option><option value="bundle">Бэлгийн багц</option></select></label>
+            <label>Бүтээгдэхүүний нэр<input id="productName" required maxlength="80"></label>
+            <label>Тайлбар<textarea id="productDescription" rows="3" maxlength="240" required></textarea></label>
+                <div class="form-columns"><label>Үнэ<input id="productPrice" type="number" min="1" step="1" required></label><label>Ангилал<select id="productCategory" required></select></label></div>
+            <div class="form-columns product-flags"><label class="check-row"><input id="productAvailable" type="checkbox" checked> Бэлэн байгаа</label><label class="check-row"><input id="productFeatured" type="checkbox"> Онцлох</label></div>
+            <div class="product-type-fields" id="flowerFields">
+                <h3>Цэцгийн мэдээлэл</h3>
+                <div class="form-columns"><label>Цэцгийн төрөл<select id="productFlowerKind"><option value="rose">Сарнай</option><option value="peony">Пион</option><option value="tulip">Алтанзул</option><option value="daisy">Цагаан мандарваа</option><option value="mixed">Холимог</option></select></label><label>Баглааны хэмжээ<select id="productFlowerSize"><option>Mini</option><option selected>Medium</option><option>Large</option></select></label></div>
+                <label>Цэцгийн ангилал<select id="productFlowerCategory"><option value="romance">Хайртдаа</option><option value="birthday">Төрсөн өдөрт</option><option value="mom">Ээждээ</option><option value="mini">Бяцхан баглаа</option><option value="featured">Онцлох</option></select></label>
+                <label>Өнгө<select id="productFlowerTone"><option value="0">Ягаан</option><option value="1">Зөөлөн ягаан</option><option value="2">Цайвар тоорын</option><option value="3">Ногоон</option><option value="4">Нил ягаан</option></select></label>
+                <label class="check-row"><input id="productFreeCoffee" type="checkbox"> Үнэгүй кофе авах эрхтэй</label>
+            </div>
+            <div class="product-type-fields hidden" id="coffeeFields">
+                <h3>Кофены мэдээлэл</h3>
+                <label>Ундааны нэр<input id="productDrinkName" maxlength="60"></label>
+                <div class="form-columns"><label>Халуун / Хүйтэн<select id="productTemperature"><option value="hot">Халуун</option><option value="cold">Хүйтэн</option></select></label><label>Хэмжээ<select id="productDrinkSize"><option>Small</option><option selected>Medium</option><option>Large</option></select></label></div>
+                <label class="check-row"><input id="productHasCoffee" type="checkbox" checked> Кофетой</label>
+            </div>
+            <div class="product-type-fields hidden" id="bundleFields">
+                <h3>Бэлгийн багцын мэдээлэл</h3>
+                <label>Багцын нэр<input id="productBundleName" maxlength="80"></label>
+                <label>Багцын тайлбар<textarea id="productBundleDescription" rows="2" maxlength="240"></textarea></label>
+                <label>Цэцэг сонгох<select id="productBundleFlower"></select></label>
+                <label>Кофе сонгох<select id="productBundleCoffee" multiple size="4"></select></label>
+                <div class="form-columns"><label class="check-row"><input id="productBundleCard" type="checkbox" checked> Мэндчилгээний карттай</label><label class="check-row"><input id="productBundleWrapping" type="checkbox"> Бэлгийн боодолтой</label></div>
+                <label>Багцын үнэ<input id="productBundlePrice" type="number" min="1" step="1"></label>
+            </div>
+            <div class="product-image-editor">
+                <div class="product-image-preview" id="productImagePreview" aria-label="Бүтээгдэхүүний зурагны урьдчилсан харагдац"></div>
+                <div><label>Бүтээгдэхүүний зураг<input id="productImageInput" type="file" accept="image/png,image/jpeg,image/webp"></label><p id="productImageError" class="form-error" role="alert"></p><button id="changeProductImage" class="button ghost" type="button">Зураг солих</button><button id="removeProductImage" class="button ghost" type="button">Зураг арилгах</button></div>
+            </div>
+            <div class="admin-product-preview"><strong>Бүтээгдэхүүний урьдчилсан харагдац</strong><div id="productLivePreview"></div></div>
+            <button class="button dark full" type="submit">Хадгалах</button>
+        </form>
+    </div>
+</div>
 <div class="modal" id="successModal">
     <div class="modal-card success-card">
         <span class="success-icon">✿</span>
