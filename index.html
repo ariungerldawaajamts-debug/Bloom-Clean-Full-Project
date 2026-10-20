@@ -6,6 +6,7 @@
 <meta name="description" content="Bloom Coffee House - цэцэг ба кофе">
 <title>Bloom Coffee House | Цэцэг ба кофе</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
 <div class="announcement">Шинэхэн цэцэг, дулаахан кофе · Дархан хотод өдөр бүр хүргэлттэй
@@ -18,11 +19,12 @@
         <button class="menu-toggle" id="menuToggle" type="button" aria-label="Цэс нээх" aria-controls="mainNav" aria-expanded="false">☰</button>
         <nav id="mainNav"><a href="#home">Нүүр</a>
             <a href="#flowers">Цэцэг</a><a href="#coffee">Кофе</a>
-            <a href="#delivery">Хүргэлт</a><a href="#orders">Миний захиалга</a>
-            <a href="#wishlist">Хүслийн жагсаалт</a>
             <a href="#about">Бидний тухай</a>
         </nav><div class="header-actions">
             <button class="text-button" id="authButton">Нэвтрэх</button>
+            <a class="text-button hidden" id="userOrdersLink" href="#account/orders">Миний захиалга</a>
+            <a class="text-button hidden" id="userWishlistLink" href="#account/wishlist">Хүслийн жагсаалт</a>
+            <a class="text-button hidden" id="adminDashboardButton" href="#admin/orders">Админ удирдлага</a>
             <button class="round-button" id="wishlistButton">♡<i id="wishlistCount">0</i>
             </button><button class="cart-button" id="cartButton">Сагс <i id="cartCount">0</i>
             </button></div></header>
@@ -93,6 +95,19 @@
 </div><div class="bundle-grid" id="bundleGrid"></div>
 <button class="button dark builder-launch" id="builderButton">Өөрийн бэлгийн багцыг бүтээх</button>
 </section>
+<section class="user-dashboard hidden" id="userDashboard" aria-label="Хэрэглэгчийн dashboard">
+    <div class="dashboard-heading">
+        <p class="eyebrow">Таны Bloom бүртгэл</p>
+        <h1>Хэрэглэгчийн <em>dashboard</em></h1>
+        <p id="userDashboardGreeting"></p>
+    </div>
+    <nav class="user-dashboard-tabs" aria-label="Хэрэглэгчийн хэсгүүд">
+        <a href="#account/orders" data-user-tab="orders">Миний захиалга</a>
+        <a href="#account/delivery" data-user-tab="delivery">Хүргэлтийн төлөв</a>
+        <a href="#account/wishlist" data-user-tab="wishlist">Хүслийн жагсаалт</a>
+        <a href="#account/profile" data-user-tab="profile">Миний мэдээлэл</a>
+        <button type="button" id="userLogoutButton">Гарах</button>
+    </nav>
 <section class="section tracking-section" id="delivery">
     <div class="section-heading"><div>
         <p class="eyebrow">Сэтгэл догдлон хүлээх мөч</p>
@@ -105,7 +120,7 @@
     <div class="section-heading centered">
         <div><p class="eyebrow">Таны түүх</p>
             <h2>Миний <em>захиалга</em></h2>
-        </div></div><div class="lookup-box"><p class="eyebrow">Зочин захиалга хайх</p><p>Энэ нь зөвхөн localStorage-д суурилсан демо хайлт.</p><div><input id="lookupOrderId" placeholder="Захиалгын дугаар"><input id="lookupPhone" placeholder="Утасны дугаар"><button class="button dark" id="lookupButton">Хайх</button></div><p class="form-error" id="lookupError"></p></div><div id="orderList"></div>
+        </div></div><div class="lookup-box"><p class="eyebrow">Өөрийн захиалга хайх</p><p>Хайлт зөвхөн таны энэ browser-ийн demo бүртгэлтэй холбогдсон захиалгыг шалгана.</p><div><input id="lookupOrderId" placeholder="Захиалгын дугаар"><input id="lookupPhone" placeholder="Утасны дугаар"><button class="button dark" id="lookupButton">Хайх</button></div><p class="form-error" id="lookupError"></p></div><div id="orderList"></div>
     </section>
 <section class="section pale" id="wishlist">
     <div class="section-heading centered">
@@ -113,6 +128,14 @@
             <h2>Хүслийн <em>жагсаалт</em></h2></div>
         </div><div class="product-grid" id="wishlistGrid"></div>
     </section>
+<section class="section pale profile-section hidden" id="profile">
+    <div class="section-heading centered"><div>
+        <p class="eyebrow">Хувийн мэдээлэл</p>
+        <h2>Миний <em>мэдээлэл</em></h2>
+    </div></div>
+    <div class="profile-card"><p><span>Нэр</span><strong id="profileName"></strong></p><p><span>И-мэйл</span><strong id="profileEmail"></strong></p><small>Энэ demo бүртгэлийн мэдээлэл зөвхөн энэ browser-ийн localStorage-д хадгалагдана.</small></div>
+</section>
+</section>
 <section class="admin-section hidden" id="admin">
     <div class="section-heading"><div>
         <p class="eyebrow">Зөвхөн удирдлагад</p>
@@ -157,6 +180,13 @@
                 <tbody id="adminTable"></tbody>
             </table>
         </div>
+        <div class="admin-delivery-panel hidden" id="adminDeliveryPanel">
+                <div class="admin-product-heading"><h3>Хүргэлтийн захиалгууд</h3><p>Хүргэлтийн мэдээлэл нь холбогдох захиалгатайгаа хамт хадгалагдана.</p></div>
+                <div class="table-wrap"><table>
+                    <thead><tr><th>Захиалга</th><th>Хүлээн авагч</th><th>Утас</th><th>Хаяг</th><th>Хүргүүлэх</th><th>Төлбөр</th><th>Хүргэлтийн төлөв</th></tr></thead>
+                    <tbody id="adminDeliveryTable"></tbody>
+                </table></div>
+        </div>
     </section>
 <section class="about" id="about">
     <div>
@@ -179,19 +209,19 @@
         </span></div><p>Цэцэгсийн гоо үзэсгэлэн, кофены дулаан мэдрэмж.</p>
         <div><a href="#flowers">Цэцэг</a>
             <a href="#coffee">Кофе</a>
-            <a href="#delivery">Хүргэлт</a>
             <a href="#about">Бидний тухай</a>
         </div>
     </footer>
 <div class="overlay" id="overlay">
 
-</div><aside class="drawer" id="cartDrawer">
+</div><aside class="drawer" id="cartDrawer" aria-label="Сагс">
     <div class="drawer-head"><div>
         <p class="eyebrow">Таны сонголт</p>
         <h2>Сагс</h2></div><button class="close" data-close>×</button>
     </div><div id="cartItems"></div><div class="drawer-total">
-        <span>Нийт</span><strong id="cartTotal">0₮</strong>
-        <button class="button dark full" id="checkoutButton">Захиалга баталгаажуулах</button>
+        <div id="cartBreakdown" class="cart-breakdown" aria-live="polite"></div>
+        <span>Нийт төлөх дүн</span><strong id="cartTotal">0₮</strong>
+        <button class="button dark full" id="checkoutButton" type="button">Захиалга баталгаажуулах</button>
     </div>
 </aside>
 <div class="modal" id="authModal">
@@ -224,37 +254,56 @@
     </div>
 </div>
 <div class="modal" id="checkoutModal">
-    <div class="modal-card">
-        <button class="close" data-close>×</button>
-        <p class="eyebrow">Хүргэлтийн мэдээлэл</p>
-        <h2>Захиалга үүсгэх</h2>
-        <div id="checkoutSummary" class="summary"></div>
-        <form id="checkoutForm">
-            <label>Хүлээн авагчийн нэр<input id="customerName" required></label>
-            <label>Утасны дугаар<input id="customerPhone" inputmode="tel" placeholder="9987 3899" required></label>
-            <label>Хүргэлтийн хаяг<input id="customerAddress" required></label><label>Хүргүүлэх өдөр<input id="deliveryDate" type="date" required></label><label>Хүргүүлэх цагийн сонголт<select id="deliveryTime" required><option value="">Сонгох</option><option>09:00–12:00</option><option>12:00–15:00</option><option>15:00–18:00</option><option>18:00–21:00</option></select></label><label>Хүргэлтийн бүс<select id="deliveryArea"><option value="Төв">Төвийн бүс · 0₮</option><option value="Ойролцоо">Ойролцоо бүс · 5,000₮</option><option value="Алслагдсан">Алслагдсан бүс · 10,000₮</option></select></label>
-            <label class="check-row"><input id="surpriseGift" type="checkbox"> Гэнэтийн бэлэг болгон хүргүүлэх</label>
-            <label>Нэмэлт тэмдэглэл<textarea id="customerNote" rows="3">
-
-            </textarea></label><fieldset><legend>Төлбөрийн хэлбэр</legend>
-                <label>
-                    <input type="radio" name="payment" value="Бэлнээр" checked> Бэлнээр</label>
-                    <label><input type="radio" name="payment" value="QPay"> QPay <small>(демо)
-                    </small>
-                    </label>
-                    <label>
-                        <input type="radio" name="payment" value="Картаар"> Картаар <small>(демо)</small>
-                    </label>
-                </fieldset><div class="coupon-row">
-                    <input id="couponInput" placeholder="Купон код">
-                    <button class="button ghost" type="button" id="applyCoupon">Купон хэрэглэх</button>
-                </div><div id="priceBreakdown" class="summary"></div>
-                <p class="form-error" id="checkoutError">
-                </p>
-                <button class="button dark full">Захиалга үүсгэх</button>
+    <div class="checkout-layout">
+        <section class="modal-card checkout-form-card" aria-labelledby="checkoutTitle">
+            <button class="close" type="button" data-close aria-label="Checkout хаах">×</button>
+            <p class="eyebrow">Bloom · Захиалга</p>
+            <h2 id="checkoutTitle">Захиалга баталгаажуулах</h2>
+            <form id="checkoutForm">
+                <section class="checkout-group" aria-labelledby="deliveryHeading">
+                    <h3 id="deliveryHeading">Хүргэлтийн мэдээлэл</h3>
+                    <div class="checkout-fields">
+                        <label>Хүлээн авагчийн нэр<input id="customerName" autocomplete="name" required></label>
+                        <label>Утасны дугаар<input id="customerPhone" inputmode="tel" autocomplete="tel" placeholder="9987 3899" required></label>
+                        <label class="field-wide">Хүргэлтийн хаяг<input id="customerAddress" autocomplete="street-address" required></label>
+                        <label>Хүргүүлэх өдөр<input id="deliveryDate" type="date" required></label>
+                        <label>Хүргүүлэх цаг<select id="deliveryTime" required><option value="">Сонгох</option><option>09:00–12:00</option><option>12:00–15:00</option><option>15:00–18:00</option><option>18:00–21:00</option></select></label>
+                        <label class="field-wide">Хүргэлтийн бүс<select id="deliveryArea"><option value="Төв">Төвийн бүс · 0₮</option><option value="Ойролцоо">Ойролцоо бүс · 5,000₮</option><option value="Алслагдсан">Алслагдсан бүс · 10,000₮</option></select></label>
+                    </div>
+                </section>
+                <section class="checkout-group" aria-labelledby="extraHeading">
+                    <h3 id="extraHeading">Нэмэлт мэдээлэл</h3>
+                    <label class="check-row"><input id="surpriseGift" type="checkbox"> Гэнэтийн бэлэг болгон хүргүүлэх</label>
+                    <label class="field-wide">Нэмэлт тэмдэглэл<textarea id="customerNote" rows="3"></textarea></label>
+                </section>
+                <fieldset class="checkout-group payment-group">
+                    <legend>Төлбөр</legend>
+                    <div class="payment-options">
+                        <label><input type="radio" name="payment" value="Бэлнээр" checked> Бэлнээр</label>
+                        <label><input type="radio" name="payment" value="QPay"> QPay <small>(демо)</small></label>
+                        <label><input type="radio" name="payment" value="Картаар"> Картаар <small>(демо)</small></label>
+                    </div>
+                </fieldset>
+                <section class="checkout-group coupon-group" aria-labelledby="couponHeading">
+                    <h3 id="couponHeading">Купон</h3>
+                    <div class="coupon-row">
+                        <label class="visually-hidden" for="couponInput">Купон код</label>
+                        <input id="couponInput" placeholder="Купон код" autocomplete="off">
+                        <button class="button ghost" type="button" id="applyCoupon">Купон хэрэглэх</button>
+                    </div>
+                </section>
+                <p class="form-error checkout-error" id="checkoutError" role="alert"></p>
             </form>
-        </div>
+            <button class="button dark full checkout-submit" type="submit" form="checkoutForm">Захиалга баталгаажуулах</button>
+        </section>
+        <aside class="checkout-order-card" aria-labelledby="checkoutOrderHeading">
+            <p class="eyebrow">Таны сонголт</p>
+            <h2 id="checkoutOrderHeading">Захиалгын тойм</h2>
+            <div id="checkoutSummary" class="checkout-summary"></div>
+            <div id="priceBreakdown" class="summary checkout-breakdown" aria-live="polite"></div>
+        </aside>
     </div>
+</div>
 <div class="modal" id="builderModal">
     <div class="modal-card builder-card">
         <button class="close" data-close>×</button>
@@ -341,4 +390,5 @@
     </div></div><div class="toast" id="toast" role="status">
         
     </div>
-<script src="script.js"></script></body></html>
+<script src="script.js"></script>
+<script src="dashboard.js"></script></body></html>
