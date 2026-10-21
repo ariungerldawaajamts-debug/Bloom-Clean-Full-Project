@@ -16,8 +16,7 @@ body[data-view="admin"] #cartButton,
 body[data-view="admin"] #cartDrawer,
 body[data-view="admin"] #overlay,
 body[data-view="admin"] #userOrdersLink,
-body[data-view="admin"] #userWishlistLink,
-body[data-view="user"] #adminDashboardButton {
+body[data-view="admin"] #userHeaderActions {
   display: none !important;
 }
 body[data-view="admin"] footer {
@@ -133,6 +132,10 @@ body[data-view="admin"] footer {
 .admin-management .availability-list {
   flex-basis: 100%;
 }
+.admin-management > .profile-section {
+  flex-basis: 100%;
+  padding: 20px 0;
+}
 .admin-delivery-panel .admin-product-heading {
   align-items: flex-end;
   flex-wrap: wrap;
@@ -148,7 +151,7 @@ body[data-view="admin"] footer {
 }
 .admin-section table {
   width: 100%;
-  min-width: 760px;
+  min-width: 900px;
 }
 .admin-delivery-panel table {
   min-width: 1050px;
@@ -965,10 +968,6 @@ body.bloom-overlay-open .site-header {
     align-items: center;
     justify-content: center;
   }
-  .site-header #userOrdersLink,
-  .site-header #userWishlistLink {
-    display: none !important;
-  }
   .site-header #mainNav {
     position: absolute;
     top: 100%;
@@ -1118,6 +1117,148 @@ body.bloom-overlay-open .site-header {
   gap: 8px;
   padding-top: 12px;
 }
+.admin-product-filters > .custom-select {
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+@media (min-width: 900px) {
+  body[data-view="admin"] .site-header {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: clamp(8px, 1vw, 16px);
+    padding-inline: clamp(16px, 2.5vw, 36px);
+  }
+  body[data-view="admin"] .site-header .brand {
+    flex: 0 0 auto;
+  }
+  body[data-view="admin"] .site-header .header-tabs:not(:empty) {
+    display: flex;
+    flex: 0 1 auto;
+    order: 1;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  body[data-view="admin"] .site-header .header-tabs > .admin-tabs {
+    width: auto;
+    min-width: 0;
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+  body[data-view="admin"] .site-header .header-tabs button {
+    min-height: 38px;
+    padding-inline: clamp(6px, 0.8vw, 11px);
+    font-size: clamp(11px, 1vw, 13px);
+  }
+  body[data-view="admin"] .site-header .header-actions {
+    flex: 0 0 auto;
+    order: 2;
+    margin-left: auto;
+    flex-wrap: nowrap;
+  }
+  body[data-view="admin"] .site-header .header-actions .header-btn {
+    max-width: none;
+    min-width: max-content;
+    padding-inline: clamp(7px, 0.9vw, 12px);
+    font-size: clamp(11px, 1vw, 13px);
+  }
+}
+
+@media (max-width: 900px) {
+  body[data-view="admin"] .site-header {
+    position: sticky;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    min-height: 68px;
+    padding: 8px 16px;
+  }
+  body[data-view="admin"] .site-header .brand {
+    flex: 0 1 auto;
+  }
+  body[data-view="admin"] .site-header #menuToggle {
+    display: inline-flex;
+    flex: 0 0 40px;
+    align-items: center;
+    justify-content: center;
+    order: 2;
+    width: 40px;
+    height: 40px;
+    margin: 0;
+  }
+  body[data-view="admin"] .site-header .mobile-search-button {
+    display: none;
+  }
+  body[data-view="admin"] .site-header .header-tabs:not(:empty) {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 25;
+    display: none;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    padding: 10px 16px 14px;
+    border-bottom: 1px solid var(--line);
+    background: var(--paper);
+    box-shadow: 0 12px 24px #5d26381c;
+  }
+  body[data-view="admin"] .site-header .header-tabs.open {
+    display: flex;
+  }
+  body[data-view="admin"] .site-header .header-tabs > .admin-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 6px;
+  }
+  body[data-view="admin"] .site-header .header-tabs button {
+    width: 100%;
+    min-width: 0;
+    white-space: normal;
+  }
+  body[data-view="admin"] .site-header .header-actions {
+    display: flex;
+    flex: 0 0 auto;
+    order: 3;
+    width: auto;
+    margin-left: auto;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  body[data-view="admin"] .site-header .header-actions .header-btn {
+    max-width: none;
+    min-width: max-content;
+    overflow: visible;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 420px) {
+  body[data-view="admin"] .site-header {
+    gap: 5px;
+    padding-inline: 10px;
+  }
+  body[data-view="admin"] .site-header .brand-mark {
+    font-size: 27px;
+  }
+  body[data-view="admin"] .site-header .brand b {
+    font-size: 23px;
+  }
+  body[data-view="admin"] .site-header .header-actions .header-btn {
+    padding-inline: 7px;
+    font-size: 11px;
+  }
+}
 .profile-edit-error {
   margin: 0;
 }
@@ -1136,8 +1277,141 @@ body.bloom-overlay-open .site-header {
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .site-header #userOrdersLink,
-  .site-header #userWishlistLink {
+}
+
+.site-header #mainNav {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-left: 32px;
+  gap: 20px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+body:not([data-view="admin"]) .site-header {
+  gap: 0;
+}
+.site-header #mainNav .header-actions {
+  flex: 0 0 auto;
+  align-items: center;
+  flex-wrap: nowrap;
+  margin-left: auto;
+  gap: 12px;
+  white-space: nowrap;
+}
+.site-header .brand-logo {
+  display: block;
+  width: auto;
+  height: 56px;
+  object-fit: contain;
+}
+.site-header .brand {
+  flex: 0 0 auto;
+  margin-right: 0;
+}
+.site-header .header-actions .round-button,
+.site-header .header-actions .cart-button {
+  position: relative;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+.site-header .header-actions .round-button i,
+.site-header .header-actions .cart-button i {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+}
+.site-header .header-actions #userOrdersLink {
+  flex: 0 1 auto;
+  min-width: max-content;
+  white-space: nowrap;
+}
+.site-header > #authButton {
+  flex: 0 0 auto;
+  margin-left: 16px;
+}
+.user-header-logout {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 899.98px) {
+  body:not([data-view="admin"]) .site-header {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    grid-template-areas: "menu brand auth";
+    gap: 10px;
+  }
+  body:not([data-view="admin"]) .site-header .brand {
+    grid-area: brand;
+    justify-self: center;
+    min-width: 0;
+  }
+  body:not([data-view="admin"]) .site-header #menuToggle {
+    grid-area: menu;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
+  body:not([data-view="admin"]) .site-header > #authButton {
+    grid-area: auth;
+    margin: 0;
+    white-space: nowrap;
+  }
+  body:not([data-view="admin"]) .site-header #mainNav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 25;
+    display: none;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 8px 16px 14px;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 4px;
+    border-bottom: 1px solid var(--line);
+    background: var(--paper);
+    box-shadow: 0 12px 24px #5d26381c;
+    gap: 4px;
+    white-space: normal;
+    overflow-x: hidden;
+  }
+  body:not([data-view="admin"]) .site-header #mainNav.open {
+    display: flex;
+  }
+  body:not([data-view="admin"]) .site-header #mainNav > a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  body:not([data-view="admin"]) .site-header #mainNav .header-actions {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 6px 0 0;
+    gap: 12px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  body:not([data-view="admin"]) .site-header #mainNav #userOrdersLink {
+    border: 0;
+    background: transparent;
+    padding-inline: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  body:not([data-view="admin"]) .site-header {
+    grid-template-areas: "menu brand search";
+  }
+  body:not([data-view="admin"]) .site-header > #authButton {
     display: none !important;
+  }
+  body:not([data-view="admin"]) .site-header .brand-logo {
+    height: 42px;
   }
 }

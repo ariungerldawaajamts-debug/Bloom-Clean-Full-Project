@@ -22,9 +22,14 @@
         ☰
       </button>
       <a class="brand" href="#home">
-        <span class="brand-mark">✿</span>
-        <span><b>Bloom</b><small>Coffee House</small></span></a
-      >
+        <img
+          class="brand-logo"
+          src="assets/logo-header@1x.png"
+          srcset="assets/logo-header@1x.png 1x, assets/logo-header.png 2x"
+          alt="Bloom Coffee House"
+          height="56"
+        />
+      </a>
       <button
         class="mobile-search-button"
         id="mobileSearchButton"
@@ -43,21 +48,32 @@
         <a class="mobile-only-nav" href="#wishlist"
           >Хүслийн жагсаалт <i id="mobileWishlistCount">0</i></a
         >
+        <div class="header-actions hidden" id="userHeaderActions">
+          <a class="text-button header-btn" id="userOrdersLink" href="#account/orders"
+            >Миний захиалга</a
+          >
+          <button
+            class="round-button"
+            id="wishlistButton"
+            type="button"
+            aria-label="Хүслийн жагсаалт"
+            title="Хүслийн жагсаалт"
+          >
+            ♡<i id="wishlistCount">0</i>
+          </button>
+          <button class="cart-button" id="cartButton" type="button">
+            Сагс <i id="cartCount">0</i>
+          </button>
+          <button
+            class="text-button header-btn user-header-logout hidden"
+            id="userHeaderLogoutButton"
+            type="button"
+          >
+            Гарах
+          </button>
+        </div>
       </nav>
-      <div class="header-actions">
-        <button class="text-button header-btn" id="authButton">Нэвтрэх</button>
-        <a class="text-button header-btn hidden" id="userOrdersLink" href="#account/orders"
-          >Миний захиалга</a
-        >
-        <a class="text-button header-btn hidden" id="userWishlistLink" href="#account/wishlist"
-          >Хүслийн жагсаалт</a
-        >
-        <a class="text-button header-btn hidden" id="adminDashboardButton" href="#admin/orders"
-          >Админ удирдлага</a
-        >
-        <button class="round-button" id="wishlistButton">♡<i id="wishlistCount">0</i></button
-        ><button class="cart-button" id="cartButton">Сагс <i id="cartCount">0</i></button>
-      </div>
+      <button class="text-button header-btn" id="authButton">Нэвтрэх</button>
       <nav id="headerAdminTabs" class="header-tabs" aria-label="Админ хэсгүүд"></nav>
     </header>
     <main id="home">
@@ -261,7 +277,6 @@
           <button class="header-btn" type="button" data-admin-tab="bundles">Багц</button>
           <button class="header-btn" type="button" data-admin-tab="delivery">Хүргэлт</button>
           <button class="header-btn" type="button" data-admin-tab="about">Бидний тухай</button>
-          <button class="header-btn" type="button" data-admin-tab="profile">Миний мэдээлэл</button>
           <button class="header-btn" type="button" data-admin-tab="settings">Тохиргоо</button>
         </nav>
         <p class="admin-demo-note">
@@ -326,7 +341,8 @@
                 <th>Утас</th>
                 <th>Огноо</th>
                 <th>Нийт дүн</th>
-                <th>Төлөв</th>
+                <th>Төлбөрийн төлөв</th>
+                <th>Захиалгын төлөв</th>
                 <th>Үйлдэл</th>
               </tr>
             </thead>
@@ -640,6 +656,31 @@
                   <small>(демо)</small></label
                 >
               </div>
+              <section
+                id="qpayPaymentPanel"
+                class="qpay-payment-panel hidden"
+                aria-labelledby="qpayHeading"
+                aria-live="polite"
+              >
+                <div class="qpay-demo-label">ДЕМО · Жинхэнэ төлбөр хийгдэхгүй</div>
+                <h3 id="qpayHeading">QPay демо QR</h3>
+                <div class="qpay-qr-shell" id="qpayQrShell">
+                  <div id="qpayQr" role="img" aria-label="Демо QPay QR код"></div>
+                  <div class="qpay-expired-overlay hidden" id="qpayExpiredOverlay">
+                    Хугацаа дууссан
+                  </div>
+                </div>
+                <p>Нийт дүн: <strong id="qpayAmount">0₮</strong></p>
+                <p>Захиалгын дугаар: <strong id="qpayOrderId"></strong></p>
+                <p>QR хүчинтэй хугацаа: <strong id="qpayCountdown">05:00</strong></p>
+                <p class="form-error hidden" id="qpayError" role="alert"></p>
+                <button class="button dark" id="qpayPaidButton" type="button">
+                  Төлбөр төлсөн
+                </button>
+                <button class="button ghost hidden" id="qpayRegenerateButton" type="button">
+                  Дахин үүсгэх
+                </button>
+              </section>
             </fieldset>
             <section class="checkout-group coupon-group" aria-labelledby="couponHeading">
               <h3 id="couponHeading">Купон</h3>
@@ -651,7 +692,12 @@
             </section>
             <p class="form-error checkout-error" id="checkoutError" role="alert"></p>
           </form>
-          <button class="button dark full checkout-submit" type="submit" form="checkoutForm">
+          <button
+            class="button dark full checkout-submit"
+            id="checkoutSubmitButton"
+            type="submit"
+            form="checkoutForm"
+          >
             Захиалга баталгаажуулах
           </button>
         </section>
@@ -872,6 +918,7 @@
       </div>
     </div>
     <div class="toast" id="toast" role="status"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="script.js"></script>
     <script src="dashboard.js"></script>
     <script src="password-recovery.js"></script>

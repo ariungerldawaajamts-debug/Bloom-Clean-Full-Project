@@ -1,0 +1,209 @@
+    <div class="modal" id="builderModal">
+      <div class="modal-card builder-card">
+        <button class="close" data-close>×</button>
+        <p class="eyebrow">Өөрийн бэлгээ урлаарай</p>
+        <h2>Бэлгийн <em>багц бүтээгч</em></h2>
+        <form id="builderForm">
+          <label>Цэцгийн баглаа<select id="builderFlower"></select> </label>
+          <p class="promo-note" id="builderPromo"></p>
+          <label
+            >Мэндчилгээний загвар<select id="builderCard">
+              <option>Хайр</option>
+              <option>Төрсөн өдөр</option>
+              <option>Ээждээ</option>
+              <option>Баяр хүргэе</option>
+              <option>Энгийн мэндчилгээ</option>
+            </select>
+          </label>
+          <label
+            >Хүлээн авагчийн нэр (заавал биш)<input
+              id="builderRecipient"
+              placeholder="Жишээ: Ээждээ"
+            />
+          </label>
+          <label
+            >Хувийн мэндчилгээ<textarea
+              id="builderMessage"
+              rows="3"
+              placeholder="Таны сэтгэлийн үг..."
+            >
+            </textarea>
+          </label>
+          <fieldset>
+            <legend>Бэлгийн кофе</legend>
+            <div id="builderCoffeeOptions"></div>
+          </fieldset>
+          <label class="check-row">
+            <input type="checkbox" id="builderWrapping" /> Дээд зэрэглэлийн бэлгийн боодол
+            <span>+10,000₮</span>
+          </label>
+          <div class="builder-preview" id="builderPreview"></div>
+          <div class="builder-total" id="builderTotal"></div>
+          <button class="button dark full" type="submit">Багцыг сагсанд нэмэх</button>
+        </form>
+      </div>
+    </div>
+    <div class="modal" id="detailModal">
+      <div class="modal-card detail-card">
+        <button class="close" data-close>×</button>
+        <div id="detailVisual" class="detail-visual"></div>
+        <div class="eyebrow" id="detailCategory"></div>
+        <h2 id="detailName"></h2>
+        <p id="detailDescription"></p>
+        <strong id="detailPrice" class="detail-price"></strong>
+        <p id="detailPromotion" class="promo-note"></p>
+        <label
+          >Тоо хэмжээ<input id="detailQuantity" type="number" min="1" max="20" value="1" /></label
+        ><button class="button dark full" id="detailAdd">Сагсанд нэмэх</button>
+      </div>
+    </div>
+    <div class="modal" id="productModal">
+      <div class="modal-card product-editor-card">
+        <button class="close" type="button" data-close aria-label="Хаах">×</button>
+        <p class="eyebrow">Админ · бүтээгдэхүүн</p>
+        <h2 id="productFormTitle">Бүтээгдэхүүн нэмэх</h2>
+        <form id="adminProductForm">
+          <label
+            >Төрөл<select id="productType" required>
+              <option value="flower">Цэцэг</option>
+              <option value="coffee">Кофе</option>
+              <option value="bundle">Бэлгийн багц</option>
+            </select></label
+          >
+          <label>Бүтээгдэхүүний нэр<input id="productName" required maxlength="80" /></label>
+          <label
+            >Тайлбар<textarea id="productDescription" rows="3" maxlength="240" required></textarea>
+          </label>
+          <div class="form-columns">
+            <label>Үнэ<input id="productPrice" type="number" min="1" step="1" required /></label
+            ><label>Ангилал<select id="productCategory" required></select></label>
+          </div>
+          <div class="form-columns product-flags">
+            <label class="check-row"
+              ><input id="productAvailable" type="checkbox" checked /> Бэлэн байгаа</label
+            ><label class="check-row"><input id="productFeatured" type="checkbox" /> Онцлох</label>
+          </div>
+          <div class="product-type-fields" id="flowerFields">
+            <h3>Цэцгийн мэдээлэл</h3>
+            <div class="form-columns">
+              <label
+                >Цэцгийн төрөл<select id="productFlowerKind">
+                  <option value="rose">Сарнай</option>
+                  <option value="peony">Пион</option>
+                  <option value="tulip">Алтанзул</option>
+                  <option value="daisy">Цагаан мандарваа</option>
+                  <option value="mixed">Холимог</option>
+                </select></label
+              ><label
+                >Баглааны хэмжээ<select id="productFlowerSize">
+                  <option>Mini</option>
+                  <option selected>Medium</option>
+                  <option>Large</option>
+                </select></label
+              >
+            </div>
+            <label
+              >Цэцгийн ангилал<select id="productFlowerCategory">
+                <option value="romance">Хайртдаа</option>
+                <option value="birthday">Төрсөн өдөрт</option>
+                <option value="mom">Ээждээ</option>
+                <option value="mini">Бяцхан баглаа</option>
+                <option value="featured">Онцлох</option>
+              </select></label
+            >
+            <label
+              >Өнгө<select id="productFlowerTone">
+                <option value="0">Ягаан</option>
+                <option value="1">Зөөлөн ягаан</option>
+                <option value="2">Цайвар тоорын</option>
+                <option value="3">Ногоон</option>
+                <option value="4">Нил ягаан</option>
+              </select></label
+            >
+            <label class="check-row"
+              ><input id="productFreeCoffee" type="checkbox" /> Үнэгүй кофе авах эрхтэй</label
+            >
+          </div>
+          <div class="product-type-fields hidden" id="coffeeFields">
+            <h3>Кофены мэдээлэл</h3>
+            <label>Ундааны нэр<input id="productDrinkName" maxlength="60" /></label>
+            <div class="form-columns">
+              <label
+                >Халуун / Хүйтэн<select id="productTemperature">
+                  <option value="hot">Халуун</option>
+                  <option value="cold">Хүйтэн</option>
+                </select></label
+              ><label
+                >Хэмжээ<select id="productDrinkSize">
+                  <option>Small</option>
+                  <option selected>Medium</option>
+                  <option>Large</option>
+                </select></label
+              >
+            </div>
+            <label class="check-row"
+              ><input id="productHasCoffee" type="checkbox" checked /> Кофетой</label
+            >
+          </div>
+          <div class="product-type-fields hidden" id="bundleFields">
+            <h3>Бэлгийн багцын мэдээлэл</h3>
+            <label>Багцын нэр<input id="productBundleName" maxlength="80" /></label>
+            <label
+              >Багцын тайлбар<textarea
+                id="productBundleDescription"
+                rows="2"
+                maxlength="240"
+              ></textarea>
+            </label>
+            <label>Цэцэг сонгох<select id="productBundleFlower"></select></label>
+            <label>Кофе сонгох<select id="productBundleCoffee" multiple size="4"></select></label>
+            <div class="form-columns">
+              <label class="check-row"
+                ><input id="productBundleCard" type="checkbox" checked /> Мэндчилгээний
+                карттай</label
+              ><label class="check-row"
+                ><input id="productBundleWrapping" type="checkbox" /> Бэлгийн боодолтой</label
+              >
+            </div>
+            <label
+              >Багцын үнэ<input id="productBundlePrice" type="number" min="1" step="1"
+            /></label>
+          </div>
+          <div class="product-image-editor">
+            <div
+              class="product-image-preview"
+              id="productImagePreview"
+              aria-label="Бүтээгдэхүүний зурагны урьдчилсан харагдац"
+            ></div>
+            <div>
+              <label
+                >Бүтээгдэхүүний зураг<input
+                  id="productImageInput"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+              /></label>
+              <p id="productImageError" class="form-error" role="alert"></p>
+              <button id="changeProductImage" class="button ghost" type="button">Зураг солих</button
+              ><button id="removeProductImage" class="button ghost" type="button">
+                Зураг арилгах
+              </button>
+            </div>
+          </div>
+          <div class="admin-product-preview">
+            <strong>Бүтээгдэхүүний урьдчилсан харагдац</strong>
+            <div id="productLivePreview"></div>
+          </div>
+          <button class="button dark full" type="submit">Хадгалах</button>
+        </form>
+      </div>
+    </div>
+    <div class="modal" id="successModal">
+      <div class="modal-card success-card">
+        <span class="success-icon">✿</span>
+        <p class="eyebrow">Баярлалаа</p>
+        <h2>Захиалга хүлээн авлаа.</h2>
+        <p id="successText"></p>
+        <button class="button dark full" data-close>Хаах</button>
+      </div>
+    </div>
+    <div class="toast" id="toast" role="status"></div>

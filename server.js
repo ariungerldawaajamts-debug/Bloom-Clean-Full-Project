@@ -1,6 +1,8 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 app.use(cors({ origin: true, credentials: true }));
@@ -57,6 +59,15 @@ function qpayError(error) {
     "QPay хүсэлт амжилтгүй боллоо."
   );
 }
+
+app.get("/api/qpay/status", (req, res) => {
+  res.json({
+    configured: Boolean(configured()),
+    qrAvailable: fs.existsSync(
+      path.join(__dirname, "assets", "payment-qr.png"),
+    ),
+  });
+});
 
 app.post("/api/qpay/create-invoice", async (req, res) => {
   try {

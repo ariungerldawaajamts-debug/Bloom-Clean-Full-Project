@@ -1,0 +1,85 @@
+      <section class="user-dashboard hidden" id="userDashboard" aria-label="Хэрэглэгчийн dashboard">
+        <div class="dashboard-heading">
+          <p class="eyebrow">Таны Bloom бүртгэл</p>
+          <h1>Хэрэглэгчийн <em>dashboard</em></h1>
+          <p id="userDashboardGreeting"></p>
+        </div>
+        <nav class="user-dashboard-tabs" aria-label="Хэрэглэгчийн хэсгүүд">
+          <a href="#account/orders" data-user-tab="orders">Миний захиалга</a>
+          <a href="#account/delivery" data-user-tab="delivery">Хүргэлтийн төлөв</a>
+          <a href="#account/wishlist" data-user-tab="wishlist">Хүслийн жагсаалт</a>
+          <a href="#account/profile" data-user-tab="profile">Миний мэдээлэл</a>
+          <button type="button" id="userLogoutButton">Гарах</button>
+        </nav>
+        <section class="section tracking-section" id="delivery">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Сэтгэл догдлон хүлээх мөч</p>
+              <h2>Хүргэлтийн явцыг <em>хараарай</em></h2>
+            </div>
+            <p>Захиалгын төлөв өөрчлөгдөх бүрд энд шинэчлэгдэнэ.</p>
+          </div>
+          <div id="tracking"></div>
+        </section>
+        <section class="section pale" id="orders">
+          <div class="section-heading centered">
+            <div>
+              <p class="eyebrow">Таны түүх</p>
+              <h2>Миний <em>захиалга</em></h2>
+            </div>
+          </div>
+          <div class="lookup-box">
+            <p class="eyebrow">Өөрийн захиалга хайх</p>
+            <p>Хайлт зөвхөн таны энэ browser-ийн demo бүртгэлтэй холбогдсон захиалгыг шалгана.</p>
+            <div>
+              <input id="lookupOrderId" placeholder="Захиалгын дугаар" /><input
+                id="lookupPhone"
+                placeholder="Утасны дугаар"
+              /><button class="button dark" id="lookupButton">Хайх</button>
+            </div>
+            <p class="form-error" id="lookupError"></p>
+          </div>
+          <div id="orderList"></div>
+        </section>
+        <section class="section pale" id="wishlist">
+          <div class="section-heading centered">
+            <div>
+              <p class="eyebrow">Хадгалсан сонголт</p>
+              <h2>Хүслийн <em>жагсаалт</em></h2>
+            </div>
+          </div>
+          <div class="product-grid" id="wishlistGrid"></div>
+        </section>
+        <section class="section pale profile-section hidden" id="profile">
+          <div class="section-heading centered">
+            <div>
+              <p class="eyebrow">Хувийн мэдээлэл</p>
+              <h2>Миний <em>мэдээлэл</em></h2>
+            </div>
+          </div>
+          <div class="profile-card">
+            <p>
+              <span>Нэр</span><strong id="profileName"></strong
+              ><input id="profileNameInput" class="hidden" aria-label="Нэр" />
+            </p>
+            <p><span>И-мэйл</span><strong id="profileEmail"></strong></p>
+            <p id="profileRoleRow" class="hidden">
+              <span>Эрх</span><strong id="profileRole"></strong>
+            </p>
+            <p id="profileEditError" class="form-error hidden" role="alert"></p>
+            <div class="profile-actions">
+              <button class="button ghost" id="editProfileName" type="button">Засах</button>
+              <button class="button dark hidden" id="saveProfileName" type="button">
+                Хадгалах
+              </button>
+              <button class="button ghost hidden" id="cancelProfileName" type="button">
+                Болих
+              </button>
+            </div>
+            <small
+              >Энэ demo бүртгэлийн мэдээлэл зөвхөн энэ browser-ийн localStorage-д
+              хадгалагдана.</small
+            >
+          </div>
+        </section>
+      </section>

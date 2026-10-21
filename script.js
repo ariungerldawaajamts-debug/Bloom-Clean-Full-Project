@@ -9,7 +9,7 @@ function renderOrdersBundleAware() {
     ? os
         .map(
           (o) =>
-            `<article class="order-card"><div><small>Захиалгын дугаар</small><strong>${o.id}</strong><small>${new Date(o.createdAt).toLocaleString("mn-MN")}</small></div><p>${o.items.map((i) => `${esc(i.kind === "bundle" ? i.name : item(i.id)?.name || "Бүтээгдэхүүн")} ×${i.qty}`).join(", ")}<br><b>${money(o.total)}</b> · ${esc(o.payment)}${o.items.some((i) => i.kind === "bundle" && i.message) ? `<br><span class="bundle-order-note">Мэндчилгээ хадгалагдсан</span>` : ""}</p><span class="status-pill">${statuses[o.status]}</span><button class="button ghost" data-track="${o.id}">Захиалга харах</button></article>`,
+            `<article class="order-card"><div><small>Захиалгын дугаар</small><strong>${o.id}</strong><small>${new Date(o.createdAt).toLocaleString("mn-MN")}</small></div><p>${o.items.map((i) => `${esc(i.kind === "bundle" ? i.name : item(i.id)?.name || "Бүтээгдэхүүн")} ×${i.qty}`).join(", ")}<br><b>${money(o.total)}</b> · ${esc(o.paymentMethod || o.payment)}${o.items.some((i) => i.kind === "bundle" && i.message) ? `<br><span class="bundle-order-note">Мэндчилгээ хадгалагдсан</span>` : ""}</p><span class="status-pill">${statuses[o.status]}</span><button class="button ghost" data-track="${o.id}">Захиалга харах</button></article>`,
         )
         .join("")
     : `<div class="empty">Одоогоор таны захиалга алга байна.</div>`;
@@ -419,6 +419,22 @@ const $ = (id) => document.getElementById(id),
     delivered: "Хүргэгдсэн",
   },
   steps = Object.keys(statuses);
+function createOrderId() {
+  return `BLM-${Date.now().toString().slice(-8)}`;
+}
+function isOrderPaid(order) {
+  return (
+    order?.payment === "paid" ||
+    order?.payment == null ||
+    ["Бэлнээр", "QPay", "Картаар"].includes(order.payment)
+  );
+}
+function paymentStatusLabel(order) {
+  if (order?.payment === "pending-review") return "Шалгагдаж байна";
+  if (order?.payment === "pending" || order?.payment === "awaiting-payment")
+    return "Хүлээгдэж байна";
+  return isOrderPaid(order) ? "Төлөгдсөн" : "Хүлээгдэж байна";
+}
 const extraState = {
   availability: load("bloom_availability", {}),
   coupon: null,
@@ -562,7 +578,7 @@ function renderOrders() {
     ? os
         .map(
           (o) =>
-            `<article class="order-card"><div><small>Захиалгын дугаар</small><strong>${o.id}</strong><small>${new Date(o.createdAt).toLocaleString("mn-MN")}</small></div><p>${o.items.map((i) => `${esc(item(i.id).name)} ×${i.qty}`).join(", ")}<br><b>${money(o.total)}</b> · ${esc(o.payment)}</p><span class="status-pill">${statuses[o.status]}</span><button class="button ghost" data-track="${o.id}">Захиалга харах</button></article>`,
+            `<article class="order-card"><div><small>Захиалгын дугаар</small><strong>${o.id}</strong><small>${new Date(o.createdAt).toLocaleString("mn-MN")}</small></div><p>${o.items.map((i) => `${esc(item(i.id).name)} ×${i.qty}`).join(", ")}<br><b>${money(o.total)}</b> · ${esc(o.paymentMethod || o.payment)}</p><span class="status-pill">${statuses[o.status]}</span><button class="button ghost" data-track="${o.id}">Захиалга харах</button></article>`,
         )
         .join("")
     : `<div class="empty">Одоогоор таны захиалга алга байна.</div>`;
@@ -588,7 +604,10 @@ function renderAdmin() {
         (filter === "all" || o.status === filter) &&
         `${o.id} ${o.customer}`.toLowerCase().includes(q),
     ),
-    sales = state.orders.reduce((n, o) => n + o.total, 0);
+    sales = state.orders.reduce(
+      (n, o) => n + (isOrderPaid(o) ? Number(o.total) || 0 : 0),
+      0,
+    );
   $("adminStats").innerHTML = [
     ["Нийт захиалга", state.orders.length],
     ["Нийт борлуулалт", money(sales)],
@@ -640,7 +659,7 @@ function order(data) {
       data.finalTotal ??
       state.cart.reduce((n, x) => n + cartPrice(x) * x.qty, 0),
     o = {
-      id: `BLM-${Date.now().toString().slice(-8)}`,
+      id: data.id || createOrderId(),
       createdAt: Date.now(),
       userId: state.session?.email || null,
       customer: data.customer,
@@ -652,6 +671,7 @@ function order(data) {
       surprise: Boolean(data.surprise),
       note: data.note || "",
       payment: data.payment,
+      paymentMethod: data.paymentMethod || data.payment,
       coupon: data.coupon || null,
       discount: data.discount || 0,
       deliveryFee: data.deliveryFee || 0,
@@ -663,14 +683,20 @@ function order(data) {
         name: cartLabel(x),
       })),
       status: "confirmed",
-      manual: false,
+      manual: data.payment === "pending-review",
     };
   state.orders.unshift(o);
   state.cart = [];
   state.selected = o.id;
   render();
   $("successText").textContent =
-    `Таны ${o.id} дугаартай захиалга бүртгэгдлээ. Төлөв: ${statuses[o.status]}.`;
+    o.payment === "pending-review"
+      ? `Таны ${o.id} дугаартай захиалга бүртгэгдлээ. Таны төлбөрийг админ шалгаж баталгаажуулна.`
+      : o.payment === "pending"
+        ? `Таны ${o.id} дугаартай захиалга бүртгэгдлээ. Төлбөр: хүлээгдэж байна.`
+        : o.paymentMethod === "QPay"
+          ? `Таны ${o.id} дугаартай захиалга бүртгэгдлээ. Демо QPay төлбөр төлөгдсөн.`
+          : `Таны ${o.id} дугаартай захиалга бүртгэгдлээ. Төлөв: ${statuses[o.status]}.`;
   layer("successModal");
 }
 function timer() {
@@ -680,6 +706,7 @@ function timer() {
     if (!extraState.tracking) return;
     let changed = false;
     state.orders.forEach((o) => {
+      if (!isOrderPaid(o)) return;
       let i = steps.indexOf(o.status);
       if (!o.manual && i < 3) {
         o.status = steps[i + 1];
@@ -858,6 +885,12 @@ function init() {
   $("adminTable").onchange = (e) => {
     if (!e.target.dataset.status) return;
     let o = state.orders.find((x) => x.id === e.target.dataset.status);
+    if (!o) return;
+    if (!isOrderPaid(o)) {
+      toast("Төлбөр баталгаажаагүй захиалгын төлөвийг өөрчлөх боломжгүй.");
+      render();
+      return;
+    }
     o.status = e.target.value;
     o.manual = true;
     render();
@@ -1468,7 +1501,6 @@ function setAdminTab(tab) {
     bundles: "Багц <em>удирдах</em>",
     delivery: "Хүргэлт <em>удирдах</em>",
     about: "Бидний тухай <em>засах</em>",
-    profile: "Миний мэдээлэл",
     settings: "Тохиргоо <em>удирдах</em>",
   };
   document
@@ -1816,7 +1848,160 @@ function renderBreakdown() {
   const t = checkoutTotals();
   $("priceBreakdown").innerHTML =
     `Барааны дүн: <strong>${money(t.items)}</strong><br>Хөнгөлөлт: <strong>−${money(t.discount)}</strong><br>Хүргэлтийн төлбөр: <strong>${money(t.fee)}</strong><br>Сав баглаа боодлын нэмэлт төлбөр: <strong>${money(t.wrapping)}</strong><hr>Эцсийн төлөх дүн: <strong>${money(t.final)}</strong>`;
+  if (
+    qpayOrderId &&
+    !$("qpayPaymentPanel").classList.contains("hidden") &&
+    $("qpayPaymentPanel").dataset.amount !== String(t.final)
+  ) {
+    createQpayQr();
+  }
 }
+let qpayOrderId = null;
+let qpayTimer = null;
+let qpayExpiresAt = 0;
+function stopQpayTimer() {
+  clearInterval(qpayTimer);
+  qpayTimer = null;
+}
+function clearQpayPayment() {
+  stopQpayTimer();
+  qpayOrderId = null;
+  qpayExpiresAt = 0;
+  $("qpayPaymentPanel").removeAttribute("data-amount");
+  $("qpayPaymentPanel").classList.add("hidden");
+  $("qpayQr").replaceChildren();
+  $("qpayQrShell").classList.remove("is-expired");
+  $("qpayExpiredOverlay").classList.add("hidden");
+  $("qpayCountdown").textContent = "05:00";
+  $("qpayError").textContent = "";
+  $("qpayError").classList.add("hidden");
+  $("qpayPaidButton").classList.remove("hidden");
+  $("qpayPaidButton").disabled = false;
+  $("qpayRegenerateButton").classList.add("hidden");
+  $("checkoutSubmitButton").classList.remove("hidden");
+}
+function updateCheckoutPaymentButton() {
+  const isQpay =
+    document.querySelector("[name=payment]:checked")?.value === "QPay";
+  $("checkoutSubmitButton").textContent = isQpay
+    ? "QPay-ээр төлөх"
+    : "Захиалга баталгаажуулах";
+  $("checkoutSubmitButton").classList.toggle(
+    "hidden",
+    isQpay && !$("qpayPaymentPanel").classList.contains("hidden"),
+  );
+}
+function updateQpayCountdown() {
+  const seconds = Math.max(0, Math.ceil((qpayExpiresAt - Date.now()) / 1000));
+  $("qpayCountdown").textContent =
+    `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+  if (seconds > 0) return;
+  stopQpayTimer();
+  $("qpayQrShell").classList.add("is-expired");
+  $("qpayExpiredOverlay").classList.remove("hidden");
+  $("qpayPaidButton").disabled = true;
+  $("qpayRegenerateButton").classList.remove("hidden");
+}
+function createQpayQr(regenerate = false) {
+  stopQpayTimer();
+  if (regenerate || !qpayOrderId) qpayOrderId = createOrderId();
+  const amount = checkoutTotals().final;
+  $("qpayPaymentPanel").dataset.amount = String(amount);
+  $("qpayAmount").textContent = money(amount);
+  $("qpayOrderId").textContent = qpayOrderId;
+  $("qpayQr").replaceChildren();
+  $("qpayQrShell").classList.remove("is-expired");
+  $("qpayExpiredOverlay").classList.add("hidden");
+  $("qpayError").textContent = "";
+  $("qpayError").classList.add("hidden");
+  $("qpayPaidButton").classList.remove("hidden");
+  $("qpayPaidButton").disabled = false;
+  $("qpayRegenerateButton").classList.add("hidden");
+
+  if (typeof QRCode !== "function") {
+    const error = new Error("qrcode.js CDN сан ачаалагдсангүй.");
+    console.error("Демо QR үүсгэж чадсангүй.", error);
+    qpayOrderId = null;
+    $("qpayPaymentPanel").classList.remove("hidden");
+    $("qpayPaidButton").classList.add("hidden");
+    $("checkoutSubmitButton").classList.remove("hidden");
+    $("qpayError").textContent =
+      "Демо QR үүсгэх сан ачаалагдсангүй. Интернэт холболтоо шалгаад дахин оролдоно уу.";
+    $("qpayError").classList.remove("hidden");
+    return;
+  }
+
+  new QRCode($("qpayQr"), {
+    text: `BLOOM-DEMO|${qpayOrderId}|${amount}`,
+    width: 220,
+    height: 220,
+    colorDark: "#5c2538",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.M,
+  });
+  $("qpayPaymentPanel").classList.remove("hidden");
+  $("checkoutSubmitButton").classList.add("hidden");
+  qpayExpiresAt = Date.now() + 5 * 60 * 1000;
+  updateQpayCountdown();
+  qpayTimer = setInterval(updateQpayCountdown, 1000);
+}
+function checkoutOrderData(payment, paymentMethod, id) {
+  const phone = $("customerPhone").value.replace(/\s/g, "");
+  if (!/^\d{8}$/.test(phone)) {
+    $("checkoutError").textContent = "Утасны дугаар 8 оронтой байна уу.";
+    return null;
+  }
+  const totals = checkoutTotals();
+  return {
+    id,
+    customer: $("customerName").value.trim(),
+    phone,
+    address: $("customerAddress").value.trim(),
+    note: $("customerNote").value.trim(),
+    deliveryDate: $("deliveryDate").value,
+    deliveryTime: $("deliveryTime").value,
+    deliveryArea: $("deliveryArea").value,
+    surprise: Boolean($("surpriseGift").checked),
+    coupon: extraState.coupon,
+    discount: totals.discount,
+    deliveryFee: totals.fee,
+    wrappingFee: totals.wrapping,
+    payment,
+    paymentMethod,
+    finalTotal: totals.final,
+  };
+}
+document.querySelectorAll("[name=payment]").forEach((option) => {
+  option.addEventListener("change", () => {
+    clearQpayPayment();
+    updateCheckoutPaymentButton();
+  });
+});
+$("qpayPaidButton").addEventListener("click", () => {
+  if (!$("checkoutForm").reportValidity() || !qpayOrderId) return;
+  if (Date.now() >= qpayExpiresAt) {
+    updateQpayCountdown();
+    return;
+  }
+  const data = checkoutOrderData("paid", "QPay", qpayOrderId);
+  if (!data) return;
+  stopQpayTimer();
+  order(data);
+  extraState.coupon = null;
+  $("checkoutForm").reset();
+  clearQpayPayment();
+  updateCheckoutPaymentButton();
+});
+$("qpayRegenerateButton").addEventListener("click", () => {
+  if (!$("checkoutForm").reportValidity()) return;
+  createQpayQr(true);
+});
+new MutationObserver(() => {
+  if (!$("checkoutModal").classList.contains("show")) clearQpayPayment();
+}).observe($("checkoutModal"), {
+  attributes: true,
+  attributeFilter: ["class"],
+});
 $("deliveryArea").onchange = renderBreakdown;
 $("applyCoupon").onclick = () => {
   const code = $("couponInput").value.trim().toUpperCase();
@@ -1835,30 +2020,29 @@ $("applyCoupon").onclick = () => {
 };
 $("checkoutForm").onsubmit = (e) => {
   e.preventDefault();
-  const phone = $("customerPhone").value.replace(/\s/g, "");
-  if (!/^\d{8}$/.test(phone))
-    return ($("checkoutError").textContent =
-      "Утасны дугаар 8 оронтой байна уу.");
-  const totals = checkoutTotals();
-  order({
-    customer: $("customerName").value.trim(),
-    phone,
-    address: $("customerAddress").value.trim(),
-    note: $("customerNote").value.trim(),
-    deliveryDate: $("deliveryDate").value,
-    deliveryTime: $("deliveryTime").value,
-    deliveryArea: $("deliveryArea").value,
-    surprise: Boolean($("surpriseGift").checked),
-    coupon: extraState.coupon,
-    discount: totals.discount,
-    deliveryFee: totals.fee,
-    wrappingFee: totals.wrapping,
-    payment: document.querySelector("[name=payment]:checked").value,
-    finalTotal: totals.final,
-  });
+  const selectedPayment = document.querySelector("[name=payment]:checked");
+  const paymentMethod = selectedPayment.value;
+  if (paymentMethod === "QPay") {
+    if (qpayOrderId && !$("qpayPaymentPanel").classList.contains("hidden"))
+      return;
+    const data = checkoutOrderData("pending", paymentMethod);
+    if (!data) return;
+    createQpayQr();
+    return;
+  }
+  const payment = paymentMethod === "Бэлнээр" ? "pending" : "paid";
+  const data = checkoutOrderData(payment, paymentMethod);
+  if (!data) return;
+  order(data);
   extraState.coupon = null;
   e.target.reset();
+  clearQpayPayment();
+  updateCheckoutPaymentButton();
 };
+document
+  .querySelectorAll("[name=payment]")
+  .forEach((option) => option.addEventListener("change", updateCheckoutPaymentButton));
+updateCheckoutPaymentButton();
 add = addAvailable;
 document.addEventListener("click", (e) => {
   const detail = e.target.closest("[data-detail]");
@@ -1972,6 +2156,8 @@ $("advanceOrder").onclick = () => {
   const o =
     state.orders.find((x) => x.id === state.selected) || state.orders[0];
   if (!o) return toast("Ахиулах захиалга алга байна.");
+  if (!isOrderPaid(o))
+    return toast("Төлбөр баталгаажаагүй захиалгыг ахиулах боломжгүй.");
   const index = steps.indexOf(o.status);
   if (index < 3) {
     o.status = steps[index + 1];

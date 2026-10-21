@@ -1,0 +1,43 @@
+      <section class="section" id="flowers">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Bloom-ийн сонголт</p>
+            <h2>Таны сэтгэлийг илэрхийлэх <em>баглаа</em></h2>
+          </div>
+          <p>Өнгө, хэмжээ, зориулалтаар нь сонгож, хайртай хүндээ илгээгээрэй.</p>
+        </div>
+        <div class="toolbar">
+          <div class="tabs" id="flowerTabs">
+            <button class="active" data-flower-filter="all">Бүгд</button>
+            <button data-flower-filter="romance">Хайртдаа</button>
+            <button data-flower-filter="birthday">Төрсөн өдөрт</button>
+            <button data-flower-filter="mom">Ээждээ</button>
+            <button data-flower-filter="mini">Бяцхан баглаа</button>
+            <button data-flower-filter="featured">Онцлох</button>
+          </div>
+          <label class="sort"
+            >Эрэмбэ
+            <select id="flowerSort">
+              <option value="default">Сонгох</option>
+              <option value="low">Үнэ өсөхөөр</option>
+              <option value="high">Үнэ буурахаар</option>
+              <option value="name">Нэрээр</option>
+            </select>
+          </label>
+          <div class="advanced-search">
+            <input
+              id="productSearch"
+              type="search"
+              placeholder="Цэцэг, кофе, бэлгийн багц хайх"
+            /><input id="minPrice" type="number" min="0" placeholder="Доод үнэ" /><input
+              id="maxPrice"
+              type="number"
+              min="0"
+              placeholder="Дээд үнэ"
+            /><button id="clearFilters" type="button">Шүүлтүүр цэвэрлэх</button>
+          </div>
+          <p class="result-count" id="flowerCount"></p>
+        </div>
+        <div class="product-grid" id="flowerGrid"></div>
+        <div class="product-grid" id="flowerGrid"></div>
+      </section>

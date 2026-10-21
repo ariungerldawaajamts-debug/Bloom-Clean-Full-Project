@@ -1,0 +1,91 @@
+    <div class="modal" id="checkoutModal">
+      <div class="checkout-layout">
+        <section class="modal-card checkout-form-card" aria-labelledby="checkoutTitle">
+          <button class="close" type="button" data-close aria-label="Checkout хаах">×</button>
+          <p class="eyebrow">Bloom · Захиалга</p>
+          <h2 id="checkoutTitle">Захиалга баталгаажуулах</h2>
+          <form id="checkoutForm">
+            <section class="checkout-group" aria-labelledby="deliveryHeading">
+              <h3 id="deliveryHeading">Хүргэлтийн мэдээлэл</h3>
+              <div class="checkout-fields">
+                <label
+                  >Хүлээн авагчийн нэр<input id="customerName" autocomplete="name" required
+                /></label>
+                <label
+                  >Утасны дугаар<input
+                    id="customerPhone"
+                    inputmode="tel"
+                    autocomplete="tel"
+                    placeholder="9987 3899"
+                    required
+                /></label>
+                <label class="field-wide"
+                  >Хүргэлтийн хаяг<input
+                    id="customerAddress"
+                    autocomplete="street-address"
+                    required
+                /></label>
+                <label>Хүргүүлэх өдөр<input id="deliveryDate" type="date" required /></label>
+                <label
+                  >Хүргүүлэх цаг<select id="deliveryTime" required>
+                    <option value="">Сонгох</option>
+                    <option>09:00–12:00</option>
+                    <option>12:00–15:00</option>
+                    <option>15:00–18:00</option>
+                    <option>18:00–21:00</option>
+                  </select></label
+                >
+                <label class="field-wide"
+                  >Хүргэлтийн бүс<select id="deliveryArea">
+                    <option value="Төв">Төвийн бүс · 0₮</option>
+                    <option value="Ойролцоо">Ойролцоо бүс · 5,000₮</option>
+                    <option value="Алслагдсан">Алслагдсан бүс · 10,000₮</option>
+                  </select></label
+                >
+              </div>
+            </section>
+            <section class="checkout-group" aria-labelledby="extraHeading">
+              <h3 id="extraHeading">Нэмэлт мэдээлэл</h3>
+              <label class="check-row"
+                ><input id="surpriseGift" type="checkbox" /> Гэнэтийн бэлэг болгон хүргүүлэх</label
+              >
+              <label class="field-wide"
+                >Нэмэлт тэмдэглэл<textarea id="customerNote" rows="3"></textarea>
+              </label>
+            </section>
+            <fieldset class="checkout-group payment-group">
+              <legend>Төлбөр</legend>
+              <div class="payment-options">
+                <label><input type="radio" name="payment" value="Бэлнээр" checked /> Бэлнээр</label>
+                <label
+                  ><input type="radio" name="payment" value="QPay" /> QPay
+                  <small>(демо)</small></label
+                >
+                <label
+                  ><input type="radio" name="payment" value="Картаар" /> Картаар
+                  <small>(демо)</small></label
+                >
+              </div>
+            </fieldset>
+            <section class="checkout-group coupon-group" aria-labelledby="couponHeading">
+              <h3 id="couponHeading">Купон</h3>
+              <div class="coupon-row">
+                <label class="visually-hidden" for="couponInput">Купон код</label>
+                <input id="couponInput" placeholder="Купон код" autocomplete="off" />
+                <button class="button ghost" type="button" id="applyCoupon">Купон хэрэглэх</button>
+              </div>
+            </section>
+            <p class="form-error checkout-error" id="checkoutError" role="alert"></p>
+          </form>
+          <button class="button dark full checkout-submit" type="submit" form="checkoutForm">
+            Захиалга баталгаажуулах
+          </button>
+        </section>
+        <aside class="checkout-order-card" aria-labelledby="checkoutOrderHeading">
+          <p class="eyebrow">Таны сонголт</p>
+          <h2 id="checkoutOrderHeading">Захиалгын тойм</h2>
+          <div id="checkoutSummary" class="checkout-summary"></div>
+          <div id="priceBreakdown" class="summary checkout-breakdown" aria-live="polite"></div>
+        </aside>
+      </div>
+    </div>

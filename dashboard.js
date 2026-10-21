@@ -145,6 +145,7 @@
     const main = document.querySelector("main");
     const requested = location.hash.slice(1) || "home";
     let route = requested;
+    if (route === "admin/profile") route = "admin/settings";
 
     if (route.startsWith("admin")) {
       if (!isAdmin()) route = isUser() ? "account/orders" : "home";
@@ -161,8 +162,8 @@
         ? "user"
         : "public";
     const profileSection = $("profile");
-    if (view === "admin" && route === "admin/profile") {
-      $("admin").append(profileSection);
+    if (view === "admin" && route === "admin/settings") {
+      $("adminManagement").append(profileSection);
     } else if (profileSection.parentElement !== $("userDashboard")) {
       $("userDashboard").append(profileSection);
     }
@@ -170,16 +171,21 @@
     else $("admin").prepend(adminTabNav);
     main.dataset.view = view;
     document.body.dataset.view = view;
+    headerAdminTabs.classList.remove("open");
+    $("mainNav").classList.remove("open");
+    $("menuToggle").setAttribute("aria-expanded", "false");
+    $("menuToggle").setAttribute("aria-label", "Цэс нээх");
     $("userDashboard").classList.toggle("hidden", view !== "user");
     $("admin").classList.toggle("hidden", view !== "admin");
     $("userOrdersLink").classList.toggle("hidden", !isUser());
-    $("userWishlistLink").classList.toggle("hidden", !isUser());
-    $("adminDashboardButton").classList.toggle("hidden", !isAdmin());
+    $("userHeaderActions").classList.toggle("hidden", !isUser());
+    $("userHeaderLogoutButton").classList.toggle("hidden", !isUser());
     $("authButton").textContent = validSession()
       ? isAdmin()
         ? "Гарах"
         : `${state.session.name || "Миний профайл"} · Гарах`
       : "Нэвтрэх";
+    $("authButton").classList.toggle("hidden", isUser());
     renderProfile();
 
     if (view === "user") {
@@ -197,7 +203,6 @@
           "bundles",
           "delivery",
           "about",
-          "profile",
           "settings",
         ].includes(tab)
           ? tab
@@ -209,23 +214,64 @@
   function showOrders() {
     const list = orders();
     const orderList = $("orderList");
+    orderList.replaceChildren();
     if (!isUser()) {
-      orderList.innerHTML = `<div class="empty">Захиалгаа харахын тулд хэрэглэгчийн бүртгэлээр нэвтэрнэ үү.</div>`;
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      empty.textContent =
+        "Захиалгаа харахын тулд хэрэглэгчийн бүртгэлээр нэвтэрнэ үү.";
+      orderList.appendChild(empty);
       return;
     }
-    orderList.innerHTML = list.length
-      ? list
-          .map((order) => {
-            const items = Array.isArray(order.items) ? order.items : [];
-            return `<article class="order-card">
-        <div><small>Захиалгын дугаар</small><strong>${esc(order.id)}</strong><small>${new Date(order.createdAt).toLocaleString("mn-MN")}</small></div>
-        <p>${items.map((entry) => `${esc(entry.name || item(entry.id)?.name || "Бүтээгдэхүүн")} ×${Number(entry.qty) || 1}`).join(", ")}<br><b>${money(order.total)}</b> · ${esc(order.payment || "")}</p>
-        <span class="status-pill">${esc(statuses[order.status] || order.status || "Тодорхойгүй")}</span>
-        <button class="button ghost" type="button" data-track="${esc(order.id)}">Захиалгын дэлгэрэнгүй</button>
-      </article>`;
-          })
-          .join("")
-      : `<div class="empty">Одоогоор таны захиалга алга байна.</div>`;
+    if (!list.length) {
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      empty.textContent = "Одоогоор таны захиалга алга байна.";
+      orderList.appendChild(empty);
+      return;
+    }
+    list.forEach((order) => {
+      const article = document.createElement("article");
+      article.className = "order-card";
+      const heading = document.createElement("div");
+      const orderLabel = document.createElement("small");
+      orderLabel.textContent = "Захиалгын дугаар";
+      const orderId = document.createElement("strong");
+      orderId.textContent = order.id;
+      const createdAt = document.createElement("small");
+      createdAt.textContent = new Date(order.createdAt).toLocaleString("mn-MN");
+      heading.append(orderLabel, orderId, createdAt);
+
+      const details = document.createElement("p");
+      const items = Array.isArray(order.items) ? order.items : [];
+      details.textContent = items
+        .map(
+          (entry) =>
+            `${entry.name || item(entry.id)?.name || "Бүтээгдэхүүн"} ×${Number(entry.qty) || 1}`,
+        )
+        .join(", ");
+      details.appendChild(document.createElement("br"));
+      const total = document.createElement("b");
+      total.textContent = money(order.total);
+      details.appendChild(total);
+      details.appendChild(
+        document.createTextNode(
+          ` · ${order.paymentMethod || order.payment || ""}${order.payment === "pending-review" ? " · Төлбөр шалгагдаж байна" : ""}`,
+        ),
+      );
+
+      const status = document.createElement("span");
+      status.className = "status-pill";
+      status.textContent =
+        statuses[order.status] || order.status || "Тодорхойгүй";
+      const trackButton = document.createElement("button");
+      trackButton.className = "button ghost";
+      trackButton.type = "button";
+      trackButton.dataset.track = order.id;
+      trackButton.textContent = "Захиалгын дэлгэрэнгүй";
+      article.append(heading, details, status, trackButton);
+      orderList.appendChild(article);
+    });
   }
   renderOrdersBundleAware = showOrders;
 
@@ -251,6 +297,64 @@
   }
   renderTracking = showTracking;
 
+  function createAdminOrderRow(order) {
+    const row = document.createElement("tr");
+    const appendCell = (value) => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      row.appendChild(cell);
+      return cell;
+    };
+    appendCell(order.id);
+    const customerCell = appendCell(order.customer || "");
+    if (order.note) {
+      const note = document.createElement("small");
+      note.textContent = `Тэмдэглэл: ${order.note}`;
+      customerCell.append(document.createElement("br"), note);
+    }
+    appendCell(order.phone || "");
+    appendCell(new Date(order.createdAt).toLocaleDateString("mn-MN"));
+    appendCell(money(order.total));
+    appendCell(paymentStatusLabel(order));
+
+    const statusCell = document.createElement("td");
+    const statusSelect = document.createElement("select");
+    statusSelect.setAttribute("aria-label", `${order.id} захиалгын төлөв`);
+    statusSelect.dataset.status = order.id;
+    statusSelect.disabled = !isOrderPaid(order);
+    steps.forEach((status) => {
+      const option = document.createElement("option");
+      option.value = status;
+      option.textContent = statuses[status];
+      option.selected = status === order.status;
+      statusSelect.appendChild(option);
+    });
+    statusCell.appendChild(statusSelect);
+    row.appendChild(statusCell);
+
+    const actionCell = document.createElement("td");
+    if (order.payment === "pending-review") {
+      const confirmButton = document.createElement("button");
+      confirmButton.className = "button ghost";
+      confirmButton.type = "button";
+      confirmButton.dataset.confirmPayment = order.id;
+      confirmButton.setAttribute(
+        "aria-label",
+        `${order.id} төлбөр баталгаажуулах`,
+      );
+      confirmButton.textContent = "Төлбөр баталгаажуулах";
+      actionCell.appendChild(confirmButton);
+    }
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "remove";
+    deleteButton.type = "button";
+    deleteButton.dataset.deleteOrder = order.id;
+    deleteButton.textContent = "Устгах";
+    actionCell.appendChild(deleteButton);
+    row.appendChild(actionCell);
+    return row;
+  }
+
   function renderAdminDashboard() {
     if (!isAdmin()) return;
     const query = $("adminSearch").value.trim().toLocaleLowerCase("mn-MN");
@@ -272,7 +376,8 @@
       );
     });
     const sales = state.orders.reduce(
-      (sum, order) => sum + (Number(order.total) || 0),
+      (sum, order) =>
+        sum + (isOrderPaid(order) ? Number(order.total) || 0 : 0),
       0,
     );
     $("adminStats").innerHTML = [
@@ -292,31 +397,70 @@
           `<div class="stat"><small>${label}</small><strong>${value}</strong></div>`,
       )
       .join("");
-    $("adminTable").innerHTML = matches.length
-      ? matches
-          .map(
-            (order) => `<tr>
-      <td>${esc(order.id)}</td><td>${esc(order.customer || "")}${order.note ? `<br><small>Тэмдэглэл: ${esc(order.note)}</small>` : ""}</td><td>${esc(order.phone || "")}</td>
-      <td>${new Date(order.createdAt).toLocaleDateString("mn-MN")}</td><td>${money(order.total)}</td>
-      <td><select aria-label="${esc(order.id)} захиалгын төлөв" data-status="${esc(order.id)}">${steps.map((status) => `<option value="${status}" ${status === order.status ? "selected" : ""}>${esc(statuses[status])}</option>`).join("")}</select></td>
-      <td><button class="remove" type="button" data-delete-order="${esc(order.id)}">Устгах</button></td>
-    </tr>`,
-          )
-          .join("")
-      : `<tr><td colspan="7">Одоогоор захиалга алга.</td></tr>`;
-    $("adminDeliveryTable").innerHTML = state.orders.length
-      ? state.orders
-          .map(
-            (order) => `<tr>
-      <td>${esc(order.id)}</td><td>${esc(order.customer || "")}</td><td>${esc(order.phone || "")}</td>
-      <td>${esc(order.address || "—")}</td>
-      <td>${esc(order.deliveryDate || "—")} ${esc(order.deliveryTime || "")}<br><small>${esc(order.deliveryArea || "")}</small></td>
-      <td>${money(order.deliveryFee || 0)}</td>
-      <td><select aria-label="${esc(order.id)} хүргэлтийн төлөв" data-delivery-status="${esc(order.id)}">${steps.map((status) => `<option value="${status}" ${status === order.status ? "selected" : ""}>${esc(statuses[status])}</option>`).join("")}</select></td>
-    </tr>`,
-          )
-          .join("")
-      : `<tr><td colspan="7">Одоогоор хүргэлтийн захиалга алга.</td></tr>`;
+    const adminTable = $("adminTable");
+    adminTable.replaceChildren();
+    if (matches.length) {
+      matches.forEach((order) =>
+        adminTable.appendChild(createAdminOrderRow(order)),
+      );
+    } else {
+      const emptyRow = document.createElement("tr");
+      const emptyCell = document.createElement("td");
+      emptyCell.colSpan = 8;
+      emptyCell.textContent = "Одоогоор захиалга алга.";
+      emptyRow.appendChild(emptyCell);
+      adminTable.appendChild(emptyRow);
+    }
+    const deliveryTable = $("adminDeliveryTable");
+    deliveryTable.replaceChildren();
+    if (state.orders.length) {
+      state.orders.forEach((order) => {
+        const row = document.createElement("tr");
+        const appendCell = (value) => {
+          const cell = document.createElement("td");
+          cell.textContent = value;
+          row.appendChild(cell);
+          return cell;
+        };
+        appendCell(order.id);
+        appendCell(order.customer || "");
+        appendCell(order.phone || "");
+        appendCell(order.address || "—");
+        const deliveryCell = appendCell(
+          `${order.deliveryDate || "—"} ${order.deliveryTime || ""}`,
+        );
+        const area = document.createElement("small");
+        area.textContent = order.deliveryArea || "";
+        deliveryCell.append(document.createElement("br"), area);
+        appendCell(money(order.deliveryFee || 0));
+
+        const statusCell = document.createElement("td");
+        const statusSelect = document.createElement("select");
+        statusSelect.setAttribute(
+          "aria-label",
+          `${order.id} хүргэлтийн төлөв`,
+        );
+        statusSelect.dataset.deliveryStatus = order.id;
+        statusSelect.disabled = !isOrderPaid(order);
+        steps.forEach((status) => {
+          const option = document.createElement("option");
+          option.value = status;
+          option.textContent = statuses[status];
+          option.selected = status === order.status;
+          statusSelect.appendChild(option);
+        });
+        statusCell.appendChild(statusSelect);
+        row.appendChild(statusCell);
+        deliveryTable.appendChild(row);
+      });
+    } else {
+      const emptyRow = document.createElement("tr");
+      const emptyCell = document.createElement("td");
+      emptyCell.colSpan = 7;
+      emptyCell.textContent = "Одоогоор хүргэлтийн захиалга алга.";
+      emptyRow.appendChild(emptyCell);
+      deliveryTable.appendChild(emptyRow);
+    }
     $("toggleTracking").textContent =
       `Демо tracking: ${extraState.tracking ? "асаалттай" : "унтраалттай"}`;
   }
@@ -533,7 +677,7 @@
   setAdminTab = function (tab) {
     if (!isAdmin()) return;
     previousSetAdminTab(tab);
-    $("profile").classList.toggle("hidden", tab !== "profile");
+    $("profile").classList.toggle("hidden", tab !== "settings");
     $("adminManagement").classList.toggle("hidden", tab !== "settings");
     $("adminDeliveryPanel").classList.toggle("hidden", tab !== "delivery");
     $("adminStats").classList.toggle("hidden", tab !== "orders");
@@ -565,28 +709,16 @@
 
   $("authButton").onclick = () =>
     validSession() ? logout() : layer("authModal");
+  $("userHeaderLogoutButton").onclick = logout;
   $("userLogoutButton").onclick = logout;
   $("wishlistButton").onclick = () => {
     if (isUser()) location.hash = "#account/wishlist";
-    else if (!isAdmin()) layer("authModal");
+    else if (!isAdmin()) location.hash = "#wishlist";
   };
   $("userOrdersLink").onclick = (event) => {
     if (!isUser()) {
       event.preventDefault();
       layer("authModal");
-    }
-  };
-  $("userWishlistLink").onclick = (event) => {
-    if (!isUser()) {
-      event.preventDefault();
-      layer("authModal");
-    }
-  };
-  $("adminDashboardButton").onclick = (event) => {
-    if (!isAdmin()) {
-      event.preventDefault();
-      if (isUser()) location.hash = "#account/orders";
-      else layer("authModal");
     }
   };
   $("lookupButton").onclick = () => {
@@ -610,11 +742,29 @@
     if (!orderId || !isAdmin()) return;
     const order = state.orders.find((entry) => entry.id === orderId);
     if (!order) return;
+    if (!isOrderPaid(order)) {
+      toast("Төлбөр баталгаажаагүй захиалгын төлөвийг өөрчлөх боломжгүй.");
+      render();
+      return;
+    }
     order.status = event.target.value;
     order.manual = true;
     render();
     toast("Хүргэлтийн төлөв шинэчлэгдлээ");
   };
+  $("adminTable").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-confirm-payment]");
+    if (!button || !isAdmin()) return;
+    const order = state.orders.find(
+      (entry) => entry.id === button.dataset.confirmPayment,
+    );
+    if (!order || order.payment !== "pending-review") return;
+    if (!confirm(`${order.id} төлбөр орсныг баталгаажуулах уу?`)) return;
+    order.payment = "paid";
+    order.manual = false;
+    render();
+    toast("Төлбөр баталгаажлаа");
+  });
 
   $("editProfileName").addEventListener("click", () => setProfileEditing(true));
   $("cancelProfileName").addEventListener("click", () => renderProfile());
@@ -701,9 +851,19 @@
 
   adminTabNav.addEventListener("click", (event) => {
     const button = event.target.closest("[data-admin-tab]");
-    if (button && isAdmin())
+    if (button && isAdmin()) {
+      headerAdminTabs.classList.remove("open");
+      $("menuToggle").setAttribute("aria-expanded", "false");
+      $("menuToggle").setAttribute("aria-label", "Цэс нээх");
       location.hash = `#admin/${button.dataset.adminTab}`;
+    }
   });
+  $("menuToggle").onclick = () => {
+    const target = isAdmin() ? headerAdminTabs : $("mainNav");
+    const open = target.classList.toggle("open");
+    $("menuToggle").setAttribute("aria-expanded", String(open));
+    $("menuToggle").setAttribute("aria-label", open ? "Цэс хаах" : "Цэс нээх");
+  };
   document
     .querySelector(".user-dashboard-tabs")
     .addEventListener("click", (event) => {
@@ -737,4 +897,267 @@
     renderOrdersBundleAware();
     renderTracking();
   }
+  if (isAdmin()) renderAdminDashboard();
+
+  const customSelects = new WeakMap();
+  let openSelect = null;
+  const enabledOptionIndexes = (select) =>
+    [...select.options]
+      .map((option, index) => (option.disabled ? -1 : index))
+      .filter((index) => index >= 0);
+
+  function updateCustomSelect(select) {
+    const ui = customSelects.get(select);
+    if (!ui) return;
+    const selected = [...select.options].filter((option) => option.selected);
+    ui.label.textContent = select.multiple
+      ? selected.map((option) => option.textContent).join(", ") || "Сонгох"
+      : selected[0]?.textContent || select.options[0]?.textContent || "Сонгох";
+    ui.trigger.disabled = select.disabled;
+    ui.trigger.setAttribute("aria-disabled", String(select.disabled));
+    ui.trigger.setAttribute(
+      "aria-expanded",
+      String(openSelect?.select === select),
+    );
+    if (openSelect?.select === select) renderCustomSelectOptions(select);
+  }
+
+  function renderCustomSelectOptions(select) {
+    const ui = customSelects.get(select);
+    if (!ui) return;
+    ui.menu.replaceChildren();
+    [...select.options].forEach((option, index) => {
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "custom-select-option";
+      item.id = `${ui.id}-option-${index}`;
+      item.setAttribute("role", "option");
+      item.setAttribute("aria-selected", String(option.selected));
+      item.disabled = option.disabled;
+      item.tabIndex = -1;
+      item.textContent = option.textContent;
+      if (index === ui.activeIndex) item.classList.add("is-active");
+      item.addEventListener("pointerenter", () => {
+        ui.activeIndex = index;
+        setActiveCustomOption(select, index);
+      });
+      item.addEventListener("click", (event) => {
+        event.stopPropagation();
+        if (select.multiple) {
+          option.selected = !option.selected;
+        } else {
+          select.selectedIndex = index;
+          closeCustomSelect();
+        }
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        updateCustomSelect(select);
+        if (select.multiple) positionCustomSelect(select);
+        ui.trigger.focus();
+      });
+      ui.menu.appendChild(item);
+    });
+    ui.menu.setAttribute("aria-multiselectable", String(select.multiple));
+  }
+
+  function setActiveCustomOption(select, index) {
+    const ui = customSelects.get(select);
+    if (!ui) return;
+    ui.activeIndex = index;
+    [...ui.menu.children].forEach((option, optionIndex) => {
+      option.classList.toggle("is-active", optionIndex === index);
+    });
+    ui.trigger.setAttribute("aria-activedescendant", `${ui.id}-option-${index}`);
+    ui.menu.children[index]?.scrollIntoView({ block: "nearest" });
+  }
+
+  function positionCustomSelect(select) {
+    if (openSelect?.select !== select) return;
+    const { trigger, menu } = openSelect;
+    const rect = trigger.getBoundingClientRect();
+    const margin = 8;
+    const availableBelow = window.innerHeight - rect.bottom - margin;
+    const availableAbove = rect.top - margin;
+    const placeAbove = availableBelow < 180 && availableAbove > availableBelow;
+    const available = Math.max(
+      80,
+      Math.min(320, placeAbove ? availableAbove : availableBelow),
+    );
+    menu.style.width = `${Math.min(
+      Math.max(rect.width, 160),
+      window.innerWidth - margin * 2,
+    )}px`;
+    menu.style.maxHeight = `${available}px`;
+    menu.style.left = `${Math.min(
+      Math.max(margin, rect.left),
+      window.innerWidth - menu.offsetWidth - margin,
+    )}px`;
+    menu.style.top = placeAbove
+      ? `${Math.max(margin, rect.top - Math.min(menu.scrollHeight, available) - 6)}px`
+      : `${Math.min(window.innerHeight - margin, rect.bottom + 6)}px`;
+  }
+
+  function closeCustomSelect() {
+    if (!openSelect) return;
+    const { select, trigger, menu, wrapper } = openSelect;
+    menu.remove();
+    wrapper.classList.remove("is-open");
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.removeAttribute("aria-activedescendant");
+    openSelect = null;
+    updateCustomSelect(select);
+  }
+
+  function openCustomSelect(select) {
+    const ui = customSelects.get(select);
+    if (!ui || select.disabled) return;
+    updateCustomSelect(select);
+    closeCustomSelect();
+    const enabled = enabledOptionIndexes(select);
+    if (!enabled.length) return;
+    const selectedIndex = select.selectedIndex;
+    ui.activeIndex = enabled.includes(selectedIndex) ? selectedIndex : enabled[0];
+    ui.menu = document.createElement("div");
+    ui.menu.className = "custom-select-menu";
+    ui.menu.setAttribute("role", "listbox");
+    ui.menu.id = `${ui.id}-listbox`;
+    ui.trigger.setAttribute("aria-controls", ui.menu.id);
+    ui.wrapper.classList.add("is-open");
+    renderCustomSelectOptions(select);
+    document.body.appendChild(ui.menu);
+    openSelect = { select, trigger: ui.trigger, menu: ui.menu, wrapper: ui.wrapper };
+    ui.trigger.setAttribute("aria-expanded", "true");
+    positionCustomSelect(select);
+    ui.trigger.setAttribute("aria-activedescendant", `${ui.id}-option-${ui.activeIndex}`);
+    ui.menu.children[ui.activeIndex]?.scrollIntoView({ block: "nearest" });
+  }
+
+  function enhanceSelect(select) {
+    if (customSelects.has(select) || select.closest(".custom-select")) return;
+    const wrapper = document.createElement("span");
+    wrapper.className = "custom-select";
+    const trigger = document.createElement("button");
+    const id = `bloom-select-${Math.random().toString(36).slice(2)}`;
+    trigger.type = "button";
+    trigger.className = "custom-select-trigger";
+    trigger.setAttribute("role", "combobox");
+    trigger.setAttribute("aria-haspopup", "listbox");
+    trigger.setAttribute("aria-controls", `${id}-listbox`);
+    const label = select.closest("label");
+    const labelText = [...(label?.childNodes || [])]
+      .filter((node) => node.nodeType === Node.TEXT_NODE)
+      .map((node) => node.textContent.trim())
+      .filter(Boolean)
+      .join(" ");
+    trigger.setAttribute(
+      "aria-label",
+      select.getAttribute("aria-label") ||
+        labelText ||
+        select.options[select.selectedIndex]?.textContent.trim() ||
+        "Сонгох",
+    );
+    select.classList.add("custom-select-native");
+    select.setAttribute("aria-hidden", "true");
+    select.tabIndex = -1;
+    select.parentNode.insertBefore(wrapper, select);
+    wrapper.append(select, trigger);
+    const ui = { id, wrapper, trigger, label: document.createElement("span"), menu: null, activeIndex: 0 };
+    trigger.appendChild(ui.label);
+    customSelects.set(select, ui);
+    trigger.addEventListener("click", () => {
+      if (openSelect?.select === select) closeCustomSelect();
+      else openCustomSelect(select);
+    });
+    trigger.addEventListener("keydown", (event) => {
+      if (!["ArrowDown", "ArrowUp", "Enter", " ", "Escape"].includes(event.key))
+        return;
+      event.preventDefault();
+      if (event.key === "Escape") {
+        closeCustomSelect();
+        return;
+      }
+      if (!openSelect || openSelect.select !== select) {
+        openCustomSelect(select);
+        return;
+      }
+      const enabled = enabledOptionIndexes(select);
+      const current = enabled.indexOf(ui.activeIndex);
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        const direction = event.key === "ArrowDown" ? 1 : -1;
+        const next = (current + direction + enabled.length) % enabled.length;
+        setActiveCustomOption(select, enabled[next]);
+      } else if (event.key === "Enter" || event.key === " ") {
+        ui.menu.children[ui.activeIndex]?.click();
+      }
+    });
+    select.addEventListener("change", () => updateCustomSelect(select));
+    updateCustomSelect(select);
+  }
+
+  function scanCustomSelects(root) {
+    if (root instanceof HTMLSelectElement) enhanceSelect(root);
+    if (root.querySelectorAll)
+      root.querySelectorAll("select").forEach(enhanceSelect);
+  }
+
+  scanCustomSelects(document);
+  const selectObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (
+        mutation.type === "childList" &&
+        mutation.target instanceof HTMLSelectElement
+      ) {
+        updateCustomSelect(mutation.target);
+      }
+      mutation.addedNodes.forEach((node) => {
+        if (node instanceof Element) scanCustomSelects(node);
+      });
+      if (
+        mutation.type === "attributes" &&
+        mutation.target instanceof HTMLSelectElement
+      ) {
+        updateCustomSelect(mutation.target);
+      }
+      if (
+        mutation.type === "attributes" &&
+        mutation.target instanceof HTMLOptionElement
+      ) {
+        updateCustomSelect(mutation.target.closest("select"));
+      }
+    });
+  });
+  selectObserver.observe(document.body, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    attributeFilter: ["disabled", "selected"],
+  });
+  document.addEventListener("click", (event) => {
+    if (
+      openSelect &&
+      !openSelect.wrapper.contains(event.target) &&
+      !openSelect.menu.contains(event.target)
+    ) closeCustomSelect();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeCustomSelect();
+  });
+  const syncCustomSelects = () =>
+    document
+      .querySelectorAll("select.custom-select-native")
+      .forEach(updateCustomSelect);
+  const scheduleCustomSelectSync = () => queueMicrotask(syncCustomSelects);
+  ["click", "change", "reset"].forEach((eventName) =>
+    document.addEventListener(eventName, scheduleCustomSelectSync, true),
+  );
+  window.addEventListener("hashchange", scheduleCustomSelectSync);
+  window.addEventListener("resize", () => {
+    if (openSelect) positionCustomSelect(openSelect.select);
+  });
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (openSelect) positionCustomSelect(openSelect.select);
+    },
+    true,
+  );
 })();

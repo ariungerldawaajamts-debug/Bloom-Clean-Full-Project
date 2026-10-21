@@ -1,0 +1,116 @@
+    <div class="overlay" id="overlay"></div>
+    <aside class="drawer" id="cartDrawer" aria-label="Сагс">
+      <div class="drawer-head">
+        <div>
+          <p class="eyebrow">Таны сонголт</p>
+          <h2>Сагс</h2>
+        </div>
+        <button class="close" data-close>×</button>
+      </div>
+      <div id="cartItems"></div>
+      <div class="drawer-total">
+        <div id="cartBreakdown" class="cart-breakdown" aria-live="polite"></div>
+        <span>Нийт төлөх дүн</span><strong id="cartTotal">0₮</strong>
+        <button class="button dark full" id="checkoutButton" type="button">
+          Захиалга баталгаажуулах
+        </button>
+      </div>
+    </aside>
+    <div
+      class="modal"
+      id="authModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="authModalTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-card">
+        <button class="close" type="button" data-close aria-label="Нэвтрэх цонх хаах">×</button>
+        <p class="eyebrow" id="authModalTitle">Bloom-д тавтай морил</p>
+        <div class="auth-tabs">
+          <button class="active" type="button" data-auth-tab="login">Нэвтрэх</button>
+          <button type="button" data-auth-tab="register">Бүртгүүлэх</button>
+        </div>
+        <form id="loginForm">
+          <label for="loginEmail"
+            >И-мэйл<input id="loginEmail" type="email" autocomplete="email" required />
+          </label>
+          <label for="loginPassword"
+            >Нууц үг<input
+              id="loginPassword"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+          </label>
+          <p class="form-error" id="loginError"></p>
+          <button class="button dark full" type="submit">Нэвтрэх</button>
+          <button class="forgot-password-link" id="forgotPasswordLink" type="button">
+            Нууц үгээ мартсан уу?
+          </button>
+          <p class="form-status" id="loginStatus" role="status" aria-live="polite"></p>
+        </form>
+        <form id="registerForm" class="hidden">
+          <label for="registerName"
+            >Нэр<input id="registerName" autocomplete="name" required />
+          </label>
+          <label for="registerEmail"
+            >И-мэйл<input id="registerEmail" type="email" autocomplete="email" required /> </label
+          ><label
+            >Нууц үг<input id="registerPassword" type="password" minlength="6" required /> </label
+          ><label>Нууц үг давтах<input id="registerConfirm" type="password" required /></label>
+          <p class="form-error" id="registerError"></p>
+          <button class="button dark full">Бүртгэл үүсгэх</button>
+        </form>
+        <section
+          class="password-recovery hidden"
+          id="passwordRecovery"
+          aria-labelledby="recoveryTitle"
+        >
+          <h2 id="recoveryTitle">Нууц үг сэргээх</h2>
+          <p class="recovery-demo-note" id="recoveryDemoNote">
+            Демо горим: имэйл илгээх үйлчилгээ холбогдоогүй. Доорх үйлдэл зөвхөн энэ төхөөрөмжийн
+            demo бүртгэлийн нууц үгийг өөрчилнө; таны бүртгэлийг баталгаажуулахгүй.
+          </p>
+          <button class="recovery-back-link" id="recoveryBackButton" type="button">
+            ← Нэвтрэх хэсэг рүү буцах
+          </button>
+          <form id="passwordResetRequestForm" novalidate>
+            <label for="recoveryEmail">Бүртгэлтэй и-мэйл хаяг</label>
+            <input
+              id="recoveryEmail"
+              type="email"
+              autocomplete="email"
+              aria-describedby="recoveryEmailError"
+            />
+            <p class="form-error" id="recoveryEmailError" role="alert" aria-live="polite"></p>
+            <p class="form-status" id="recoveryRequestStatus" role="status" aria-live="polite"></p>
+            <button class="button dark full" type="submit">Үргэлжлүүлэх</button>
+          </form>
+          <form class="hidden" id="passwordResetForm" novalidate>
+            <p class="recovery-demo-note" id="recoveryResetNote"></p>
+            <label for="newPassword">Шинэ нууц үг</label>
+            <input
+              id="newPassword"
+              type="password"
+              autocomplete="new-password"
+              aria-describedby="passwordResetError"
+              minlength="8"
+            />
+            <label for="confirmNewPassword">Шинэ нууц үгээ давтах</label>
+            <input
+              id="confirmNewPassword"
+              type="password"
+              autocomplete="new-password"
+              aria-describedby="passwordResetError"
+            />
+            <p class="form-error" id="passwordResetError" role="alert" aria-live="polite"></p>
+            <button class="button dark full" type="submit">Нууц үг шинэчлэх</button>
+          </form>
+        </section>
+        <small class="security-note" id="authSecurityNote"
+          >Энэ бол демо нэвтрэлт. localStorage дахь энгийн нууц үг бодит хэрэглэгчийн мэдээлэлд
+          аюулгүй биш.</small
+        >
+      </div>
+    </div>

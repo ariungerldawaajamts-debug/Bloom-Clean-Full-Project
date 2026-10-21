@@ -1,0 +1,125 @@
+      <section class="admin-section hidden" id="admin">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Зөвхөн удирдлагад</p>
+            <h2 id="adminSectionTitle">Захиалга <em>удирдах</em></h2>
+          </div>
+        </div>
+        <nav class="admin-tabs aligned-content" aria-label="Админ хэсгүүд">
+          <button class="header-btn active" type="button" data-admin-tab="orders">Захиалга</button>
+          <button class="header-btn" type="button" data-admin-tab="products">Бүтээгдэхүүн</button>
+          <button class="header-btn" type="button" data-admin-tab="bundles">Багц</button>
+          <button class="header-btn" type="button" data-admin-tab="delivery">Хүргэлт</button>
+          <button class="header-btn" type="button" data-admin-tab="about">Бидний тухай</button>
+          <button class="header-btn" type="button" data-admin-tab="profile">Миний мэдээлэл</button>
+          <button class="header-btn" type="button" data-admin-tab="settings">Тохиргоо</button>
+        </nav>
+        <p class="admin-demo-note">
+          Энэ нь frontend demo систем бөгөөд мэдээллийг зөвхөн тухайн төхөөрөмжийн localStorage-д
+          хадгална. “Бидний тухай” засвар зөвхөн энэ браузер дээр хадгалагдана.
+        </p>
+        <section class="admin-product-panel hidden" id="adminProductPanel">
+          <div class="admin-product-heading">
+            <h3 id="adminProductListTitle">Бүтээгдэхүүний жагсаалт</h3>
+            <button class="button dark" id="addProductButton" type="button">
+              Бүтээгдэхүүн нэмэх
+            </button>
+          </div>
+          <div class="admin-product-filters">
+            <input id="adminProductSearch" type="search" placeholder="Бүтээгдэхүүн хайх" />
+            <select id="adminProductType">
+              <option value="all">Бүх төрөл</option>
+              <option value="flower">Цэцэг</option>
+              <option value="coffee">Кофе</option>
+              <option value="bundle">Бэлгийн багц</option>
+            </select>
+            <select id="adminProductAvailability">
+              <option value="all">Бүх төлөв</option>
+              <option value="available">Бэлэн</option>
+              <option value="unavailable">Бэлэн биш</option>
+              <option value="inactive">Идэвхгүй</option>
+            </select>
+            <select id="adminProductSort">
+              <option value="name">Нэрээр</option>
+              <option value="price-asc">Үнэ өсөхөөр</option>
+              <option value="price-desc">Үнэ буурахаар</option>
+            </select>
+          </div>
+          <div class="admin-product-list" id="adminProductList"></div>
+        </section>
+        <div class="stats" id="adminStats"></div>
+        <div class="admin-tools" id="adminTools">
+          <input id="adminSearch" placeholder="Захиалгын дугаар, нэр хайх" />
+          <select id="adminStatusFilter">
+            <option value="all">Бүх төлөв</option>
+            <option value="confirmed">Баталгаажсан</option>
+            <option value="preparing">Бэлтгэж байна</option>
+            <option value="out">Хүргэлтэд гарсан</option>
+            <option value="delivered">Хүргэгдсэн</option>
+          </select>
+        </div>
+        <div class="admin-management" id="adminManagement">
+          <button class="button dark" id="toggleTracking">Демо tracking: асаалттай</button
+          ><button class="button ghost" id="advanceOrder">Сонгосон захиалгыг ахиулах</button
+          ><button class="button ghost" id="addDemoProduct">Демо бүтээгдэхүүн нэмэх</button
+          ><button class="button ghost" id="manageAvailability">
+            Бүтээгдэхүүний бэлэн байдлыг удирдах</button
+          ><button class="button ghost" id="configureDelivery">Хүргэлтийн тариф тохируулах</button>
+          <div id="availabilityList" class="availability-list"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Захиалгын дугаар</th>
+                <th>Үйлчлүүлэгч</th>
+                <th>Утас</th>
+                <th>Огноо</th>
+                <th>Нийт дүн</th>
+                <th>Төлөв</th>
+                <th>Үйлдэл</th>
+              </tr>
+            </thead>
+            <tbody id="adminTable"></tbody>
+          </table>
+        </div>
+        <div class="admin-delivery-panel hidden" id="adminDeliveryPanel">
+          <div class="admin-product-heading">
+            <h3>Хүргэлтийн захиалгууд</h3>
+            <p>Хүргэлтийн мэдээлэл нь холбогдох захиалгатайгаа хамт хадгалагдана.</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Захиалга</th>
+                  <th>Хүлээн авагч</th>
+                  <th>Утас</th>
+                  <th>Хаяг</th>
+                  <th>Хүргүүлэх</th>
+                  <th>Төлбөр</th>
+                  <th>Хүргэлтийн төлөв</th>
+                </tr>
+              </thead>
+              <tbody id="adminDeliveryTable"></tbody>
+            </table>
+          </div>
+        </div>
+        <section
+          class="admin-about-panel hidden"
+          id="adminAboutPanel"
+          aria-labelledby="adminAboutHeading"
+        >
+          <h3 id="adminAboutHeading">“Бидний тухай” хэсгийг засах</h3>
+          <label for="editAbout1">Эхний догол мөр</label>
+          <textarea id="editAbout1" rows="5"></textarea>
+          <label for="editAbout2">Хоёр дахь догол мөр</label>
+          <textarea id="editAbout2" rows="5"></textarea>
+          <label for="editAboutContact">Холбоо барих мэдээлэл</label>
+          <textarea id="editAboutContact" rows="3"></textarea>
+          <div class="admin-about-actions">
+            <button class="button dark" id="saveAbout" type="button">Хадгалах</button>
+            <button class="button ghost" id="resetAbout" type="button">Анхны төлөвт буцаах</button>
+          </div>
+        </section>
+      </section>
