@@ -1,478 +1,879 @@
 <!doctype html>
 <html lang="mn">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Bloom Coffee House - цэцэг ба кофе">
-<title>Bloom Coffee House | Цэцэг ба кофе</title>
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="dashboard.css">
-</head>
-<body>
-<div class="announcement">Шинэхэн цэцэг, дулаахан кофе · Дархан хотод өдөр бүр хүргэлттэй
-
-</div>
-<header class="site-header">
-        <button class="menu-toggle" id="menuToggle" type="button" aria-label="Цэс нээх" aria-controls="mainNav" aria-expanded="false">☰</button>
-    <a class="brand" href="#home">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content="Bloom Coffee House - цэцэг ба кофе" />
+    <title>Bloom Coffee House | Цэцэг ба кофе</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+  <body>
+    <div class="announcement">Шинэхэн цэцэг, дулаахан кофе · Дархан хотод өдөр бүр хүргэлттэй</div>
+    <header class="site-header">
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        type="button"
+        aria-label="Цэс нээх"
+        aria-controls="mainNav"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+      <a class="brand" href="#home">
         <span class="brand-mark">✿</span>
-        <span><b>Bloom</b><small>Coffee House</small></span></a>
-        <button class="mobile-search-button" id="mobileSearchButton" type="button" aria-label="Бүтээгдэхүүн хайх">
-            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.6"></circle><path d="m16 16 4.2 4.2"></path></svg>
-        </button>
-        <nav id="mainNav"><a href="#home">Нүүр</a>
-            <a href="#flowers">Цэцэг</a><a href="#coffee">Кофе</a>
-            <a href="#about">Бидний тухай</a>
-            <a class="mobile-only-nav" href="#bundles">Бэлгийн багц</a>
-            <a class="mobile-only-nav" href="#wishlist">Хүслийн жагсаалт <i id="mobileWishlistCount">0</i></a>
-        </nav><div class="header-actions">
-            <button class="text-button header-btn" id="authButton">Нэвтрэх</button>
-            <a class="text-button header-btn hidden" id="userOrdersLink" href="#account/orders">Миний захиалга</a>
-            <a class="text-button header-btn hidden" id="userWishlistLink" href="#account/wishlist">Хүслийн жагсаалт</a>
-            <a class="text-button header-btn hidden" id="adminDashboardButton" href="#admin/orders">Админ удирдлага</a>
-            <button class="round-button" id="wishlistButton">♡<i id="wishlistCount">0</i>
-            </button><button class="cart-button" id="cartButton">Сагс <i id="cartCount">0</i>
-            </button></div><nav id="headerAdminTabs" class="header-tabs" aria-label="Админ хэсгүүд"></nav></header>
-<main id="home">
-<section class="hero">
-    <div class="hero-copy">
-        <p class="eyebrow">Цэцэгсийн жижигхэн ертөнц</p>
-        <h1>Цэцэгсийн гоо үзэсгэлэн,<br><em>кофены дулаан мэдрэмж</em>
-        </h1>
-        <p>Bloom Coffee House-д шинэхэн баглаа, гараар бэлтгэсэн кофе, хайр шингэсэн бэлэг нэг дор.</p>
-        <div class="hero-actions">
+        <span><b>Bloom</b><small>Coffee House</small></span></a
+      >
+      <button
+        class="mobile-search-button"
+        id="mobileSearchButton"
+        type="button"
+        aria-label="Бүтээгдэхүүн хайх"
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <circle cx="10.8" cy="10.8" r="6.6"></circle>
+          <path d="m16 16 4.2 4.2"></path>
+        </svg>
+      </button>
+      <nav id="mainNav">
+        <a href="#home">Нүүр</a> <a href="#flowers">Цэцэг</a><a href="#coffee">Кофе</a>
+        <a href="#about">Бидний тухай</a>
+        <a class="mobile-only-nav" href="#bundles">Бэлгийн багц</a>
+        <a class="mobile-only-nav" href="#wishlist"
+          >Хүслийн жагсаалт <i id="mobileWishlistCount">0</i></a
+        >
+      </nav>
+      <div class="header-actions">
+        <button class="text-button header-btn" id="authButton">Нэвтрэх</button>
+        <a class="text-button header-btn hidden" id="userOrdersLink" href="#account/orders"
+          >Миний захиалга</a
+        >
+        <a class="text-button header-btn hidden" id="userWishlistLink" href="#account/wishlist"
+          >Хүслийн жагсаалт</a
+        >
+        <a class="text-button header-btn hidden" id="adminDashboardButton" href="#admin/orders"
+          >Админ удирдлага</a
+        >
+        <button class="round-button" id="wishlistButton">♡<i id="wishlistCount">0</i></button
+        ><button class="cart-button" id="cartButton">Сагс <i id="cartCount">0</i></button>
+      </div>
+      <nav id="headerAdminTabs" class="header-tabs" aria-label="Админ хэсгүүд"></nav>
+    </header>
+    <main id="home">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Цэцэгсийн жижигхэн ертөнц</p>
+          <h1>Цэцэгсийн гоо үзэсгэлэн,<br /><em>кофены дулаан мэдрэмж</em></h1>
+          <p>
+            Bloom Coffee House-д шинэхэн баглаа, гараар бэлтгэсэн кофе, хайр шингэсэн бэлэг нэг дор.
+          </p>
+          <div class="hero-actions">
             <a class="button primary" href="#flowers">Цэцгийн баглаа үзэх</a>
-            <a class="button ghost" href="#coffee">Кофе сонгох</a></div>
-            <div class="hero-note">Өдөр бүр 09:00–21:00 · Дархан хот</div>
-        </div><div class="hero-art" id="heroArt"></div>
-    </section>
-<div class="promise">
-    <span>✿ Шинэхэн цэцэг</span>
-    <span>☕ Чанартай кофе</span>
-    <span>♡ Хүртээмжтэй хүргэлт</span>
-</div>
-<section class="section" id="flowers">
-    <div class="section-heading"><div>
-        <p class="eyebrow">Bloom-ийн сонголт</p>
-        <h2>Таны сэтгэлийг илэрхийлэх <em>баглаа</em></h2>
-    </div><p>Өнгө, хэмжээ, зориулалтаар нь сонгож, хайртай хүндээ илгээгээрэй.</p>
-</div><div class="toolbar"><div class="tabs" id="flowerTabs">
-    <button class="active" data-flower-filter="all">Бүгд</button>
-    <button data-flower-filter="romance">Хайртдаа</button>
-    <button data-flower-filter="birthday">Төрсөн өдөрт</button>
-    <button data-flower-filter="mom">Ээждээ</button>
-    <button data-flower-filter="mini">Бяцхан баглаа</button>
-    <button data-flower-filter="featured">Онцлох</button>
-</div><label class="sort">Эрэмбэ <select id="flowerSort">
-    <option value="default">Сонгох</option>
-    <option value="low">Үнэ өсөхөөр</option>
-    <option value="high">Үнэ буурахаар</option>
-    <option value="name">Нэрээр</option>
-</select>
-</label>
-<div class="advanced-search"><input id="productSearch" type="search" placeholder="Цэцэг, кофе, бэлгийн багц хайх"><input id="minPrice" type="number" min="0" placeholder="Доод үнэ"><input id="maxPrice" type="number" min="0" placeholder="Дээд үнэ"><button id="clearFilters" type="button">Шүүлтүүр цэвэрлэх</button></div><p class="result-count" id="flowerCount"></p>
-<div class="product-grid" id="flowerGrid"></div>
-<div class="product-grid" id="flowerGrid"></div>
-</div>
-</section>
-</section>
-<section class="story">
-    <div><p class="eyebrow">Нэг аяга кофе, нэг нандин баглаа</p>
-        <h2>Хором мөч бүрийг <br><em>илүү гэгээлэг болгоно.</em>
-        </h2><p>Бид цэцэгсийн өнгө, кофены үнэр, хүний сайхан сэтгэлийг нэгэн дулаан орон зайд холбосон.</p>
-        <a class="button dark" href="#about">Bloom-ийн тухай</a>
-    </div><div class="story-art" id="storyArt"></div>
-</section>
-<section class="section coffee-section" id="coffee">
-    <div class="section-heading"><div>
-        <p class="eyebrow">Bloom Coffee Corner</p>
-        <h2>Тайвшрах <em>аяга</em></h2></div>
-        <p>Өглөөг сэргээх халуун кофе эсвэл зуны өдөрт зориулсан хүйтэн ундаанаас сонгоно уу.</p>
-    </div><div class="tabs aligned-content" id="drinkTabs">
-        <button class="active" data-drink-filter="all">Бүгд</button>
-        <button data-drink-filter="hot">Халуун</button>
-        <button data-drink-filter="cold">Хүйтэн</button>
-        <button data-drink-filter="noncoffee">Кафенгүй</button>
-    </div><div class="product-grid drink-grid" id="drinkGrid"></div>
-</section>
-<section class="bundle-section" id="bundles">
-    <div class="section-heading"><div>
-        <p class="eyebrow">Bloom-ийн бэлэг</p>
-        <h2>Сэтгэл шингэсэн <em>багц</em></h2>
-    </div><p>Баглаа, кофе, мэндчилгээний картыг нэгэн гоёмсог бэлэг болгон сонгоорой.</p>
-</div><div class="bundle-grid" id="bundleGrid"></div>
-<button class="button dark builder-launch" id="builderButton">Өөрийн бэлгийн багцыг бүтээх</button>
-</section>
-<section class="user-dashboard hidden" id="userDashboard" aria-label="Хэрэглэгчийн dashboard">
-    <div class="dashboard-heading">
-        <p class="eyebrow">Таны Bloom бүртгэл</p>
-        <h1>Хэрэглэгчийн <em>dashboard</em></h1>
-        <p id="userDashboardGreeting"></p>
-    </div>
-    <nav class="user-dashboard-tabs" aria-label="Хэрэглэгчийн хэсгүүд">
-        <a href="#account/orders" data-user-tab="orders">Миний захиалга</a>
-        <a href="#account/delivery" data-user-tab="delivery">Хүргэлтийн төлөв</a>
-        <a href="#account/wishlist" data-user-tab="wishlist">Хүслийн жагсаалт</a>
-        <a href="#account/profile" data-user-tab="profile">Миний мэдээлэл</a>
-        <button type="button" id="userLogoutButton">Гарах</button>
-    </nav>
-<section class="section tracking-section" id="delivery">
-    <div class="section-heading"><div>
-        <p class="eyebrow">Сэтгэл догдлон хүлээх мөч</p>
-        <h2>Хүргэлтийн явцыг <em>хараарай</em></h2>
-    </div>
-    <p>Захиалгын төлөв өөрчлөгдөх бүрд энд шинэчлэгдэнэ.</p>
-</div>
-<div id="tracking"></div></section>
-<section class="section pale" id="orders">
-    <div class="section-heading centered">
-        <div><p class="eyebrow">Таны түүх</p>
-            <h2>Миний <em>захиалга</em></h2>
-        </div></div><div class="lookup-box"><p class="eyebrow">Өөрийн захиалга хайх</p><p>Хайлт зөвхөн таны энэ browser-ийн demo бүртгэлтэй холбогдсон захиалгыг шалгана.</p><div><input id="lookupOrderId" placeholder="Захиалгын дугаар"><input id="lookupPhone" placeholder="Утасны дугаар"><button class="button dark" id="lookupButton">Хайх</button></div><p class="form-error" id="lookupError"></p></div><div id="orderList"></div>
-    </section>
-<section class="section pale" id="wishlist">
-    <div class="section-heading centered">
-        <div><p class="eyebrow">Хадгалсан сонголт</p>
-            <h2>Хүслийн <em>жагсаалт</em></h2></div>
-        </div><div class="product-grid" id="wishlistGrid"></div>
-    </section>
-<section class="section pale profile-section hidden" id="profile">
-    <div class="section-heading centered"><div>
-        <p class="eyebrow">Хувийн мэдээлэл</p>
-        <h2>Миний <em>мэдээлэл</em></h2>
-    </div></div>
-    <div class="profile-card">
-        <p><span>Нэр</span><strong id="profileName"></strong><input id="profileNameInput" class="hidden" aria-label="Нэр"></p>
-        <p><span>И-мэйл</span><strong id="profileEmail"></strong></p>
-        <p id="profileRoleRow" class="hidden"><span>Эрх</span><strong id="profileRole"></strong></p>
-        <p id="profileEditError" class="form-error hidden" role="alert"></p>
-        <div class="profile-actions">
-            <button class="button ghost" id="editProfileName" type="button">Засах</button>
-            <button class="button dark hidden" id="saveProfileName" type="button">Хадгалах</button>
-            <button class="button ghost hidden" id="cancelProfileName" type="button">Болих</button>
+            <a class="button ghost" href="#coffee">Кофе сонгох</a>
+          </div>
+          <div class="hero-note">Өдөр бүр 09:00–21:00 · Дархан хот</div>
         </div>
-        <small>Энэ demo бүртгэлийн мэдээлэл зөвхөн энэ browser-ийн localStorage-д хадгалагдана.</small>
-    </div>
-</section>
-</section>
-<section class="admin-section hidden" id="admin">
-    <div class="section-heading"><div>
-        <p class="eyebrow">Зөвхөн удирдлагад</p>
-        <h2 id="adminSectionTitle">Захиалга <em>удирдах</em></h2>
-    </div></div>
-    <nav class="admin-tabs aligned-content" aria-label="Админ хэсгүүд">
-        <button class="header-btn active" type="button" data-admin-tab="orders">Захиалга</button>
-        <button class="header-btn" type="button" data-admin-tab="products">Бүтээгдэхүүн</button>
-        <button class="header-btn" type="button" data-admin-tab="bundles">Багц</button>
-        <button class="header-btn" type="button" data-admin-tab="delivery">Хүргэлт</button>
-        <button class="header-btn" type="button" data-admin-tab="about">Бидний тухай</button>
-        <button class="header-btn" type="button" data-admin-tab="profile">Миний мэдээлэл</button>
-        <button class="header-btn" type="button" data-admin-tab="settings">Тохиргоо</button>
-    </nav>
-    <p class="admin-demo-note">Энэ нь frontend demo систем бөгөөд мэдээллийг зөвхөн тухайн төхөөрөмжийн localStorage-д хадгална. “Бидний тухай” засвар зөвхөн энэ браузер дээр хадгалагдана.</p>
-    <section class="admin-product-panel hidden" id="adminProductPanel">
-        <div class="admin-product-heading"><h3 id="adminProductListTitle">Бүтээгдэхүүний жагсаалт</h3><button class="button dark" id="addProductButton" type="button">Бүтээгдэхүүн нэмэх</button></div>
-        <div class="admin-product-filters">
-            <input id="adminProductSearch" type="search" placeholder="Бүтээгдэхүүн хайх">
-            <select id="adminProductType"><option value="all">Бүх төрөл</option><option value="flower">Цэцэг</option><option value="coffee">Кофе</option><option value="bundle">Бэлгийн багц</option></select>
-            <select id="adminProductAvailability"><option value="all">Бүх төлөв</option><option value="available">Бэлэн</option><option value="unavailable">Бэлэн биш</option><option value="inactive">Идэвхгүй</option></select>
-            <select id="adminProductSort"><option value="name">Нэрээр</option><option value="price-asc">Үнэ өсөхөөр</option><option value="price-desc">Үнэ буурахаар</option></select>
+        <div class="hero-art" id="heroArt"></div>
+      </section>
+      <div class="promise">
+        <span>✿ Шинэхэн цэцэг</span>
+        <span>☕ Чанартай кофе</span>
+        <span>♡ Хүртээмжтэй хүргэлт</span>
+      </div>
+      <section class="section" id="flowers">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Bloom-ийн сонголт</p>
+            <h2>Таны сэтгэлийг илэрхийлэх <em>баглаа</em></h2>
+          </div>
+          <p>Өнгө, хэмжээ, зориулалтаар нь сонгож, хайртай хүндээ илгээгээрэй.</p>
         </div>
-        <div class="admin-product-list" id="adminProductList"></div>
-    </section>
-    <div class="stats" id="adminStats">
-    </div>
-    <div class="admin-tools" id="adminTools">
-        <input id="adminSearch" placeholder="Захиалгын дугаар, нэр хайх">
-        <select id="adminStatusFilter"><option value="all">Бүх төлөв</option>
+        <div class="toolbar">
+          <div class="tabs" id="flowerTabs">
+            <button class="active" data-flower-filter="all">Бүгд</button>
+            <button data-flower-filter="romance">Хайртдаа</button>
+            <button data-flower-filter="birthday">Төрсөн өдөрт</button>
+            <button data-flower-filter="mom">Ээждээ</button>
+            <button data-flower-filter="mini">Бяцхан баглаа</button>
+            <button data-flower-filter="featured">Онцлох</button>
+          </div>
+          <label class="sort"
+            >Эрэмбэ
+            <select id="flowerSort">
+              <option value="default">Сонгох</option>
+              <option value="low">Үнэ өсөхөөр</option>
+              <option value="high">Үнэ буурахаар</option>
+              <option value="name">Нэрээр</option>
+            </select>
+          </label>
+          <div class="advanced-search">
+            <input
+              id="productSearch"
+              type="search"
+              placeholder="Цэцэг, кофе, бэлгийн багц хайх"
+            /><input id="minPrice" type="number" min="0" placeholder="Доод үнэ" /><input
+              id="maxPrice"
+              type="number"
+              min="0"
+              placeholder="Дээд үнэ"
+            /><button id="clearFilters" type="button">Шүүлтүүр цэвэрлэх</button>
+          </div>
+          <p class="result-count" id="flowerCount"></p>
+          <div class="product-grid" id="flowerGrid"></div>
+        </div>
+      </section>
+      <section class="story">
+        <div>
+          <p class="eyebrow">Нэг аяга кофе, нэг нандин баглаа</p>
+          <h2>Хором мөч бүрийг <br /><em>илүү гэгээлэг болгоно.</em></h2>
+          <p>
+            Бид цэцэгсийн өнгө, кофены үнэр, хүний сайхан сэтгэлийг нэгэн дулаан орон зайд холбосон.
+          </p>
+          <a class="button dark" href="#about">Bloom-ийн тухай</a>
+        </div>
+        <div class="story-art" id="storyArt"></div>
+      </section>
+      <section class="section coffee-section" id="coffee">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Bloom Coffee Corner</p>
+            <h2>Тайвшрах <em>аяга</em></h2>
+          </div>
+          <p>Өглөөг сэргээх халуун кофе эсвэл зуны өдөрт зориулсан хүйтэн ундаанаас сонгоно уу.</p>
+        </div>
+        <div class="tabs aligned-content" id="drinkTabs">
+          <button class="active" data-drink-filter="all">Бүгд</button>
+          <button data-drink-filter="hot">Халуун</button>
+          <button data-drink-filter="cold">Хүйтэн</button>
+          <button data-drink-filter="noncoffee">Кафенгүй</button>
+        </div>
+        <div class="product-grid drink-grid" id="drinkGrid"></div>
+      </section>
+      <section class="bundle-section" id="bundles">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Bloom-ийн бэлэг</p>
+            <h2>Сэтгэл шингэсэн <em>багц</em></h2>
+          </div>
+          <p>Баглаа, кофе, мэндчилгээний картыг нэгэн гоёмсог бэлэг болгон сонгоорой.</p>
+        </div>
+        <div class="bundle-grid" id="bundleGrid"></div>
+        <button class="button dark builder-launch" id="builderButton">
+          Өөрийн бэлгийн багцыг бүтээх
+        </button>
+      </section>
+      <section class="user-dashboard hidden" id="userDashboard" aria-label="Хэрэглэгчийн dashboard">
+        <div class="dashboard-heading">
+          <p class="eyebrow">Таны Bloom бүртгэл</p>
+          <h1>Хэрэглэгчийн <em>dashboard</em></h1>
+          <p id="userDashboardGreeting"></p>
+        </div>
+        <nav class="user-dashboard-tabs" aria-label="Хэрэглэгчийн хэсгүүд">
+          <a href="#account/orders" data-user-tab="orders">Миний захиалга</a>
+          <a href="#account/delivery" data-user-tab="delivery">Хүргэлтийн төлөв</a>
+          <a href="#account/wishlist" data-user-tab="wishlist">Хүслийн жагсаалт</a>
+          <a href="#account/profile" data-user-tab="profile">Миний мэдээлэл</a>
+          <button type="button" id="userLogoutButton">Гарах</button>
+        </nav>
+        <section class="section tracking-section" id="delivery">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Сэтгэл догдлон хүлээх мөч</p>
+              <h2>Хүргэлтийн явцыг <em>хараарай</em></h2>
+            </div>
+            <p>Захиалгын төлөв өөрчлөгдөх бүрд энд шинэчлэгдэнэ.</p>
+          </div>
+          <div id="tracking"></div>
+        </section>
+        <section class="section pale" id="orders">
+          <div class="section-heading centered">
+            <div>
+              <p class="eyebrow">Таны түүх</p>
+              <h2>Миний <em>захиалга</em></h2>
+            </div>
+          </div>
+          <div class="lookup-box">
+            <p class="eyebrow">Өөрийн захиалга хайх</p>
+            <p>Хайлт зөвхөн таны энэ browser-ийн demo бүртгэлтэй холбогдсон захиалгыг шалгана.</p>
+            <div>
+              <input id="lookupOrderId" placeholder="Захиалгын дугаар" /><input
+                id="lookupPhone"
+                placeholder="Утасны дугаар"
+              /><button class="button dark" id="lookupButton">Хайх</button>
+            </div>
+            <p class="form-error" id="lookupError"></p>
+          </div>
+          <div id="orderList"></div>
+        </section>
+        <section class="section pale" id="wishlist">
+          <div class="section-heading centered">
+            <div>
+              <p class="eyebrow">Хадгалсан сонголт</p>
+              <h2>Хүслийн <em>жагсаалт</em></h2>
+            </div>
+          </div>
+          <div class="product-grid" id="wishlistGrid"></div>
+        </section>
+        <section class="section pale profile-section hidden" id="profile">
+          <div class="section-heading centered">
+            <div>
+              <p class="eyebrow">Хувийн мэдээлэл</p>
+              <h2>Миний <em>мэдээлэл</em></h2>
+            </div>
+          </div>
+          <div class="profile-card">
+            <p>
+              <span>Нэр</span><strong id="profileName"></strong
+              ><input id="profileNameInput" class="hidden" aria-label="Нэр" />
+            </p>
+            <p><span>И-мэйл</span><strong id="profileEmail"></strong></p>
+            <p id="profileRoleRow" class="hidden">
+              <span>Эрх</span><strong id="profileRole"></strong>
+            </p>
+            <p id="profileEditError" class="form-error hidden" role="alert"></p>
+            <div class="profile-actions">
+              <button class="button ghost" id="editProfileName" type="button">Засах</button>
+              <button class="button dark hidden" id="saveProfileName" type="button">
+                Хадгалах
+              </button>
+              <button class="button ghost hidden" id="cancelProfileName" type="button">
+                Болих
+              </button>
+            </div>
+            <small
+              >Энэ demo бүртгэлийн мэдээлэл зөвхөн энэ browser-ийн localStorage-д
+              хадгалагдана.</small
+            >
+          </div>
+        </section>
+      </section>
+      <section class="admin-section hidden" id="admin">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Зөвхөн удирдлагад</p>
+            <h2 id="adminSectionTitle">Захиалга <em>удирдах</em></h2>
+          </div>
+        </div>
+        <nav class="admin-tabs aligned-content" aria-label="Админ хэсгүүд">
+          <button class="header-btn active" type="button" data-admin-tab="orders">Захиалга</button>
+          <button class="header-btn" type="button" data-admin-tab="products">Бүтээгдэхүүн</button>
+          <button class="header-btn" type="button" data-admin-tab="bundles">Багц</button>
+          <button class="header-btn" type="button" data-admin-tab="delivery">Хүргэлт</button>
+          <button class="header-btn" type="button" data-admin-tab="about">Бидний тухай</button>
+          <button class="header-btn" type="button" data-admin-tab="profile">Миний мэдээлэл</button>
+          <button class="header-btn" type="button" data-admin-tab="settings">Тохиргоо</button>
+        </nav>
+        <p class="admin-demo-note">
+          Энэ нь frontend demo систем бөгөөд мэдээллийг зөвхөн тухайн төхөөрөмжийн localStorage-д
+          хадгална. “Бидний тухай” засвар зөвхөн энэ браузер дээр хадгалагдана.
+        </p>
+        <section class="admin-product-panel hidden" id="adminProductPanel">
+          <div class="admin-product-heading">
+            <h3 id="adminProductListTitle">Бүтээгдэхүүний жагсаалт</h3>
+            <button class="button dark" id="addProductButton" type="button">
+              Бүтээгдэхүүн нэмэх
+            </button>
+          </div>
+          <div class="admin-product-filters">
+            <input id="adminProductSearch" type="search" placeholder="Бүтээгдэхүүн хайх" />
+            <select id="adminProductType">
+              <option value="all">Бүх төрөл</option>
+              <option value="flower">Цэцэг</option>
+              <option value="coffee">Кофе</option>
+              <option value="bundle">Бэлгийн багц</option>
+            </select>
+            <select id="adminProductAvailability">
+              <option value="all">Бүх төлөв</option>
+              <option value="available">Бэлэн</option>
+              <option value="unavailable">Бэлэн биш</option>
+              <option value="inactive">Идэвхгүй</option>
+            </select>
+            <select id="adminProductSort">
+              <option value="name">Нэрээр</option>
+              <option value="price-asc">Үнэ өсөхөөр</option>
+              <option value="price-desc">Үнэ буурахаар</option>
+            </select>
+          </div>
+          <div class="admin-product-list" id="adminProductList"></div>
+        </section>
+        <div class="stats" id="adminStats"></div>
+        <div class="admin-tools" id="adminTools">
+          <input id="adminSearch" placeholder="Захиалгын дугаар, нэр хайх" />
+          <select id="adminStatusFilter">
+            <option value="all">Бүх төлөв</option>
             <option value="confirmed">Баталгаажсан</option>
             <option value="preparing">Бэлтгэж байна</option>
             <option value="out">Хүргэлтэд гарсан</option>
             <option value="delivered">Хүргэгдсэн</option>
-        </select></div><div class="admin-management" id="adminManagement"><button class="button dark" id="toggleTracking">Демо tracking: асаалттай</button><button class="button ghost" id="advanceOrder">Сонгосон захиалгыг ахиулах</button><button class="button ghost" id="addDemoProduct">Демо бүтээгдэхүүн нэмэх</button><button class="button ghost" id="manageAvailability">Бүтээгдэхүүний бэлэн байдлыг удирдах</button><button class="button ghost" id="configureDelivery">Хүргэлтийн тариф тохируулах</button><div id="availabilityList" class="availability-list"></div></div><div class="table-wrap"><table>
-            <thead><tr><th>Захиалгын дугаар</th>
+          </select>
+        </div>
+        <div class="admin-management" id="adminManagement">
+          <button class="button dark" id="toggleTracking">Демо tracking: асаалттай</button
+          ><button class="button ghost" id="advanceOrder">Сонгосон захиалгыг ахиулах</button
+          ><button class="button ghost" id="addDemoProduct">Демо бүтээгдэхүүн нэмэх</button
+          ><button class="button ghost" id="manageAvailability">
+            Бүтээгдэхүүний бэлэн байдлыг удирдах</button
+          ><button class="button ghost" id="configureDelivery">Хүргэлтийн тариф тохируулах</button>
+          <div id="availabilityList" class="availability-list"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Захиалгын дугаар</th>
                 <th>Үйлчлүүлэгч</th>
                 <th>Утас</th>
                 <th>Огноо</th>
                 <th>Нийт дүн</th>
                 <th>Төлөв</th>
                 <th>Үйлдэл</th>
-            </tr></thead>
-                <tbody id="adminTable"></tbody>
-            </table>
+              </tr>
+            </thead>
+            <tbody id="adminTable"></tbody>
+          </table>
         </div>
         <div class="admin-delivery-panel hidden" id="adminDeliveryPanel">
-                <div class="admin-product-heading"><h3>Хүргэлтийн захиалгууд</h3><p>Хүргэлтийн мэдээлэл нь холбогдох захиалгатайгаа хамт хадгалагдана.</p></div>
-                <div class="table-wrap"><table>
-                    <thead><tr><th>Захиалга</th><th>Хүлээн авагч</th><th>Утас</th><th>Хаяг</th><th>Хүргүүлэх</th><th>Төлбөр</th><th>Хүргэлтийн төлөв</th></tr></thead>
-                    <tbody id="adminDeliveryTable"></tbody>
-                </table></div>
+          <div class="admin-product-heading">
+            <h3>Хүргэлтийн захиалгууд</h3>
+            <p>Хүргэлтийн мэдээлэл нь холбогдох захиалгатайгаа хамт хадгалагдана.</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Захиалга</th>
+                  <th>Хүлээн авагч</th>
+                  <th>Утас</th>
+                  <th>Хаяг</th>
+                  <th>Хүргүүлэх</th>
+                  <th>Төлбөр</th>
+                  <th>Хүргэлтийн төлөв</th>
+                </tr>
+              </thead>
+              <tbody id="adminDeliveryTable"></tbody>
+            </table>
+          </div>
         </div>
-        <section class="admin-about-panel hidden" id="adminAboutPanel" aria-labelledby="adminAboutHeading">
-            <h3 id="adminAboutHeading">“Бидний тухай” хэсгийг засах</h3>
-            <label for="editAbout1">Эхний догол мөр</label>
-            <textarea id="editAbout1" rows="5"></textarea>
-            <label for="editAbout2">Хоёр дахь догол мөр</label>
-            <textarea id="editAbout2" rows="5"></textarea>
-            <label for="editAboutContact">Холбоо барих мэдээлэл</label>
-            <textarea id="editAboutContact" rows="3"></textarea>
-            <div class="admin-about-actions">
-                <button class="button dark" id="saveAbout" type="button">Хадгалах</button>
-                <button class="button ghost" id="resetAbout" type="button">Анхны төлөвт буцаах</button>
-            </div>
+        <section
+          class="admin-about-panel hidden"
+          id="adminAboutPanel"
+          aria-labelledby="adminAboutHeading"
+        >
+          <h3 id="adminAboutHeading">“Бидний тухай” хэсгийг засах</h3>
+          <label for="editAbout1">Эхний догол мөр</label>
+          <textarea id="editAbout1" rows="5"></textarea>
+          <label for="editAbout2">Хоёр дахь догол мөр</label>
+          <textarea id="editAbout2" rows="5"></textarea>
+          <label for="editAboutContact">Холбоо барих мэдээлэл</label>
+          <textarea id="editAboutContact" rows="3"></textarea>
+          <div class="admin-about-actions">
+            <button class="button dark" id="saveAbout" type="button">Хадгалах</button>
+            <button class="button ghost" id="resetAbout" type="button">Анхны төлөвт буцаах</button>
+          </div>
         </section>
-    </section>
-<section class="about" id="about">
-    <div>
-        <p class="eyebrow">Бидний тухай</p>
-        <h2>Бэлэг бүрт <em>сэтгэл</em> бий.</h2>
-    </div>
-    <div>
-        <p id="aboutText1">Bloom Coffee House бол цэцэг ба кофег нэгэн орон зайд хослуулсан Дархан хотын жижигхэн булан юм. Бид таны өдөр тутмын баяр, талархал, дурсамж бүрийг илүү үзэсгэлэнтэй болгохыг хүсдэг.
-
-        </p>
-        <p id="aboutText2">Баглаа бүрийг шинэхэн цэцгээр анхааралтай бэлтгэж, кофены буланд аяга бүрийг тайван мөчид тохируулан урладаг. Таны илгээх бэлэг дулаан, бодолтой, мартагдашгүй байг.</p>
-        <p class="contact" id="aboutContact">Дархан хот, Дархан-Уул аймаг · Өдөр бүр 09:00–21:00<br>9987 3899 · hello@bloom.mn</p>
-    </div>
-</section>
-</main>
-<nav class="mobile-bottom-nav" aria-label="Гар утасны үндсэн цэс">
-    <a class="mobile-nav-item" href="#home" aria-label="Нүүр">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"></path></svg>
+      </section>
+      <section class="about" id="about">
+        <div>
+          <p class="eyebrow">Бидний тухай</p>
+          <h2>Бэлэг бүрт <em>сэтгэл</em> бий.</h2>
+        </div>
+        <div>
+          <p id="aboutText1">
+            Bloom Coffee House бол цэцэг ба кофег нэгэн орон зайд хослуулсан Дархан хотын жижигхэн
+            булан юм. Бид таны өдөр тутмын баяр, талархал, дурсамж бүрийг илүү үзэсгэлэнтэй болгохыг
+            хүсдэг.
+          </p>
+          <p id="aboutText2">
+            Баглаа бүрийг шинэхэн цэцгээр анхааралтай бэлтгэж, кофены буланд аяга бүрийг тайван
+            мөчид тохируулан урладаг. Таны илгээх бэлэг дулаан, бодолтой, мартагдашгүй байг.
+          </p>
+          <p class="contact" id="aboutContact">
+            Дархан хот, Дархан-Уул аймаг · Өдөр бүр 09:00–21:00<br />9987 3899 · hello@bloom.mn
+          </p>
+        </div>
+      </section>
+    </main>
+    <nav class="mobile-bottom-nav" aria-label="Гар утасны үндсэн цэс">
+      <a class="mobile-nav-item" href="#home" aria-label="Нүүр">
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"></path>
+        </svg>
         <span>Нүүр</span>
-    </a>
-    <a class="mobile-nav-item" href="#flowers" aria-label="Бараа">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+      </a>
+      <a class="mobile-nav-item" href="#flowers" aria-label="Бараа">
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+          <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+          <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+          <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+        </svg>
         <span>Бараа</span>
-    </a>
-    <button class="mobile-nav-item" id="mobileCartButton" type="button" aria-label="Сагс">
+      </a>
+      <button class="mobile-nav-item" id="mobileCartButton" type="button" aria-label="Сагс">
         <span class="mobile-nav-icon">
-            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 4h2l2.2 11.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H6"></path><circle cx="10" cy="20" r="1"></circle><circle cx="18" cy="20" r="1"></circle></svg>
-            <i id="mobileCartCount">0</i>
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M3 4h2l2.2 11.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H6"></path>
+            <circle cx="10" cy="20" r="1"></circle>
+            <circle cx="18" cy="20" r="1"></circle>
+          </svg>
+          <i id="mobileCartCount">0</i>
         </span>
         <span>Сагс</span>
-    </button>
-    <button class="mobile-nav-item" id="mobileAuthButton" type="button" aria-label="Нэвтрэх">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path></svg>
+      </button>
+      <button class="mobile-nav-item" id="mobileAuthButton" type="button" aria-label="Нэвтрэх">
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <circle cx="12" cy="8" r="3.5"></circle>
+          <path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path>
+        </svg>
         <span id="mobileAuthLabel">Нэвтрэх</span>
-    </button>
-    <button class="mobile-nav-item" id="mobileMoreButton" type="button" aria-label="Бусад цэс" aria-controls="mainNav" aria-expanded="false">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle></svg>
+      </button>
+      <button
+        class="mobile-nav-item"
+        id="mobileMoreButton"
+        type="button"
+        aria-label="Бусад цэс"
+        aria-controls="mainNav"
+        aria-expanded="false"
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <circle cx="5" cy="12" r="1"></circle>
+          <circle cx="12" cy="12" r="1"></circle>
+          <circle cx="19" cy="12" r="1"></circle>
+        </svg>
         <span>Бусад</span>
-    </button>
-</nav>
-<footer>
-    <div class="brand">
+      </button>
+    </nav>
+    <footer>
+      <div class="brand">
         <span class="brand-mark">✿</span>
-        <span><b>Bloom</b><small>Coffee House</small>
-        </span></div><p>Цэцэгсийн гоо үзэсгэлэн, кофены дулаан мэдрэмж.</p>
-        <div><a href="#flowers">Цэцэг</a>
-            <a href="#coffee">Кофе</a>
-            <a href="#about">Бидний тухай</a>
-        </div>
+        <span><b>Bloom</b><small>Coffee House</small> </span>
+      </div>
+      <p>Цэцэгсийн гоо үзэсгэлэн, кофены дулаан мэдрэмж.</p>
+      <div>
+        <a href="#flowers">Цэцэг</a>
+        <a href="#coffee">Кофе</a>
+        <a href="#about">Бидний тухай</a>
+      </div>
     </footer>
-<div class="overlay" id="overlay">
-
-</div><aside class="drawer" id="cartDrawer" aria-label="Сагс">
-    <div class="drawer-head"><div>
-        <p class="eyebrow">Таны сонголт</p>
-        <h2>Сагс</h2></div><button class="close" data-close>×</button>
-    </div><div id="cartItems"></div><div class="drawer-total">
+    <div class="overlay" id="overlay"></div>
+    <aside class="drawer" id="cartDrawer" aria-label="Сагс">
+      <div class="drawer-head">
+        <div>
+          <p class="eyebrow">Таны сонголт</p>
+          <h2>Сагс</h2>
+        </div>
+        <button class="close" data-close>×</button>
+      </div>
+      <div id="cartItems"></div>
+      <div class="drawer-total">
         <div id="cartBreakdown" class="cart-breakdown" aria-live="polite"></div>
         <span>Нийт төлөх дүн</span><strong id="cartTotal">0₮</strong>
-        <button class="button dark full" id="checkoutButton" type="button">Захиалга баталгаажуулах</button>
-    </div>
-</aside>
-<div class="modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle" aria-hidden="true">
-    <div class="modal-card">
+        <button class="button dark full" id="checkoutButton" type="button">
+          Захиалга баталгаажуулах
+        </button>
+      </div>
+    </aside>
+    <div
+      class="modal"
+      id="authModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="authModalTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-card">
         <button class="close" type="button" data-close aria-label="Нэвтрэх цонх хаах">×</button>
         <p class="eyebrow" id="authModalTitle">Bloom-д тавтай морил</p>
         <div class="auth-tabs">
-            <button class="active" type="button" data-auth-tab="login">Нэвтрэх
-            </button>
-            <button type="button" data-auth-tab="register">Бүртгүүлэх</button>
+          <button class="active" type="button" data-auth-tab="login">Нэвтрэх</button>
+          <button type="button" data-auth-tab="register">Бүртгүүлэх</button>
         </div>
         <form id="loginForm">
-            <label for="loginEmail">И-мэйл<input id="loginEmail" type="email" autocomplete="email" required>
-            </label>
-            <label for="loginPassword">Нууц үг<input id="loginPassword" type="password" autocomplete="current-password" required>
-            </label>
-            <p class="form-error" id="loginError">
-            </p>
-            <button class="button dark full" type="submit">Нэвтрэх</button>
-            <button class="forgot-password-link" id="forgotPasswordLink" type="button">Нууц үгээ мартсан уу?</button>
-            <p class="form-status" id="loginStatus" role="status" aria-live="polite"></p>
+          <label for="loginEmail"
+            >И-мэйл<input id="loginEmail" type="email" autocomplete="email" required />
+          </label>
+          <label for="loginPassword"
+            >Нууц үг<input
+              id="loginPassword"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+          </label>
+          <p class="form-error" id="loginError"></p>
+          <button class="button dark full" type="submit">Нэвтрэх</button>
+          <button class="forgot-password-link" id="forgotPasswordLink" type="button">
+            Нууц үгээ мартсан уу?
+          </button>
+          <p class="form-status" id="loginStatus" role="status" aria-live="polite"></p>
         </form>
         <form id="registerForm" class="hidden">
-            <label for="registerName">Нэр<input id="registerName" autocomplete="name" required>
-            </label>
-            <label for="registerEmail">И-мэйл<input id="registerEmail" type="email" autocomplete="email" required>
-            </label><label>Нууц үг<input id="registerPassword" type="password" minlength="6" required>
-            </label><label>Нууц үг давтах<input id="registerConfirm" type="password" required></label>
-            <p class="form-error" id="registerError">
-            </p><button class="button dark full">Бүртгэл үүсгэх</button>
+          <label for="registerName"
+            >Нэр<input id="registerName" autocomplete="name" required />
+          </label>
+          <label for="registerEmail"
+            >И-мэйл<input id="registerEmail" type="email" autocomplete="email" required /> </label
+          ><label
+            >Нууц үг<input id="registerPassword" type="password" minlength="6" required /> </label
+          ><label>Нууц үг давтах<input id="registerConfirm" type="password" required /></label>
+          <p class="form-error" id="registerError"></p>
+          <button class="button dark full">Бүртгэл үүсгэх</button>
         </form>
-        <section class="password-recovery hidden" id="passwordRecovery" aria-labelledby="recoveryTitle">
-            <h2 id="recoveryTitle">Нууц үг сэргээх</h2>
-            <p class="recovery-demo-note" id="recoveryDemoNote">Демо горим: имэйл илгээх үйлчилгээ холбогдоогүй. Доорх үйлдэл зөвхөн энэ төхөөрөмжийн demo бүртгэлийн нууц үгийг өөрчилнө; таны бүртгэлийг баталгаажуулахгүй.</p>
-            <button class="recovery-back-link" id="recoveryBackButton" type="button">← Нэвтрэх хэсэг рүү буцах</button>
-            <form id="passwordResetRequestForm" novalidate>
-                <label for="recoveryEmail">Бүртгэлтэй и-мэйл хаяг</label>
-                <input id="recoveryEmail" type="email" autocomplete="email" aria-describedby="recoveryEmailError">
-                <p class="form-error" id="recoveryEmailError" role="alert" aria-live="polite"></p>
-                <p class="form-status" id="recoveryRequestStatus" role="status" aria-live="polite"></p>
-                <button class="button dark full" type="submit">Үргэлжлүүлэх</button>
-            </form>
-            <form class="hidden" id="passwordResetForm" novalidate>
-                <p class="recovery-demo-note" id="recoveryResetNote"></p>
-                <label for="newPassword">Шинэ нууц үг</label>
-                <input id="newPassword" type="password" autocomplete="new-password" aria-describedby="passwordResetError" minlength="8">
-                <label for="confirmNewPassword">Шинэ нууц үгээ давтах</label>
-                <input id="confirmNewPassword" type="password" autocomplete="new-password" aria-describedby="passwordResetError">
-                <p class="form-error" id="passwordResetError" role="alert" aria-live="polite"></p>
-                <button class="button dark full" type="submit">Нууц үг шинэчлэх</button>
-            </form>
+        <section
+          class="password-recovery hidden"
+          id="passwordRecovery"
+          aria-labelledby="recoveryTitle"
+        >
+          <h2 id="recoveryTitle">Нууц үг сэргээх</h2>
+          <p class="recovery-demo-note" id="recoveryDemoNote">
+            Демо горим: имэйл илгээх үйлчилгээ холбогдоогүй. Доорх үйлдэл зөвхөн энэ төхөөрөмжийн
+            demo бүртгэлийн нууц үгийг өөрчилнө; таны бүртгэлийг баталгаажуулахгүй.
+          </p>
+          <button class="recovery-back-link" id="recoveryBackButton" type="button">
+            ← Нэвтрэх хэсэг рүү буцах
+          </button>
+          <form id="passwordResetRequestForm" novalidate>
+            <label for="recoveryEmail">Бүртгэлтэй и-мэйл хаяг</label>
+            <input
+              id="recoveryEmail"
+              type="email"
+              autocomplete="email"
+              aria-describedby="recoveryEmailError"
+            />
+            <p class="form-error" id="recoveryEmailError" role="alert" aria-live="polite"></p>
+            <p class="form-status" id="recoveryRequestStatus" role="status" aria-live="polite"></p>
+            <button class="button dark full" type="submit">Үргэлжлүүлэх</button>
+          </form>
+          <form class="hidden" id="passwordResetForm" novalidate>
+            <p class="recovery-demo-note" id="recoveryResetNote"></p>
+            <label for="newPassword">Шинэ нууц үг</label>
+            <input
+              id="newPassword"
+              type="password"
+              autocomplete="new-password"
+              aria-describedby="passwordResetError"
+              minlength="8"
+            />
+            <label for="confirmNewPassword">Шинэ нууц үгээ давтах</label>
+            <input
+              id="confirmNewPassword"
+              type="password"
+              autocomplete="new-password"
+              aria-describedby="passwordResetError"
+            />
+            <p class="form-error" id="passwordResetError" role="alert" aria-live="polite"></p>
+            <button class="button dark full" type="submit">Нууц үг шинэчлэх</button>
+          </form>
         </section>
-        <small class="security-note" id="authSecurityNote">Энэ бол демо нэвтрэлт. localStorage дахь энгийн нууц үг бодит хэрэглэгчийн мэдээлэлд аюулгүй биш.</small>
+        <small class="security-note" id="authSecurityNote"
+          >Энэ бол демо нэвтрэлт. localStorage дахь энгийн нууц үг бодит хэрэглэгчийн мэдээлэлд
+          аюулгүй биш.</small
+        >
+      </div>
     </div>
-</div>
-<div class="modal" id="checkoutModal">
-    <div class="checkout-layout">
+    <div class="modal" id="checkoutModal">
+      <div class="checkout-layout">
         <section class="modal-card checkout-form-card" aria-labelledby="checkoutTitle">
-            <button class="close" type="button" data-close aria-label="Checkout хаах">×</button>
-            <p class="eyebrow">Bloom · Захиалга</p>
-            <h2 id="checkoutTitle">Захиалга баталгаажуулах</h2>
-            <form id="checkoutForm">
-                <section class="checkout-group" aria-labelledby="deliveryHeading">
-                    <h3 id="deliveryHeading">Хүргэлтийн мэдээлэл</h3>
-                    <div class="checkout-fields">
-                        <label>Хүлээн авагчийн нэр<input id="customerName" autocomplete="name" required></label>
-                        <label>Утасны дугаар<input id="customerPhone" inputmode="tel" autocomplete="tel" placeholder="9987 3899" required></label>
-                        <label class="field-wide">Хүргэлтийн хаяг<input id="customerAddress" autocomplete="street-address" required></label>
-                        <label>Хүргүүлэх өдөр<input id="deliveryDate" type="date" required></label>
-                        <label>Хүргүүлэх цаг<select id="deliveryTime" required><option value="">Сонгох</option><option>09:00–12:00</option><option>12:00–15:00</option><option>15:00–18:00</option><option>18:00–21:00</option></select></label>
-                        <label class="field-wide">Хүргэлтийн бүс<select id="deliveryArea"><option value="Төв">Төвийн бүс · 0₮</option><option value="Ойролцоо">Ойролцоо бүс · 5,000₮</option><option value="Алслагдсан">Алслагдсан бүс · 10,000₮</option></select></label>
-                    </div>
-                </section>
-                <section class="checkout-group" aria-labelledby="extraHeading">
-                    <h3 id="extraHeading">Нэмэлт мэдээлэл</h3>
-                    <label class="check-row"><input id="surpriseGift" type="checkbox"> Гэнэтийн бэлэг болгон хүргүүлэх</label>
-                    <label class="field-wide">Нэмэлт тэмдэглэл<textarea id="customerNote" rows="3"></textarea></label>
-                </section>
-                <fieldset class="checkout-group payment-group">
-                    <legend>Төлбөр</legend>
-                    <div class="payment-options">
-                        <label><input type="radio" name="payment" value="Бэлнээр" checked> Бэлнээр</label>
-                        <label><input type="radio" name="payment" value="QPay"> QPay <small>(демо)</small></label>
-                        <label><input type="radio" name="payment" value="Картаар"> Картаар <small>(демо)</small></label>
-                    </div>
-                </fieldset>
-                <section class="checkout-group coupon-group" aria-labelledby="couponHeading">
-                    <h3 id="couponHeading">Купон</h3>
-                    <div class="coupon-row">
-                        <label class="visually-hidden" for="couponInput">Купон код</label>
-                        <input id="couponInput" placeholder="Купон код" autocomplete="off">
-                        <button class="button ghost" type="button" id="applyCoupon">Купон хэрэглэх</button>
-                    </div>
-                </section>
-                <p class="form-error checkout-error" id="checkoutError" role="alert"></p>
-            </form>
-            <button class="button dark full checkout-submit" type="submit" form="checkoutForm">Захиалга баталгаажуулах</button>
+          <button class="close" type="button" data-close aria-label="Checkout хаах">×</button>
+          <p class="eyebrow">Bloom · Захиалга</p>
+          <h2 id="checkoutTitle">Захиалга баталгаажуулах</h2>
+          <form id="checkoutForm">
+            <section class="checkout-group" aria-labelledby="deliveryHeading">
+              <h3 id="deliveryHeading">Хүргэлтийн мэдээлэл</h3>
+              <div class="checkout-fields">
+                <label
+                  >Хүлээн авагчийн нэр<input id="customerName" autocomplete="name" required
+                /></label>
+                <label
+                  >Утасны дугаар<input
+                    id="customerPhone"
+                    inputmode="tel"
+                    autocomplete="tel"
+                    placeholder="9987 3899"
+                    required
+                /></label>
+                <label class="field-wide"
+                  >Хүргэлтийн хаяг<input
+                    id="customerAddress"
+                    autocomplete="street-address"
+                    required
+                /></label>
+                <label>Хүргүүлэх өдөр<input id="deliveryDate" type="date" required /></label>
+                <label
+                  >Хүргүүлэх цаг<select id="deliveryTime" required>
+                    <option value="">Сонгох</option>
+                    <option>09:00–12:00</option>
+                    <option>12:00–15:00</option>
+                    <option>15:00–18:00</option>
+                    <option>18:00–21:00</option>
+                  </select></label
+                >
+                <label class="field-wide"
+                  >Хүргэлтийн бүс<select id="deliveryArea">
+                    <option value="Төв">Төвийн бүс · 0₮</option>
+                    <option value="Ойролцоо">Ойролцоо бүс · 5,000₮</option>
+                    <option value="Алслагдсан">Алслагдсан бүс · 10,000₮</option>
+                  </select></label
+                >
+              </div>
+            </section>
+            <section class="checkout-group" aria-labelledby="extraHeading">
+              <h3 id="extraHeading">Нэмэлт мэдээлэл</h3>
+              <label class="check-row"
+                ><input id="surpriseGift" type="checkbox" /> Гэнэтийн бэлэг болгон хүргүүлэх</label
+              >
+              <label class="field-wide"
+                >Нэмэлт тэмдэглэл<textarea id="customerNote" rows="3"></textarea>
+              </label>
+            </section>
+            <fieldset class="checkout-group payment-group">
+              <legend>Төлбөр</legend>
+              <div class="payment-options">
+                <label><input type="radio" name="payment" value="Бэлнээр" checked /> Бэлнээр</label>
+                <label
+                  ><input type="radio" name="payment" value="QPay" /> QPay
+                  <small>(демо)</small></label
+                >
+                <label
+                  ><input type="radio" name="payment" value="Картаар" /> Картаар
+                  <small>(демо)</small></label
+                >
+              </div>
+            </fieldset>
+            <section class="checkout-group coupon-group" aria-labelledby="couponHeading">
+              <h3 id="couponHeading">Купон</h3>
+              <div class="coupon-row">
+                <label class="visually-hidden" for="couponInput">Купон код</label>
+                <input id="couponInput" placeholder="Купон код" autocomplete="off" />
+                <button class="button ghost" type="button" id="applyCoupon">Купон хэрэглэх</button>
+              </div>
+            </section>
+            <p class="form-error checkout-error" id="checkoutError" role="alert"></p>
+          </form>
+          <button class="button dark full checkout-submit" type="submit" form="checkoutForm">
+            Захиалга баталгаажуулах
+          </button>
         </section>
         <aside class="checkout-order-card" aria-labelledby="checkoutOrderHeading">
-            <p class="eyebrow">Таны сонголт</p>
-            <h2 id="checkoutOrderHeading">Захиалгын тойм</h2>
-            <div id="checkoutSummary" class="checkout-summary"></div>
-            <div id="priceBreakdown" class="summary checkout-breakdown" aria-live="polite"></div>
+          <p class="eyebrow">Таны сонголт</p>
+          <h2 id="checkoutOrderHeading">Захиалгын тойм</h2>
+          <div id="checkoutSummary" class="checkout-summary"></div>
+          <div id="priceBreakdown" class="summary checkout-breakdown" aria-live="polite"></div>
         </aside>
+      </div>
     </div>
-</div>
-<div class="modal" id="builderModal">
-    <div class="modal-card builder-card">
+    <div class="modal" id="builderModal">
+      <div class="modal-card builder-card">
         <button class="close" data-close>×</button>
         <p class="eyebrow">Өөрийн бэлгээ урлаарай</p>
         <h2>Бэлгийн <em>багц бүтээгч</em></h2>
-        <form id="builderForm"><label>Цэцгийн баглаа<select id="builderFlower">
-
-        </select>
-    </label><p class="promo-note" id="builderPromo"></p>
-    <label>Мэндчилгээний загвар<select id="builderCard">
-        <option>Хайр</option><option>Төрсөн өдөр</option>
-        <option>Ээждээ</option><option>Баяр хүргэе</option>
-        <option>Энгийн мэндчилгээ</option>
-    </select>
-    </label>
-        <label>Хүлээн авагчийн нэр (заавал биш)<input id="builderRecipient" placeholder="Жишээ: Ээждээ">
-        </label>
-        <label>Хувийн мэндчилгээ<textarea id="builderMessage" rows="3" placeholder="Таны сэтгэлийн үг...">
-  </textarea>
-    </label>
-    <fieldset>
-        <legend>Бэлгийн кофе</legend>
-        <div id="builderCoffeeOptions">
-
-        </div></fieldset>
-        <label class="check-row">
-            <input type="checkbox" id="builderWrapping"> Дээд зэрэглэлийн бэлгийн боодол <span>+10,000₮</span>
-        </label><div class="builder-preview" id="builderPreview">
-
-        </div><div class="builder-total" id="builderTotal"></div>
-        <button class="button dark full" type="submit">Багцыг сагсанд нэмэх</button>
-    </form>
-</div>
-</div>
-<div class="modal" id="detailModal"><div class="modal-card detail-card"><button class="close" data-close>×</button><div id="detailVisual" class="detail-visual"></div><div class="eyebrow" id="detailCategory"></div><h2 id="detailName"></h2><p id="detailDescription"></p><strong id="detailPrice" class="detail-price"></strong><p id="detailPromotion" class="promo-note"></p><label>Тоо хэмжээ<input id="detailQuantity" type="number" min="1" max="20" value="1"></label><button class="button dark full" id="detailAdd">Сагсанд нэмэх</button></div></div>
-<div class="modal" id="productModal">
-    <div class="modal-card product-editor-card">
-        <button class="close" type="button" data-close aria-label="Хаах">×</button>
-        <p class="eyebrow">Админ · бүтээгдэхүүн</p><h2 id="productFormTitle">Бүтээгдэхүүн нэмэх</h2>
-        <form id="adminProductForm">
-            <label>Төрөл<select id="productType" required><option value="flower">Цэцэг</option><option value="coffee">Кофе</option><option value="bundle">Бэлгийн багц</option></select></label>
-            <label>Бүтээгдэхүүний нэр<input id="productName" required maxlength="80"></label>
-            <label>Тайлбар<textarea id="productDescription" rows="3" maxlength="240" required></textarea></label>
-                <div class="form-columns"><label>Үнэ<input id="productPrice" type="number" min="1" step="1" required></label><label>Ангилал<select id="productCategory" required></select></label></div>
-            <div class="form-columns product-flags"><label class="check-row"><input id="productAvailable" type="checkbox" checked> Бэлэн байгаа</label><label class="check-row"><input id="productFeatured" type="checkbox"> Онцлох</label></div>
-            <div class="product-type-fields" id="flowerFields">
-                <h3>Цэцгийн мэдээлэл</h3>
-                <div class="form-columns"><label>Цэцгийн төрөл<select id="productFlowerKind"><option value="rose">Сарнай</option><option value="peony">Пион</option><option value="tulip">Алтанзул</option><option value="daisy">Цагаан мандарваа</option><option value="mixed">Холимог</option></select></label><label>Баглааны хэмжээ<select id="productFlowerSize"><option>Mini</option><option selected>Medium</option><option>Large</option></select></label></div>
-                <label>Цэцгийн ангилал<select id="productFlowerCategory"><option value="romance">Хайртдаа</option><option value="birthday">Төрсөн өдөрт</option><option value="mom">Ээждээ</option><option value="mini">Бяцхан баглаа</option><option value="featured">Онцлох</option></select></label>
-                <label>Өнгө<select id="productFlowerTone"><option value="0">Ягаан</option><option value="1">Зөөлөн ягаан</option><option value="2">Цайвар тоорын</option><option value="3">Ногоон</option><option value="4">Нил ягаан</option></select></label>
-                <label class="check-row"><input id="productFreeCoffee" type="checkbox"> Үнэгүй кофе авах эрхтэй</label>
-            </div>
-            <div class="product-type-fields hidden" id="coffeeFields">
-                <h3>Кофены мэдээлэл</h3>
-                <label>Ундааны нэр<input id="productDrinkName" maxlength="60"></label>
-                <div class="form-columns"><label>Халуун / Хүйтэн<select id="productTemperature"><option value="hot">Халуун</option><option value="cold">Хүйтэн</option></select></label><label>Хэмжээ<select id="productDrinkSize"><option>Small</option><option selected>Medium</option><option>Large</option></select></label></div>
-                <label class="check-row"><input id="productHasCoffee" type="checkbox" checked> Кофетой</label>
-            </div>
-            <div class="product-type-fields hidden" id="bundleFields">
-                <h3>Бэлгийн багцын мэдээлэл</h3>
-                <label>Багцын нэр<input id="productBundleName" maxlength="80"></label>
-                <label>Багцын тайлбар<textarea id="productBundleDescription" rows="2" maxlength="240"></textarea></label>
-                <label>Цэцэг сонгох<select id="productBundleFlower"></select></label>
-                <label>Кофе сонгох<select id="productBundleCoffee" multiple size="4"></select></label>
-                <div class="form-columns"><label class="check-row"><input id="productBundleCard" type="checkbox" checked> Мэндчилгээний карттай</label><label class="check-row"><input id="productBundleWrapping" type="checkbox"> Бэлгийн боодолтой</label></div>
-                <label>Багцын үнэ<input id="productBundlePrice" type="number" min="1" step="1"></label>
-            </div>
-            <div class="product-image-editor">
-                <div class="product-image-preview" id="productImagePreview" aria-label="Бүтээгдэхүүний зурагны урьдчилсан харагдац"></div>
-                <div><label>Бүтээгдэхүүний зураг<input id="productImageInput" type="file" accept="image/png,image/jpeg,image/webp"></label><p id="productImageError" class="form-error" role="alert"></p><button id="changeProductImage" class="button ghost" type="button">Зураг солих</button><button id="removeProductImage" class="button ghost" type="button">Зураг арилгах</button></div>
-            </div>
-            <div class="admin-product-preview"><strong>Бүтээгдэхүүний урьдчилсан харагдац</strong><div id="productLivePreview"></div></div>
-            <button class="button dark full" type="submit">Хадгалах</button>
+        <form id="builderForm">
+          <label>Цэцгийн баглаа<select id="builderFlower"></select> </label>
+          <p class="promo-note" id="builderPromo"></p>
+          <label
+            >Мэндчилгээний загвар<select id="builderCard">
+              <option>Хайр</option>
+              <option>Төрсөн өдөр</option>
+              <option>Ээждээ</option>
+              <option>Баяр хүргэе</option>
+              <option>Энгийн мэндчилгээ</option>
+            </select>
+          </label>
+          <label
+            >Хүлээн авагчийн нэр (заавал биш)<input
+              id="builderRecipient"
+              placeholder="Жишээ: Ээждээ"
+            />
+          </label>
+          <label
+            >Хувийн мэндчилгээ<textarea
+              id="builderMessage"
+              rows="3"
+              placeholder="Таны сэтгэлийн үг..."
+            >
+            </textarea>
+          </label>
+          <fieldset>
+            <legend>Бэлгийн кофе</legend>
+            <div id="builderCoffeeOptions"></div>
+          </fieldset>
+          <label class="check-row">
+            <input type="checkbox" id="builderWrapping" /> Дээд зэрэглэлийн бэлгийн боодол
+            <span>+10,000₮</span>
+          </label>
+          <div class="builder-preview" id="builderPreview"></div>
+          <div class="builder-total" id="builderTotal"></div>
+          <button class="button dark full" type="submit">Багцыг сагсанд нэмэх</button>
         </form>
+      </div>
     </div>
-</div>
-<div class="modal" id="successModal">
-    <div class="modal-card success-card">
+    <div class="modal" id="detailModal">
+      <div class="modal-card detail-card">
+        <button class="close" data-close>×</button>
+        <div id="detailVisual" class="detail-visual"></div>
+        <div class="eyebrow" id="detailCategory"></div>
+        <h2 id="detailName"></h2>
+        <p id="detailDescription"></p>
+        <strong id="detailPrice" class="detail-price"></strong>
+        <p id="detailPromotion" class="promo-note"></p>
+        <label
+          >Тоо хэмжээ<input id="detailQuantity" type="number" min="1" max="20" value="1" /></label
+        ><button class="button dark full" id="detailAdd">Сагсанд нэмэх</button>
+      </div>
+    </div>
+    <div class="modal" id="productModal">
+      <div class="modal-card product-editor-card">
+        <button class="close" type="button" data-close aria-label="Хаах">×</button>
+        <p class="eyebrow">Админ · бүтээгдэхүүн</p>
+        <h2 id="productFormTitle">Бүтээгдэхүүн нэмэх</h2>
+        <form id="adminProductForm">
+          <label
+            >Төрөл<select id="productType" required>
+              <option value="flower">Цэцэг</option>
+              <option value="coffee">Кофе</option>
+              <option value="bundle">Бэлгийн багц</option>
+            </select></label
+          >
+          <label>Бүтээгдэхүүний нэр<input id="productName" required maxlength="80" /></label>
+          <label
+            >Тайлбар<textarea id="productDescription" rows="3" maxlength="240" required></textarea>
+          </label>
+          <div class="form-columns">
+            <label>Үнэ<input id="productPrice" type="number" min="1" step="1" required /></label
+            ><label>Ангилал<select id="productCategory" required></select></label>
+          </div>
+          <div class="form-columns product-flags">
+            <label class="check-row"
+              ><input id="productAvailable" type="checkbox" checked /> Бэлэн байгаа</label
+            ><label class="check-row"><input id="productFeatured" type="checkbox" /> Онцлох</label>
+          </div>
+          <div class="product-type-fields" id="flowerFields">
+            <h3>Цэцгийн мэдээлэл</h3>
+            <div class="form-columns">
+              <label
+                >Цэцгийн төрөл<select id="productFlowerKind">
+                  <option value="rose">Сарнай</option>
+                  <option value="peony">Пион</option>
+                  <option value="tulip">Алтанзул</option>
+                  <option value="daisy">Цагаан мандарваа</option>
+                  <option value="mixed">Холимог</option>
+                </select></label
+              ><label
+                >Баглааны хэмжээ<select id="productFlowerSize">
+                  <option>Mini</option>
+                  <option selected>Medium</option>
+                  <option>Large</option>
+                </select></label
+              >
+            </div>
+            <label
+              >Цэцгийн ангилал<select id="productFlowerCategory">
+                <option value="romance">Хайртдаа</option>
+                <option value="birthday">Төрсөн өдөрт</option>
+                <option value="mom">Ээждээ</option>
+                <option value="mini">Бяцхан баглаа</option>
+                <option value="featured">Онцлох</option>
+              </select></label
+            >
+            <label
+              >Өнгө<select id="productFlowerTone">
+                <option value="0">Ягаан</option>
+                <option value="1">Зөөлөн ягаан</option>
+                <option value="2">Цайвар тоорын</option>
+                <option value="3">Ногоон</option>
+                <option value="4">Нил ягаан</option>
+              </select></label
+            >
+            <label class="check-row"
+              ><input id="productFreeCoffee" type="checkbox" /> Үнэгүй кофе авах эрхтэй</label
+            >
+          </div>
+          <div class="product-type-fields hidden" id="coffeeFields">
+            <h3>Кофены мэдээлэл</h3>
+            <label>Ундааны нэр<input id="productDrinkName" maxlength="60" /></label>
+            <div class="form-columns">
+              <label
+                >Халуун / Хүйтэн<select id="productTemperature">
+                  <option value="hot">Халуун</option>
+                  <option value="cold">Хүйтэн</option>
+                </select></label
+              ><label
+                >Хэмжээ<select id="productDrinkSize">
+                  <option>Small</option>
+                  <option selected>Medium</option>
+                  <option>Large</option>
+                </select></label
+              >
+            </div>
+            <label class="check-row"
+              ><input id="productHasCoffee" type="checkbox" checked /> Кофетой</label
+            >
+          </div>
+          <div class="product-type-fields hidden" id="bundleFields">
+            <h3>Бэлгийн багцын мэдээлэл</h3>
+            <label>Багцын нэр<input id="productBundleName" maxlength="80" /></label>
+            <label
+              >Багцын тайлбар<textarea
+                id="productBundleDescription"
+                rows="2"
+                maxlength="240"
+              ></textarea>
+            </label>
+            <label>Цэцэг сонгох<select id="productBundleFlower"></select></label>
+            <label>Кофе сонгох<select id="productBundleCoffee" multiple size="4"></select></label>
+            <div class="form-columns">
+              <label class="check-row"
+                ><input id="productBundleCard" type="checkbox" checked /> Мэндчилгээний
+                карттай</label
+              ><label class="check-row"
+                ><input id="productBundleWrapping" type="checkbox" /> Бэлгийн боодолтой</label
+              >
+            </div>
+            <label
+              >Багцын үнэ<input id="productBundlePrice" type="number" min="1" step="1"
+            /></label>
+          </div>
+          <div class="product-image-editor">
+            <div
+              class="product-image-preview"
+              id="productImagePreview"
+              aria-label="Бүтээгдэхүүний зурагны урьдчилсан харагдац"
+            ></div>
+            <div>
+              <label
+                >Бүтээгдэхүүний зураг<input
+                  id="productImageInput"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+              /></label>
+              <p id="productImageError" class="form-error" role="alert"></p>
+              <button id="changeProductImage" class="button ghost" type="button">Зураг солих</button
+              ><button id="removeProductImage" class="button ghost" type="button">
+                Зураг арилгах
+              </button>
+            </div>
+          </div>
+          <div class="admin-product-preview">
+            <strong>Бүтээгдэхүүний урьдчилсан харагдац</strong>
+            <div id="productLivePreview"></div>
+          </div>
+          <button class="button dark full" type="submit">Хадгалах</button>
+        </form>
+      </div>
+    </div>
+    <div class="modal" id="successModal">
+      <div class="modal-card success-card">
         <span class="success-icon">✿</span>
         <p class="eyebrow">Баярлалаа</p>
         <h2>Захиалга хүлээн авлаа.</h2>
         <p id="successText"></p>
         <button class="button dark full" data-close>Хаах</button>
-    </div></div><div class="toast" id="toast" role="status">
-        
+      </div>
     </div>
-<script src="script.js"></script>
-<script src="dashboard.js"></script>
-<script src="password-recovery.js"></script></body></html>
+    <div class="toast" id="toast" role="status"></div>
+    <script src="script.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="password-recovery.js"></script>
+  </body>
+</html>
