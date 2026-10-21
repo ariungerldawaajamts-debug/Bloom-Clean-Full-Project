@@ -1,99 +1,2048 @@
-function renderOrdersBundleAware(){let os=orders();if(!state.session){$("orderList").innerHTML=`<div class="empty">Захиалгын түүхээ харахын тулд нэвтэрнэ үү.</div>`;return}$("orderList").innerHTML=os.length?os.map(o=>`<article class="order-card"><div><small>Захиалгын дугаар</small><strong>${o.id}</strong><small>${new Date(o.createdAt).toLocaleString("mn-MN")}</small></div><p>${o.items.map(i=>`${esc(i.kind==="bundle"?i.name:item(i.id)?.name||"Бүтээгдэхүүн")} ×${i.qty}`).join(", ")}<br><b>${money(o.total)}</b> · ${esc(o.payment)}${o.items.some(i=>i.kind==="bundle"&&i.message)?`<br><span class="bundle-order-note">Мэндчилгээ хадгалагдсан</span>`:""}</p><span class="status-pill">${statuses[o.status]}</span><button class="button ghost" data-track="${o.id}">Захиалга харах</button></article>`).join(""): `<div class="empty">Одоогоор таны захиалга алга байна.</div>`}
-function cartPrice(x){return x.kind==="bundle"?x.price:item(x.id)?.price||0}function cartLabel(x){return x.kind==="bundle"?x.name:item(x.id)?.name||"Бүтээгдэхүүн"}function bundleDetails(x){if(x.kind!=="bundle")return "";const coffees=x.coffees?.length?x.coffees.map(id=>item(id)?.name).join(", "):"Кофе сонгоогүй";return `Цэцэг: ${item(x.flowerId)?.name||""} · Карт: ${x.card}${x.recipient?` · ${esc(x.recipient)}`:""}${x.message?`<br>“${esc(x.message)}”`:""} · ${coffees}${x.wrapping?" · Premium боодол":""}`}function renderCartEnhanced(){const count=state.cart.reduce((n,x)=>n+x.qty,0),total=state.cart.reduce((n,x)=>n+cartPrice(x)*x.qty,0);$("cartCount").textContent=count;$("cartTotal").textContent=money(total);$("cartItems").innerHTML=state.cart.length?state.cart.map((x,i)=>{const product=x.kind==="bundle"?bundleSvg({flower:x.flowerId}):x.id[0]==="f"?flowerSvg(item(x.id)):drinkSvg(item(x.id));return `<div class="cart-line ${x.kind==="bundle"?"bundle-line":""}"><div class="cart-thumb">${product}</div><div><strong>${esc(cartLabel(x))}</strong><small>${money(cartPrice(x))}${x.kind==="bundle"?" · Бэлгийн багц":""}</small><div class="qty"><button data-qty="${i}" data-change="-1">−</button><span>${x.qty}</span><button data-qty="${i}" data-change="1">+</button></div><button class="remove" data-remove="${i}">Устгах</button></div><b>${money(cartPrice(x)*x.qty)}</b>${x.kind==="bundle"?`<div class="bundle-details">${bundleDetails(x)}</div>`:""}</div>`}).join(""):`<div class="empty">Таны сагс одоогоор хоосон байна.</div>`}function addBundle(bundle,custom={}){const flower=item(bundle.flower),limit=freeCoffeeLimit(flower),coffees=(custom.coffees||[]).slice(0,limit),entry={id:`${bundle.id}-${Date.now()}`,kind:"bundle",name:bundle.name,price:bundle.price,qty:1,flowerId:bundle.flower,coffees,card:custom.card||bundle.card||"Энгийн мэндчилгээ",recipient:custom.recipient||"",message:custom.message||"",wrapping:Boolean(custom.wrapping||bundle.wrapping),freeCoffees:coffees.map(id=>({id,price:0}))};state.cart.push(entry);persist();renderCartEnhanced();toast(`${bundle.name} сагсанд нэмэгдлээ`)}function renderBuilder(){const select=$("builderFlower");select.innerHTML=flowers.map(f=>`<option value="${f.id}">${f.name} · ${money(Math.round(f.price/1000)*1000)}</option>`).join("");$("builderCard").innerHTML=cardThemes.map(x=>`<option>${x}</option>`).join("");updateBuilder()}function updateBuilder(){const flower=item($("builderFlower").value),limit=freeCoffeeLimit(flower);$("builderPromo").textContent=limit?`${flower.name} сонгосон тул ${limit} кофе 0₮-өөр бэлэгтэй.`:"Энэ баглаа 100,000₮-д хүрээгүй тул complimentary кофе багтахгүй.";$("builderCoffeeOptions").innerHTML=drinks.map(d=>`<label class="coffee-choice"><input type="checkbox" value="${d.id}" data-builder-coffee ${limit?"":"disabled"}> ${d.name}<small>${limit?"0₮ бэлэг":"Боломжгүй"}</small></label>`).join("");document.querySelectorAll("[data-builder-coffee]").forEach(input=>input.onchange=()=>{const selected=[...document.querySelectorAll("[data-builder-coffee]:checked")];if(selected.length>limit)input.checked=false;updateBuilderSummary()});updateBuilderSummary()}function updateBuilderSummary(){const flower=item($("builderFlower").value),limit=freeCoffeeLimit(flower),coffees=[...document.querySelectorAll("[data-builder-coffee]:checked")].map(x=>x.value),wrapping=$("builderWrapping").checked,base=Math.round(flower.price/1000)*1000,total=base+(wrapping?giftWrapPrice:0);$("builderPreview").textContent=`${flower.name}\nКарт: ${$("builderCard").value}${$("builderRecipient").value?` · ${$("builderRecipient").value}`:""}\n${$("builderMessage").value||"Хувийн мэндчилгээ оруулаагүй байна."}\nКофе: ${coffees.length?coffees.map(id=>item(id).name).join(", "):"Сонгоогүй"}${limit?`\n${coffees.length} кофе 0₮-ийн бэлэг`:""}`;$("builderTotal").textContent=`Нийт: ${money(total)}${wrapping?" (10,000₮ боодол багтсан)":""}`}
-const KEYS={cart:"bloom_cart",orders:"bloom_orders",users:"bloom_users",session:"bloom_session",wishlist:"bloom_wishlist"},ADMIN={email:"admin@bloom.mn",password:"BloomAdmin123!"};
-const names=["Ягаан мөрөөдөл","Хайрын захиа","Сарны туяа","Ээждээ барих цэцэг","Хаврын аялгуу","Нууцхан инээмсэглэл","Өглөөний нар","Зөөлөн дурсамж","Улаан сарнай","Цагаан үүл","Гэгээн хайр","Төрсөн өдрийн баяр","Намрын шүлэг","Гүнжийн цэцэрлэг","Бяцхан жаргал","Сарнайн зүрх","Хаврын үнэр","Ээжийн тэврэлт","Ягаан шүр","Оддын баглаа","Хайрын хөг","Нарлаг өдөр","Зөөлөн пион","Баярын өнгө","Гэгээтэй захиа","Цэцгэн аялгуу","Романтик орой","Өдөр бүрийн баяр","Тансаг сарнай","Bloom-ийн нууц"],cats=["romance","romance","romance","mom","birthday","mini","mini","mom","romance","mom","romance","birthday","mom","featured","mini","featured","birthday","mom","featured","birthday","romance","mini","featured","birthday","mini","mom","romance","mini","featured","featured"],descs=["Зөөлөн өнгө, нандин мэдрэмж шингэсэн.","Хайрын үгийг цэцгээр хэлэхэд зориулав.","Нам гүмхэн оройн тансаг сонголт.","Ээждээ талархлаа илэрхийлэх дулаахан баглаа.","Шинэ эхлэлд зориулсан өнгөлөг цэцэгс."];
-const flowerImages=["pink-dream","romantic-rose","moonlight","mothers-day","spring-bouquet","soft-pink","sunflower","pastel-bouquet","red-rose","white-hydrangea","white-pink-rose","birthday","autumn-bouquet","pink-princess","small-pink","rose-heart","spring-tulip","mothers-hug","pink-coral","star-bouquet","red-pink-rose","sunny-day","pink-peony","colorful-mixed","bright-pink","pastel-mixed","romantic-evening","cheerful-mixed","luxury-red-rose","bloom-secret"];
-const flowers=names.map((name,i)=>({id:`f${String(i+1).padStart(2,"0")}`,name,category:cats[i],price:38000+i*9700+(i%4)*5000,description:descs[i%5],kind:["rose","peony","tulip","daisy","mixed"][i%5],tone:i%5,image:`assets/${flowerImages[i]}.jpg`}));
-flowers.push(...load("bloom_custom_products",[]).map(product=>({...product,type:"flower"})));
-const drinkImages=["latte","americano","cappuccino","espresso","mocha","caramel-latte","vanilla-latte","matcha","iced-latte","iced-americano","hot-chocolate","strawberry-milk"];
-const drinks=["Latte","Americano","Cappuccino","Espresso","Mocha","Caramel Latte","Vanilla Latte","Matcha","Iced Latte","Iced Americano","Hot Chocolate","Strawberry Milk"].map((name,i)=>({id:`d${String(i+1).padStart(2,"0")}`,name,price:7000+(i%7)*1000,description:["Зөөлөн сүүтэй эспрессо.","Цэвэр, хүчтэй кофены амт.","Торгон хөөс, баялаг амт.","Намууxан, анхилуун сонголт."][i%4],category:i===7||i>9?"noncoffee":i>7?"cold":"hot",kind:i,image:`assets/${drinkImages[i]}.jpg`}));
-const bundles=[
- {id:"b01",name:"Бяцхан баяр",description:"Mini баглаа, мэндчилгээний картын энгийн бөгөөд дотно бэлэг.",price:49000,flower:"f15",coffee:0,card:"Төрсөн өдөр",image:"assets/products/bundles/small-pink-gift-set.jpg"},
- {id:"b02",name:"Дулаан мэндчилгээ",description:"Өнгөлөг баглаа, Latte, зөөлөн мэндчилгээний карт.",price:79000,flower:"f08",coffee:1,card:"Баяр хүргэе",image:"assets/products/bundles/flower-latte-gift-set.jpg"},
- {id:"b03",name:"Хайрын захиа",description:"Романтик баглаа, нэг сонгох кофе, хайрын карт.",price:99000,flower:"f11",coffee:1,card:"Хайр",image:"assets/products/bundles/romantic-flower-coffee-set.jpg"},
- {id:"b04",name:"Аз жаргалын багц",description:"Тансаг баглаа, хоёр кофе, дурсамж үлдээх карт.",price:150000,flower:"f19",coffee:2,card:"Баяр хүргэе",image:"assets/products/bundles/luxury-flower-coffee-set.jpg"},
- {id:"b05",name:"Ээждээ барих бэлэг",description:"Ээжид зориулсан гоёмсог баглаа, кофе, premium карт.",price:120000,flower:"f08",coffee:1,card:"Ээждээ",image:"assets/products/bundles/mothers-day-flower-set.jpg"},
- {id:"b06",name:"Онцгой мөч",description:"Luxury баглаа, хоёр кофе, premium боодол, карт.",price:250000,flower:"f29",coffee:2,card:"Хайр",wrapping:true,image:"assets/products/bundles/luxury-rose-coffee-gift-box.jpg"}
+function renderOrdersBundleAware() {
+  let os = orders();
+  if (!state.session) {
+    $("orderList").innerHTML =
+      `<div class="empty">Захиалгын түүхээ харахын тулд нэвтэрнэ үү.</div>`;
+    return;
+  }
+  $("orderList").innerHTML = os.length
+    ? os
+        .map(
+          (o) =>
+            `<article class="order-card"><div><small>Захиалгын дугаар</small><strong>${o.id}</strong><small>${new Date(o.createdAt).toLocaleString("mn-MN")}</small></div><p>${o.items.map((i) => `${esc(i.kind === "bundle" ? i.name : item(i.id)?.name || "Бүтээгдэхүүн")} ×${i.qty}`).join(", ")}<br><b>${money(o.total)}</b> · ${esc(o.payment)}${o.items.some((i) => i.kind === "bundle" && i.message) ? `<br><span class="bundle-order-note">Мэндчилгээ хадгалагдсан</span>` : ""}</p><span class="status-pill">${statuses[o.status]}</span><button class="button ghost" data-track="${o.id}">Захиалга харах</button></article>`,
+        )
+        .join("")
+    : `<div class="empty">Одоогоор таны захиалга алга байна.</div>`;
+}
+function cartPrice(x) {
+  return x.kind === "bundle" ? x.price : item(x.id)?.price || 0;
+}
+function cartLabel(x) {
+  return x.kind === "bundle" ? x.name : item(x.id)?.name || "Бүтээгдэхүүн";
+}
+function bundleDetails(x) {
+  if (x.kind !== "bundle") return "";
+  const coffees = x.coffees?.length
+    ? x.coffees.map((id) => item(id)?.name).join(", ")
+    : "Кофе сонгоогүй";
+  return `Цэцэг: ${item(x.flowerId)?.name || ""} · Карт: ${x.card}${x.recipient ? ` · ${esc(x.recipient)}` : ""}${x.message ? `<br>“${esc(x.message)}”` : ""} · ${coffees}${x.wrapping ? " · Premium боодол" : ""}`;
+}
+function renderCartEnhanced() {
+  const count = state.cart.reduce((n, x) => n + x.qty, 0),
+    total = state.cart.reduce((n, x) => n + cartPrice(x) * x.qty, 0);
+  $("cartCount").textContent = count;
+  $("cartTotal").textContent = money(total);
+  $("cartItems").innerHTML = state.cart.length
+    ? state.cart
+        .map((x, i) => {
+          const product =
+            x.kind === "bundle"
+              ? bundleSvg({ flower: x.flowerId })
+              : x.id[0] === "f"
+                ? flowerSvg(item(x.id))
+                : drinkSvg(item(x.id));
+          return `<div class="cart-line ${x.kind === "bundle" ? "bundle-line" : ""}"><div class="cart-thumb">${product}</div><div><strong>${esc(cartLabel(x))}</strong><small>${money(cartPrice(x))}${x.kind === "bundle" ? " · Бэлгийн багц" : ""}</small><div class="qty"><button data-qty="${i}" data-change="-1">−</button><span>${x.qty}</span><button data-qty="${i}" data-change="1">+</button></div><button class="remove" data-remove="${i}">Устгах</button></div><b>${money(cartPrice(x) * x.qty)}</b>${x.kind === "bundle" ? `<div class="bundle-details">${bundleDetails(x)}</div>` : ""}</div>`;
+        })
+        .join("")
+    : `<div class="empty">Таны сагс одоогоор хоосон байна.</div>`;
+}
+function addBundle(bundle, custom = {}) {
+  const flower = item(bundle.flower),
+    limit = freeCoffeeLimit(flower),
+    coffees = (custom.coffees || []).slice(0, limit),
+    entry = {
+      id: `${bundle.id}-${Date.now()}`,
+      kind: "bundle",
+      name: bundle.name,
+      price: bundle.price,
+      qty: 1,
+      flowerId: bundle.flower,
+      coffees,
+      card: custom.card || bundle.card || "Энгийн мэндчилгээ",
+      recipient: custom.recipient || "",
+      message: custom.message || "",
+      wrapping: Boolean(custom.wrapping || bundle.wrapping),
+      freeCoffees: coffees.map((id) => ({ id, price: 0 })),
+    };
+  state.cart.push(entry);
+  persist();
+  renderCartEnhanced();
+  toast(`${bundle.name} сагсанд нэмэгдлээ`);
+}
+function renderBuilder() {
+  const select = $("builderFlower");
+  select.innerHTML = flowers
+    .map(
+      (f) =>
+        `<option value="${f.id}">${f.name} · ${money(Math.round(f.price / 1000) * 1000)}</option>`,
+    )
+    .join("");
+  $("builderCard").innerHTML = cardThemes
+    .map((x) => `<option>${x}</option>`)
+    .join("");
+  updateBuilder();
+}
+function updateBuilder() {
+  const flower = item($("builderFlower").value),
+    limit = freeCoffeeLimit(flower);
+  $("builderPromo").textContent = limit
+    ? `${flower.name} сонгосон тул ${limit} кофе 0₮-өөр бэлэгтэй.`
+    : "Энэ баглаа 100,000₮-д хүрээгүй тул complimentary кофе багтахгүй.";
+  $("builderCoffeeOptions").innerHTML = drinks
+    .map(
+      (d) =>
+        `<label class="coffee-choice"><input type="checkbox" value="${d.id}" data-builder-coffee ${limit ? "" : "disabled"}> ${d.name}<small>${limit ? "0₮ бэлэг" : "Боломжгүй"}</small></label>`,
+    )
+    .join("");
+  document.querySelectorAll("[data-builder-coffee]").forEach(
+    (input) =>
+      (input.onchange = () => {
+        const selected = [
+          ...document.querySelectorAll("[data-builder-coffee]:checked"),
+        ];
+        if (selected.length > limit) input.checked = false;
+        updateBuilderSummary();
+      }),
+  );
+  updateBuilderSummary();
+}
+function updateBuilderSummary() {
+  const flower = item($("builderFlower").value),
+    limit = freeCoffeeLimit(flower),
+    coffees = [
+      ...document.querySelectorAll("[data-builder-coffee]:checked"),
+    ].map((x) => x.value),
+    wrapping = $("builderWrapping").checked,
+    base = Math.round(flower.price / 1000) * 1000,
+    total = base + (wrapping ? giftWrapPrice : 0);
+  $("builderPreview").textContent =
+    `${flower.name}\nКарт: ${$("builderCard").value}${$("builderRecipient").value ? ` · ${$("builderRecipient").value}` : ""}\n${$("builderMessage").value || "Хувийн мэндчилгээ оруулаагүй байна."}\nКофе: ${coffees.length ? coffees.map((id) => item(id).name).join(", ") : "Сонгоогүй"}${limit ? `\n${coffees.length} кофе 0₮-ийн бэлэг` : ""}`;
+  $("builderTotal").textContent =
+    `Нийт: ${money(total)}${wrapping ? " (10,000₮ боодол багтсан)" : ""}`;
+}
+const KEYS = {
+    cart: "bloom_cart",
+    orders: "bloom_orders",
+    users: "bloom_users",
+    session: "bloom_session",
+    wishlist: "bloom_wishlist",
+  },
+  ADMIN = { email: "admin@bloom.mn", password: "BloomAdmin123!" };
+const names = [
+    "Ягаан мөрөөдөл",
+    "Хайрын захиа",
+    "Сарны туяа",
+    "Ээждээ барих цэцэг",
+    "Хаврын аялгуу",
+    "Нууцхан инээмсэглэл",
+    "Өглөөний нар",
+    "Зөөлөн дурсамж",
+    "Улаан сарнай",
+    "Цагаан үүл",
+    "Гэгээн хайр",
+    "Төрсөн өдрийн баяр",
+    "Намрын шүлэг",
+    "Гүнжийн цэцэрлэг",
+    "Бяцхан жаргал",
+    "Сарнайн зүрх",
+    "Хаврын үнэр",
+    "Ээжийн тэврэлт",
+    "Ягаан шүр",
+    "Оддын баглаа",
+    "Хайрын хөг",
+    "Нарлаг өдөр",
+    "Зөөлөн пион",
+    "Баярын өнгө",
+    "Гэгээтэй захиа",
+    "Цэцгэн аялгуу",
+    "Романтик орой",
+    "Өдөр бүрийн баяр",
+    "Тансаг сарнай",
+    "Bloom-ийн нууц",
+  ],
+  cats = [
+    "romance",
+    "romance",
+    "romance",
+    "mom",
+    "birthday",
+    "mini",
+    "mini",
+    "mom",
+    "romance",
+    "mom",
+    "romance",
+    "birthday",
+    "mom",
+    "featured",
+    "mini",
+    "featured",
+    "birthday",
+    "mom",
+    "featured",
+    "birthday",
+    "romance",
+    "mini",
+    "featured",
+    "birthday",
+    "mini",
+    "mom",
+    "romance",
+    "mini",
+    "featured",
+    "featured",
+  ],
+  descs = [
+    "Зөөлөн өнгө, нандин мэдрэмж шингэсэн.",
+    "Хайрын үгийг цэцгээр хэлэхэд зориулав.",
+    "Нам гүмхэн оройн тансаг сонголт.",
+    "Ээждээ талархлаа илэрхийлэх дулаахан баглаа.",
+    "Шинэ эхлэлд зориулсан өнгөлөг цэцэгс.",
+  ];
+const flowerImages = [
+  "pink-dream",
+  "romantic-rose",
+  "moonlight",
+  "mothers-day",
+  "spring-bouquet",
+  "soft-pink",
+  "sunflower",
+  "pastel-bouquet",
+  "red-rose",
+  "white-hydrangea",
+  "white-pink-rose",
+  "birthday",
+  "autumn-bouquet",
+  "pink-princess",
+  "small-pink",
+  "rose-heart",
+  "spring-tulip",
+  "mothers-hug",
+  "pink-coral",
+  "star-bouquet",
+  "red-pink-rose",
+  "sunny-day",
+  "pink-peony",
+  "colorful-mixed",
+  "bright-pink",
+  "pastel-mixed",
+  "romantic-evening",
+  "cheerful-mixed",
+  "luxury-red-rose",
+  "bloom-secret",
+];
+const flowers = names.map((name, i) => ({
+  id: `f${String(i + 1).padStart(2, "0")}`,
+  name,
+  category: cats[i],
+  price: 38000 + i * 9700 + (i % 4) * 5000,
+  description: descs[i % 5],
+  kind: ["rose", "peony", "tulip", "daisy", "mixed"][i % 5],
+  tone: i % 5,
+  image: `assets/${flowerImages[i]}.jpg`,
+}));
+flowers.push(
+  ...load("bloom_custom_products", []).map((product) => ({
+    ...product,
+    type: "flower",
+  })),
+);
+const drinkImages = [
+  "latte",
+  "americano",
+  "cappuccino",
+  "espresso",
+  "mocha",
+  "caramel-latte",
+  "vanilla-latte",
+  "matcha",
+  "iced-latte",
+  "iced-americano",
+  "hot-chocolate",
+  "strawberry-milk",
+];
+const drinks = [
+  "Latte",
+  "Americano",
+  "Cappuccino",
+  "Espresso",
+  "Mocha",
+  "Caramel Latte",
+  "Vanilla Latte",
+  "Matcha",
+  "Iced Latte",
+  "Iced Americano",
+  "Hot Chocolate",
+  "Strawberry Milk",
+].map((name, i) => ({
+  id: `d${String(i + 1).padStart(2, "0")}`,
+  name,
+  price: 7000 + (i % 7) * 1000,
+  description: [
+    "Зөөлөн сүүтэй эспрессо.",
+    "Цэвэр, хүчтэй кофены амт.",
+    "Торгон хөөс, баялаг амт.",
+    "Намууxан, анхилуун сонголт.",
+  ][i % 4],
+  category: i === 7 || i > 9 ? "noncoffee" : i > 7 ? "cold" : "hot",
+  kind: i,
+  image: `assets/${drinkImages[i]}.jpg`,
+}));
+const bundles = [
+  {
+    id: "b01",
+    name: "Бяцхан баяр",
+    description: "Mini баглаа, мэндчилгээний картын энгийн бөгөөд дотно бэлэг.",
+    price: 49000,
+    flower: "f15",
+    coffee: 0,
+    card: "Төрсөн өдөр",
+    image: "assets/products/bundles/small-pink-gift-set.jpg",
+  },
+  {
+    id: "b02",
+    name: "Дулаан мэндчилгээ",
+    description: "Өнгөлөг баглаа, Latte, зөөлөн мэндчилгээний карт.",
+    price: 79000,
+    flower: "f08",
+    coffee: 1,
+    card: "Баяр хүргэе",
+    image: "assets/products/bundles/flower-latte-gift-set.jpg",
+  },
+  {
+    id: "b03",
+    name: "Хайрын захиа",
+    description: "Романтик баглаа, нэг сонгох кофе, хайрын карт.",
+    price: 99000,
+    flower: "f11",
+    coffee: 1,
+    card: "Хайр",
+    image: "assets/products/bundles/romantic-flower-coffee-set.jpg",
+  },
+  {
+    id: "b04",
+    name: "Аз жаргалын багц",
+    description: "Тансаг баглаа, хоёр кофе, дурсамж үлдээх карт.",
+    price: 150000,
+    flower: "f19",
+    coffee: 2,
+    card: "Баяр хүргэе",
+    image: "assets/products/bundles/luxury-flower-coffee-set.jpg",
+  },
+  {
+    id: "b05",
+    name: "Ээждээ барих бэлэг",
+    description: "Ээжид зориулсан гоёмсог баглаа, кофе, premium карт.",
+    price: 120000,
+    flower: "f08",
+    coffee: 1,
+    card: "Ээждээ",
+    image: "assets/products/bundles/mothers-day-flower-set.jpg",
+  },
+  {
+    id: "b06",
+    name: "Онцгой мөч",
+    description: "Luxury баглаа, хоёр кофе, premium боодол, карт.",
+    price: 250000,
+    flower: "f29",
+    coffee: 2,
+    card: "Хайр",
+    wrapping: true,
+    image: "assets/products/bundles/luxury-rose-coffee-gift-box.jpg",
+  },
 ];
 // Keep bundle image requests limited to files included in the local assets.
-const availableBundleImages=new Set();
-const adminProducts=[...new Map([...load("bloom_custom_products",[]).filter(x=>x&&x.id).map(x=>({...x,type:"flower"})),...load("bloom_admin_products",[]).filter(x=>x&&x.id&&x.type)].map(x=>[x.id,x])).values()];
-adminProducts.forEach(product=>{const catalog=product.type==="flower"?flowers:product.type==="coffee"?drinks:bundles;if(product.type==="bundle"){product.flower=product.flower||"f01";product.coffee=product.coffees?.length||0}const existing=catalog.find(x=>x.id===product.id);if(existing)Object.assign(existing,product);else catalog.push(product)});
-const cardThemes=["Хайр","Төрсөн өдөр","Ээждээ","Баяр хүргэе","Энгийн мэндчилгээ"], giftWrapPrice=10000;
-const state={cart:load(KEYS.cart,[]),orders:load(KEYS.orders,[]),users:load(KEYS.users,[]),session:load(KEYS.session,null),wishlist:load(KEYS.wishlist,[]),flowerFilter:"all",drinkFilter:"all",sort:"default",selected:null,timer:null};const $=id=>document.getElementById(id),money=n=>Number(n).toLocaleString("mn-MN")+"₮",esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c])),statuses={confirmed:"Баталгаажсан",preparing:"Бэлтгэж байна",out:"Хүргэлтэд гарсан",delivered:"Хүргэгдсэн"},steps=Object.keys(statuses);
-const extraState={availability:load("bloom_availability",{}),coupon:null,tracking:load("bloom_tracking_demo",true),deliveryFees:load("bloom_delivery_fees",{Төв:0,Ойролцоо:5000,Алслагдсан:10000}),selectedDetail:null,search:"",minPrice:0,maxPrice:0};
-function load(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}}function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}function persist(){Object.entries({[KEYS.cart]:state.cart,[KEYS.orders]:state.orders,[KEYS.users]:state.users,[KEYS.session]:state.session,[KEYS.wishlist]:state.wishlist}).forEach(([k,v])=>save(k,v))}
-function flowerSvg(f){let c=[["#e9a1b1","#b94e70"],["#f3c2c4","#d57c89"],["#f7e4d2","#cf8b72"],["#d8e2d1","#9bab88"],["#e8cbe0","#aa6d9e"]][f.tone],p="",n=f.kind==="tulip"?5:f.kind==="daisy"?10:8;for(let i=0;i<n;i++)p+=`<ellipse cx="0" cy="-42" rx="${f.kind==="daisy"?10:18}" ry="34" fill="url(#g)" transform="rotate(${i*360/n})"/>`;return `<svg viewBox="0 0 300 250" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g"><stop stop-color="${c[0]}"/><stop offset="1" stop-color="${c[1]}"/></linearGradient></defs><path d="M145 220C130 165 145 105 150 65" stroke="#718b68" stroke-width="6" fill="none"/><path d="M145 160Q100 140 82 165Q120 178 145 168M150 130Q188 102 211 120Q186 143 150 140" fill="#9aaf8d"/><g transform="translate(150 70)">${p}<circle r="14" fill="#f2c86e"/><circle r="6" fill="#9b633e"/></g><path d="M90 220Q150 185 210 220L193 238H108Z" fill="#d8bdc8"/><path d="M96 219L204 219" stroke="#9d556e" stroke-width="4"/></svg>`}
-function drinkSvg(d){let body=d.category==="noncoffee"?d.kind===7?"#96ad76":"#e9a9b1":d.kind===1||d.kind===9?"#5a362d":"#b9825b";return `<svg viewBox="0 0 300 250" xmlns="http://www.w3.org/2000/svg"><ellipse cx="150" cy="215" rx="85" ry="13" fill="#6c4c43" opacity=".13"/><path d="M92 65H208L195 202Q150 220 105 202Z" fill="${body}" stroke="#fff" stroke-width="5"/><ellipse cx="150" cy="65" rx="61" ry="14" fill="#f6eee4"/><ellipse cx="150" cy="65" rx="47" ry="9" fill="#8a5945"/><path d="M136 59q14 14 28 0M150 53v20" stroke="#f2d2c8" stroke-width="4" fill="none"/><circle cx="220" cy="170" r="9" fill="#765445"/><circle cx="236" cy="187" r="7" fill="#765445"/></svg>`}
-function bundleSvg(bundle){const flower=item(bundle.flower);return `<svg viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg"><rect x="42" y="92" width="216" height="47" rx="8" fill="#d8bdc8"/><path d="M50 96h200" stroke="#9d556e" stroke-width="5"/><g transform="translate(150 73) scale(.6)">${flowerSvg(flower).replace(/<svg[^>]*>|<\/svg>/g,"")}</g><path d="M222 56l28 20-28 20-28-20z" fill="#c77c8d"/><rect x="211" y="76" width="22" height="38" rx="3" fill="#fff8f1" transform="rotate(9 222 95)"/><circle cx="222" cy="77" r="4" fill="#5d2638"/><path d="M225 83q12-15 22-2" stroke="#5d2638" fill="none" stroke-width="3"/></svg>`}
-function allCatalog(){return [...flowers,...drinks,...bundles.map(x=>({...x,id:x.id,category:"bundle"}))]}function matchesSearch(x){const query=extraState.search.trim().toLocaleLowerCase("mn-MN");return (!query||`${x.name} ${x.description||""}`.toLocaleLowerCase("mn-MN").includes(query))&&(!extraState.minPrice||x.price>=extraState.minPrice)&&(!extraState.maxPrice||x.price<=extraState.maxPrice)}
-function showDetail(id){const x=item(id);if(!x)return;const flower=productTypeOf(x)==="flower";extraState.selectedDetail=id;$("detailVisual").innerHTML=productVisual(x,flower?flowerSvg(x):drinkSvg(x));$("detailCategory").textContent=flower?`Цэцгийн баглаа · ${x.category}`:"Кофе ба ундаа";$("detailName").textContent=x.name;$("detailDescription").textContent=x.description;$("detailPrice").textContent=money(x.price);const limit=flower?freeCoffeeLimit(x):0;$("detailPromotion").textContent=limit?`${limit} кофе бэлэгтэй. Сонголтоо баталгаажуулахад builder нээгдэнэ.`:"";$("detailQuantity").value=1;layer("detailModal")}
-function add(id){let x=state.cart.find(a=>a.id===id);x?x.qty++:state.cart.push({id,qty:1});persist();renderCart();toast(`${item(id).name} сагсанд нэмэгдлээ`)}function renderCart(){let count=state.cart.reduce((n,x)=>n+x.qty,0),total=state.cart.reduce((n,x)=>n+item(x.id).price*x.qty,0);$("cartCount").textContent=count;$("cartTotal").textContent=money(total);$("cartItems").innerHTML=state.cart.length?state.cart.map((x,i)=>`<div class="cart-line"><div class="cart-thumb">${x.id[0]==="f"?flowerSvg(item(x.id)):drinkSvg(item(x.id))}</div><div><strong>${esc(item(x.id).name)}</strong><small>${money(item(x.id).price)}</small><div class="qty"><button data-qty="${i}" data-change="-1">−</button><span>${x.qty}</span><button data-qty="${i}" data-change="1">+</button></div><button class="remove" data-remove="${i}">Устгах</button></div><b>${money(item(x.id).price*x.qty)}</b></div>`).join(""):`<div class="empty">Таны сагс одоогоор хоосон байна.</div>`}
-function orders(){return state.session?.role==="admin"?state.orders:state.orders.filter(x=>state.session?x.userId===state.session.email:x.userId===null)}function renderOrders(){let os=orders();if(!state.session){$("orderList").innerHTML=`<div class="empty">Захиалгын түүхээ харахын тулд нэвтэрнэ үү.</div>`;return}$("orderList").innerHTML=os.length?os.map(o=>`<article class="order-card"><div><small>Захиалгын дугаар</small><strong>${o.id}</strong><small>${new Date(o.createdAt).toLocaleString("mn-MN")}</small></div><p>${o.items.map(i=>`${esc(item(i.id).name)} ×${i.qty}`).join(", ")}<br><b>${money(o.total)}</b> · ${esc(o.payment)}</p><span class="status-pill">${statuses[o.status]}</span><button class="button ghost" data-track="${o.id}">Захиалга харах</button></article>`).join(""): `<div class="empty">Одоогоор таны захиалга алга байна.</div>`}
-function renderTracking(){let o=orders().find(x=>x.id===state.selected)||orders()[0];if(!o){$("tracking").innerHTML=`<div class="empty">Одоогоор идэвхтэй захиалга алга байна.</div>`;return}state.selected=o.id;let i=steps.indexOf(o.status);$("tracking").innerHTML=`<div class="tracking-card"><div class="tracking-head"><div><small>Захиалгын дугаар</small><strong>${o.id}</strong><small>${new Date(o.createdAt).toLocaleDateString("mn-MN")} · Хүргэлт 1–2 цаг</small></div><span class="status-pill">${statuses[o.status]}</span></div><div class="steps">${steps.map((s,n)=>`<div class="step ${n<=i?(n===i?"current":"done"):""}">${statuses[s]}</div>`).join("")}</div><div class="progress"><span style="width:${(i+1)*25}%"></span></div></div>`}
-function renderAdmin(){if(state.session?.role!=="admin")return;let q=$("adminSearch").value.toLowerCase(),filter=$("adminStatusFilter").value,os=state.orders.filter(o=>(filter==="all"||o.status===filter)&&(`${o.id} ${o.customer}`.toLowerCase().includes(q))),sales=state.orders.reduce((n,o)=>n+o.total,0);$("adminStats").innerHTML=[["Нийт захиалга",state.orders.length],["Нийт борлуулалт",money(sales)],["Хүлээгдэж буй",state.orders.filter(o=>o.status!=="delivered").length],["Хүргэгдсэн",state.orders.filter(o=>o.status==="delivered").length]].map(x=>`<div class="stat"><small>${x[0]}</small><strong>${x[1]}</strong></div>`).join("");$("adminTable").innerHTML=os.map(o=>`<tr><td>${o.id}</td><td>${esc(o.customer)}</td><td>${esc(o.phone)}</td><td>${new Date(o.createdAt).toLocaleDateString("mn-MN")}</td><td>${money(o.total)}</td><td><select data-status="${o.id}">${steps.map(s=>`<option value="${s}" ${s===o.status?"selected":""}>${statuses[s]}</option>`).join("")}</select></td><td><button class="remove" data-delete-order="${o.id}">Устгах</button></td></tr>`).join("")||`<tr><td colspan="7">Одоогоор захиалга алга.</td></tr>`}
-function render(){persist();renderProducts();renderBundles();renderCartEnhanced();$("wishlistCount").textContent=state.wishlist.length;$("authButton").textContent=state.session?`${state.session.role==="admin"?"Админ":"Сайн байна уу, "+state.session.name} · Гарах`:"Нэвтрэх";$("admin").classList.toggle("hidden",state.session?.role!=="admin");renderOrdersBundleAware();renderTracking();renderAdmin()}
-function layer(id){$("overlay").classList.add("show");$(id).classList.add("show")}function close(){$("overlay").classList.remove("show");document.querySelectorAll(".drawer,.modal").forEach(x=>x.classList.remove("show"))}
-function order(data){let total=data.finalTotal??state.cart.reduce((n,x)=>n+cartPrice(x)*x.qty,0),o={id:`BLM-${Date.now().toString().slice(-8)}`,createdAt:Date.now(),userId:state.session?.email||null,customer:data.customer,phone:data.phone,address:data.address,deliveryDate:data.deliveryDate||"",deliveryTime:data.deliveryTime||"",deliveryArea:data.deliveryArea||"Төв",surprise:Boolean(data.surprise),note:data.note||"",payment:data.payment,coupon:data.coupon||null,discount:data.discount||0,deliveryFee:data.deliveryFee||0,wrappingFee:data.wrappingFee||0,total,items:state.cart.map(x=>({...x,unitPrice:cartPrice(x),name:cartLabel(x)})),status:"confirmed",manual:false};state.orders.unshift(o);state.cart=[];state.selected=o.id;render();$("successText").textContent=`Таны ${o.id} дугаартай захиалга бүртгэгдлээ. Төлөв: ${statuses[o.status]}.`;layer("successModal")}
-function timer(){clearInterval(state.timer);if(!extraState.tracking)return;state.timer=setInterval(()=>{if(!extraState.tracking)return;let changed=false;state.orders.forEach(o=>{let i=steps.indexOf(o.status);if(!o.manual&&i<3){o.status=steps[i+1];changed=true}});if(changed)render();if(!state.orders.some(o=>!o.manual&&o.status!=="delivered")){clearInterval(state.timer);state.timer=null}},5000)}
-function init(){$("heroArt").innerHTML=flowerSvg(flowers[0]);$("storyArt").innerHTML=drinkSvg(drinks[0]);render();timer();document.addEventListener("click",e=>{let a=e.target.closest("[data-add]"),w=e.target.closest("[data-wish]"),q=e.target.closest("[data-qty]"),r=e.target.closest("[data-remove]"),t=e.target.closest("[data-track]"),d=e.target.closest("[data-delete-order]");if(a)return add(a.dataset.add);if(w){state.wishlist=state.wishlist.includes(w.dataset.wish)?state.wishlist.filter(x=>x!==w.dataset.wish):[...state.wishlist,w.dataset.wish];render();return}if(q){state.cart[+q.dataset.qty].qty+=+q.dataset.change;state.cart=state.cart.filter(x=>x.qty>0);persist();renderCart();return}if(r){state.cart.splice(+r.dataset.remove,1);persist();renderCart();return}if(t){state.selected=t.dataset.track;renderTracking();$("delivery").scrollIntoView({behavior:"smooth"});return}if(d&&confirm("Энэ захиалгыг устгах уу?")){state.orders=state.orders.filter(x=>x.id!==d.dataset.deleteOrder);render();return}if(e.target.closest("[data-close]")||e.target.id==="overlay")close()});$("flowerTabs").onclick=e=>{let b=e.target.closest("button");if(!b)return;state.flowerFilter=b.dataset.flowerFilter;document.querySelectorAll("[data-flower-filter]").forEach(x=>x.classList.toggle("active",x===b));renderProducts()};$("flowerSort").onchange=e=>{state.sort=e.target.value;renderProducts()};$("drinkTabs").onclick=e=>{let b=e.target.closest("button");if(!b)return;state.drinkFilter=b.dataset.drinkFilter;document.querySelectorAll("[data-drink-filter]").forEach(x=>x.classList.toggle("active",x===b));renderProducts()};$("cartButton").onclick=()=>layer("cartDrawer");$("wishlistButton").onclick=()=>$("wishlist").scrollIntoView({behavior:"smooth"});$("menuToggle").onclick=()=>{const open=$("mainNav").classList.toggle("open");$("menuToggle").setAttribute("aria-expanded",String(open));$("menuToggle").setAttribute("aria-label",open?"Цэс хаах":"Цэс нээх")};$("mainNav").onclick=e=>{if(e.target.closest("a")){$("mainNav").classList.remove("open");$("menuToggle").setAttribute("aria-expanded","false");$("menuToggle").setAttribute("aria-label","Цэс нээх")}};$("checkoutButton").onclick=()=>{if(!state.cart.length)return toast("Сагс хоосон байна");$("checkoutSummary").textContent=`${state.cart.reduce((n,x)=>n+x.qty,0)} бүтээгдэхүүн · ${$("cartTotal").textContent}`;layer("checkoutModal")};$("authButton").onclick=()=>{if(state.session){state.session=null;render();toast("Системээс гарлаа")}else layer("authModal")};document.querySelectorAll("[data-auth-tab]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-auth-tab]").forEach(x=>x.classList.toggle("active",x===b));$("loginForm").classList.toggle("hidden",b.dataset.authTab!=="login");$("registerForm").classList.toggle("hidden",b.dataset.authTab!=="register")});$("loginForm").onsubmit=e=>{e.preventDefault();let email=$("loginEmail").value.trim().toLowerCase(),pass=$("loginPassword").value,u=email===ADMIN.email&&pass===ADMIN.password?{name:"Админ",email,role:"admin"}:state.users.find(x=>x.email===email&&x.password===pass);if(!u)return $("loginError").textContent="И-мэйл эсвэл нууц үг буруу байна.";state.session=u;close();render();timer();toast("Амжилттай нэвтэрлээ")};$("registerForm").onsubmit=e=>{e.preventDefault();let name=$("registerName").value.trim(),email=$("registerEmail").value.trim().toLowerCase(),pass=$("registerPassword").value;if(pass!==$("registerConfirm").value)return $("registerError").textContent="Нууц үг таарахгүй байна.";if(email===ADMIN.email||state.users.some(x=>x.email===email))return $("registerError").textContent="Энэ и-мэйл аль хэдийн бүртгэлтэй байна.";state.users.push({name,email,password:pass,role:"user"});state.session=state.users.at(-1);close();render();toast("Бүртгэл амжилттай үүслээ")};$("checkoutForm").onsubmit=e=>{e.preventDefault();let phone=$("customerPhone").value.replace(/\s/g,"");if(!/^\d{8}$/.test(phone))return $("checkoutError").textContent="Утасны дугаар 8 оронтой байна уу.";order({customer:$("customerName").value.trim(),phone,address:$("customerAddress").value.trim(),note:$("customerNote").value.trim(),payment:document.querySelector("[name=payment]:checked").value});e.target.reset()};$("adminSearch").oninput=renderAdmin;$("adminStatusFilter").onchange=renderAdmin;$("adminTable").onchange=e=>{if(!e.target.dataset.status)return;let o=state.orders.find(x=>x.id===e.target.dataset.status);o.status=e.target.value;o.manual=true;render();toast("Захиалгын төлөв шинэчлэгдлээ")};document.onkeydown=e=>{if(e.key==="Escape"){close();$("mainNav").classList.remove("open");$("menuToggle").setAttribute("aria-expanded","false");$("menuToggle").setAttribute("aria-label","Цэс нээх")}}}
-let editingProductId=null,pendingProductImage="",bloomToastTimer=null;
-function toast(message){const element=$("toast");element.textContent=message;element.classList.add("show");clearTimeout(bloomToastTimer);bloomToastTimer=setTimeout(()=>element.classList.remove("show"),2200)}
-function item(id){return flowers.find(x=>x.id===id)||drinks.find(x=>x.id===id)||bundles.find(x=>x.id===id)}
-addBundle=function(bundle,custom={}){const flower=item(bundle.flower),limit=freeCoffeeLimit(flower),coffees=bundle.type==="bundle"?(custom.coffees||bundle.coffees||[]):(custom.coffees||[]).slice(0,limit),entry={id:`${bundle.id}-${Date.now()}`,kind:"bundle",name:bundle.name,price:bundle.price,qty:1,flowerId:bundle.flower,coffees,card:custom.card||bundle.card||(bundle.hasCard===false?"Картгүй":"Энгийн мэндчилгээ"),recipient:custom.recipient||"",message:custom.message||"",wrapping:Boolean(custom.wrapping||bundle.wrapping),freeCoffees:coffees.map(id=>({id,price:0}))};state.cart.push(entry);persist();renderCartEnhanced();toast(`${bundle.name} сагсанд нэмэгдлээ`)}
-function saveProductWithRollback(event){const existing=adminProducts.find(x=>x.id===editingProductId),previous=existing?{...existing}:null,stored=localStorage.getItem("bloom_admin_products"),availability={...extraState.availability},catalogIds=new Set([...flowers,...drinks,...bundles].map(x=>x.id));saveProduct(event);if($("productModal").classList.contains("show")&&localStorage.getItem("bloom_admin_products")===stored){if(existing)Object.assign(existing,previous);else{for(let i=adminProducts.length-1;i>=0;i--)if(!catalogIds.has(adminProducts[i].id))adminProducts.splice(i,1);[flowers,drinks,bundles].forEach(list=>{for(let i=list.length-1;i>=0;i--)if(!catalogIds.has(list[i].id))list.splice(i,1)})}Object.keys(extraState.availability).forEach(id=>{if(!(id in availability))delete extraState.availability[id]});Object.assign(extraState.availability,availability)}}
-function productTypeOf(product){return product.type||(product.id[0]==="f"?"flower":product.id[0]==="d"?"coffee":"bundle")}
-function setHeroImage(containerId,src,alt,fallback){const container=$(containerId),image=document.createElement("img");image.className="hero-photo";image.src=src;image.alt=alt;image.addEventListener("error",()=>{container.innerHTML=fallback},{once:true});container.replaceChildren(image)}
-function renderHeroImages(){setHeroImage("heroArt","assets/hero/hero-flower-bouquet.jpg","Bloom-ийн ягаан цэцгийн баглаа",flowerSvg(flowers[0]));setHeroImage("storyArt","assets/hero/coffee-hero.jpg","Bloom-ийн latte кофе",drinkSvg(drinks[0]))}
-function productVisual(product,fallback,fallbackImage=""){const type=product?productTypeOf(product):"",flowerImage=fallbackImage||(type==="bundle"?item(product.flower)?.image:""),missingBundleImage=type==="bundle"&&product.image?.startsWith("assets/products/bundles/")&&!availableBundleImages.has(product.image),image=missingBundleImage?flowerImage:product?.image;if(!image)return fallback;return `<img class="product-image" src="${esc(image)}" alt="${esc(product.name)}" data-fallback-svg="${encodeURIComponent(fallback)}" data-fallback-image="${esc(flowerImage)}">`}
-document.addEventListener("error",event=>{const image=event.target;if(!(image instanceof HTMLImageElement)||!image.classList.contains("product-image"))return;if(image.dataset.fallbackImage){image.src=image.dataset.fallbackImage;image.dataset.fallbackImage="";return}const fallback=document.createElement("template");fallback.innerHTML=decodeURIComponent(image.dataset.fallbackSvg||"");image.replaceWith(fallback.content)},true);
-const renderCartBase=renderCartEnhanced;
-function renderCartWithImages(){renderCartBase();document.querySelectorAll("#cartItems .cart-line").forEach((line,index)=>{const entry=state.cart[index];if(!entry)return;const bundle=entry.kind==="bundle",catalogProduct=bundle?bundles.find(product=>product.id===entry.id.split("-")[0])||entry:item(entry.id),product=bundle?{...catalogProduct,...entry,image:entry.image||catalogProduct.image,flower:entry.flowerId}:catalogProduct,fallback=bundle?bundleSvg({flower:entry.flowerId}):productTypeOf(product)==="flower"?flowerSvg(product):drinkSvg(product);line.querySelector(".cart-thumb").innerHTML=productVisual(product,fallback,bundle?item(entry.flowerId)?.image:"")})}
-renderCartEnhanced=renderCartWithImages;renderCart=renderCartWithImages;renderCartWithImages();
-function freeCoffeeLimit(flower){if(flower?.freeCoffee===true)return Math.max(1,flower.price>=150000?2:1);if(flower?.freeCoffee===false)return 0;return flower.price>=150000?2:flower.price>=100000?1:0}
-function isAvailable(id){const product=item(id);return Boolean(product&&product.active!==false&&product.available!==false&&extraState.availability[id]!==false)}
-function card(product){const flower=productTypeOf(product)==="flower",liked=state.wishlist.includes(product.id),limit=flower?freeCoffeeLimit(product):0,available=product.preview?product.available!==false:isAvailable(product.id),visual=productVisual(product,flower?flowerSvg(product):drinkSvg(product)),categoryLabel={hot:"Халуун",cold:"Хүйтэн",noncoffee:"Кафенгүй"}[product.category]||"Кофе";return `<article class="product-card ${available?"":"unavailable"}" data-detail="${esc(product.id)}"><div class="product-visual">${visual}<span class="product-category">${esc(product.featured?"Онцлох":flower?"Цэцэг":categoryLabel)}</span><button class="favorite ${liked?"active":""}" type="button" data-wish="${esc(product.id)}" aria-label="Хүслийн жагсаалтад ${liked?"хасах":"нэмэх"}">${liked?"♥":"♡"}</button></div><div class="product-info"><h3>${esc(product.name)}</h3><p>${esc(product.description)}</p>${limit?`<span class="promo-badge">${limit} кофе бэлэгтэй</span>`:""}${available?"":`<span class="promo-badge unavailable-label">${product.active===false?"Идэвхгүй":"Түр дууссан"}</span>`}<div class="product-meta"><span>${money(product.price)}</span><button class="add" type="button" data-add="${esc(product.id)}" ${available?"":"disabled"}>${available?"Сагсанд нэмэх":"Боломжгүй"}</button></div></div></article>`}
-function bundleCard(bundle){const visual=productVisual(bundle,bundleSvg({...bundle,flower:bundle.flower||"f01"}),item(bundle.flower)?.image),available=bundle.preview?bundle.available!==false:isAvailable(bundle.id);return `<article class="bundle-card ${available?"":"unavailable"}"><div class="bundle-art">${visual}</div><span class="product-category">${esc(bundle.featured?"Онцлох":"Бэлгийн багц")}</span><h3>${esc(bundle.name)}</h3><p>${esc(bundle.description)}</p>${bundle.coffee?`<span class="bundle-badge">${bundle.coffee} кофе багтсан</span>`:""}${available?"":`<span class="promo-badge unavailable-label">${bundle.active===false?"Идэвхгүй":"Түр дууссан"}</span>`}<div class="bundle-price"><span>${money(bundle.price)}</span><button class="button dark" type="button" data-bundle="${esc(bundle.id)}" ${available?"":"disabled"}>${available?"Сонгох":"Боломжгүй"}</button></div></article>`}
-function renderProducts(){const visibleFlowers=flowers.filter(x=>x.active!==false&&(state.flowerFilter==="all"||x.category===state.flowerFilter||state.flowerFilter==="featured"&&x.featured)&&matchesSearch(x)).sort((a,b)=>state.sort==="low"?a.price-b.price:state.sort==="high"?b.price-a.price:state.sort==="name"?a.name.localeCompare(b.name,"mn"):0),visibleDrinks=drinks.filter(x=>x.active!==false&&matchesSearch(x)&&(state.drinkFilter==="all"||x.category===state.drinkFilter));$("flowerGrid").innerHTML=visibleFlowers.length?visibleFlowers.map(card).join(""):`<div class="empty" style="grid-column:1/-1">Тохирох цэцэг олдсонгүй.</div>`;$("flowerCount").textContent=`${visibleFlowers.length} төрлийн баглаа`;$("drinkGrid").innerHTML=visibleDrinks.length?visibleDrinks.map(card).join(""):`<div class="empty" style="grid-column:1/-1">Тохирох ундаа олдсонгүй.</div>`;const wish=state.wishlist.map(item).filter(x=>x&&x.active!==false);$("wishlistGrid").innerHTML=wish.length?wish.map(x=>productTypeOf(x)==="bundle"?bundleCard(x):card(x)).join(""):`<div class="empty" style="grid-column:1/-1">Таны хүслийн жагсаалт одоогоор хоосон байна.</div>`}
-function renderBundles(){const visible=bundles.filter(x=>x.active!==false&&matchesSearch(x));$("bundleGrid").innerHTML=visible.length?visible.map(bundleCard).join(""):`<div class="empty" style="grid-column:1/-1">Тохирох бэлгийн багц олдсонгүй.</div>`}
-function saveAdminProducts(){try{localStorage.setItem("bloom_admin_products",JSON.stringify(adminProducts));return true}catch{return false}}
-function renderAdminProducts(){if(state.session?.role!=="admin")return;const query=$("adminProductSearch").value.trim().toLocaleLowerCase("mn-MN"),typeFilter=$("adminProductType").value,availability=$("adminProductAvailability").value,sort=$("adminProductSort").value,isBundleTab=typeFilter==="bundle",catalog=isBundleTab?[...bundles,...adminProducts.filter(product=>productTypeOf(product)==="bundle"&&!bundles.some(bundle=>bundle.id===product.id))]:adminProducts.filter(product=>productTypeOf(product)!=="bundle");let entries=catalog.filter(product=>{const type=productTypeOf(product),matchesType=typeFilter==="all"||type===typeFilter,matchesQuery=!query||`${product.name} ${product.description||""}`.toLocaleLowerCase("mn-MN").includes(query),matchesAvailability=availability==="all"||availability==="inactive"?availability==="all"||product.active===false:availability==="available"?isAvailable(product.id):!isAvailable(product.id);return matchesType&&matchesQuery&&matchesAvailability});entries.sort((a,b)=>sort==="price-asc"?a.price-b.price:sort==="price-desc"?b.price-a.price:a.name.localeCompare(b.name,"mn"));$("adminProductListTitle").textContent=isBundleTab?"Бэлгийн багцын жагсаалт":"Бүтээгдэхүүний жагсаалт";$("addProductButton").textContent=isBundleTab?"Багц нэмэх":"Бүтээгдэхүүн нэмэх";$("adminProductList").innerHTML=entries.length?entries.map(product=>{const type=productTypeOf(product),builtIn=isBundleTab&&bundles.some(bundle=>bundle.id===product.id),visual=productVisual(product,type==="flower"?flowerSvg(product):type==="coffee"?drinkSvg(product):bundleSvg({...product,flower:product.flower||"f01"})),actions=builtIn?`<span class="admin-built-in-label">Үндсэн багц</span>`:`<button type="button" class="button ghost" data-product-edit="${esc(product.id)}">Засах</button><button type="button" class="button ghost" data-product-active="${esc(product.id)}">${product.active===false?"Идэвхжүүлэх":"Идэвхгүй болгох"}</button><button type="button" class="button ghost" data-product-delete="${esc(product.id)}">Устгах</button>`;return `<article class="admin-product-row"><div class="admin-product-thumb">${visual}</div><div class="admin-product-copy"><strong>${esc(product.name)}</strong><span>${{flower:"Цэцэг",coffee:"Кофе",bundle:"Бэлгийн багц"}[type]} · ${money(product.price)}</span><span>${product.active===false?"Идэвхгүй":isAvailable(product.id)?"Бэлэн":"Бэлэн биш"} · ${product.featured?"Онцлох":"Энгийн"}</span></div><div class="admin-product-actions">${actions}</div></article>`}).join(""):`<div class="admin-empty-state"><strong>${query?`“${esc(query)}” хайлтад тохирох ${isBundleTab?"багц":"бүтээгдэхүүн"} олдсонгүй.`:isBundleTab?"Одоогоор бэлгийн багц нэмээгүй байна.":"Одоогоор бүтээгдэхүүн нэмээгүй байна."}</strong><p>${isBundleTab?"Админ хэсгээс анхны бэлгийн багцаа үүсгэнэ үү.":"Бүтээгдэхүүн нэмэх товчоор каталог үүсгэж эхлээрэй."}</p><button class="button dark" type="button" data-admin-add-product>${isBundleTab?"Багц нэмэх":"Бүтээгдэхүүн нэмэх"}</button></div>`}
-function updateProductCategoryOptions(selected){const type=$("productType").value,options=type==="flower"?[["romance","Хайртдаа"],["birthday","Төрсөн өдөрт"],["mom","Ээждээ"],["mini","Бяцхан баглаа"],["featured","Онцлох"]]:type==="coffee"?[["hot","Халуун"],["cold","Хүйтэн"],["noncoffee","Кофегүй"]]:[["bundle","Бэлгийн багц"]];$("productCategory").innerHTML=options.map(([value,label])=>`<option value="${value}">${label}</option>`).join("");if(options.some(([value])=>value===selected))$("productCategory").value=selected;$("flowerFields").classList.toggle("hidden",type!=="flower");$("coffeeFields").classList.toggle("hidden",type!=="coffee");$("bundleFields").classList.toggle("hidden",type!=="bundle")}
-function fillBundleOptions(){ $("productBundleFlower").innerHTML=flowers.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("");$("productBundleCoffee").innerHTML=drinks.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join("")}
-function renderProductEditorPreview(){const type=$("productType").value,preview={id:editingProductId||`${type==="flower"?"f":type==="coffee"?"d":"b"}-preview`,type,name:$("productName").value||"Бүтээгдэхүүний нэр",description:$("productDescription").value||"Тайлбар",price:Number($("productPrice").value)||0,category:type==="flower"?$("productFlowerCategory").value:$("productCategory").value,kind:$("productFlowerKind").value,tone:Number($("productFlowerTone").value)||0,freeCoffee:$("productFreeCoffee").checked,available:$("productAvailable").checked,active:true,featured:$("productFeatured").checked,preview:true,image:pendingProductImage,flower:$("productBundleFlower").value||"f01",coffee:$("productBundleCoffee").selectedOptions.length};const fallback=type==="flower"?flowerSvg(preview):type==="coffee"?drinkSvg(preview):bundleSvg(preview);$("productImagePreview").innerHTML=productVisual(preview,fallback);$("productLivePreview").innerHTML=type==="bundle"?bundleCard({...preview,id:"preview"}):card(preview)}
-function openProductEditor(product=null,newType="flower"){editingProductId=product?.id||null;pendingProductImage=product?.image||"";$("adminProductForm").reset();$("productType").disabled=Boolean(product);$("productFormTitle").textContent=product?"Бүтээгдэхүүн засах":newType==="bundle"?"Багц нэмэх":"Бүтээгдэхүүн нэмэх";$("productType").value=product?productTypeOf(product):newType;$("productName").value=product?.name||"";$("productDescription").value=product?.description||"";$("productPrice").value=product?.price||"";$("productAvailable").checked=product?isAvailable(product.id):true;$("productFeatured").checked=Boolean(product?.featured);$("productFlowerKind").value=product?.kind||"rose";$("productFlowerCategory").value=product?.category||"romance";$("productFlowerTone").value=String(product?.tone??0);$("productFlowerSize").value=product?.flowerSize||"Medium";$("productFreeCoffee").checked=Boolean(product?.freeCoffee);$("productDrinkName").value=product?.name||"";$("productTemperature").value=product?.temperature||product?.category||"hot";$("productDrinkSize").value=product?.drinkSize||"Medium";$("productHasCoffee").checked=product?.hasCoffee!==false;$("productBundleName").value=product?.name||"";$("productBundleDescription").value=product?.description||"";$("productBundlePrice").value=product?.price||"";$("productBundleCard").checked=product?.hasCard!==false;$("productBundleWrapping").checked=Boolean(product?.wrapping);fillBundleOptions();$("productBundleFlower").value=product?.flower||"f01";[...$("productBundleCoffee").options].forEach(option=>option.selected=(product?.coffees||[]).includes(option.value));updateProductCategoryOptions(product?.category);$("productCategory").value=product?.category||$("productCategory").value;$("productImageInput").value="";$("productImageError").textContent="";renderProductEditorPreview();layer("productModal")}
-function handleProductImage(file){const error=$("productImageError"),validTypes=["image/png","image/jpeg","image/webp"];if(!file)return;if(!validTypes.includes(file.type)||!(/\.(png|jpe?g|webp)$/i.test(file.name))){error.textContent="PNG, JPG, JPEG эсвэл WEBP зураг сонгоно уу.";$("productImageInput").value="";return}if(file.size>8*1024*1024){error.textContent="Зургийн хэмжээ 8MB-аас бага байх ёстой.";$("productImageInput").value="";return}const reader=new FileReader();reader.onload=()=>{const image=new Image();image.onload=()=>{const scale=Math.min(1,1200/Math.max(image.width,image.height)),canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));const context=canvas.getContext("2d");context.fillStyle="#fff";context.fillRect(0,0,canvas.width,canvas.height);context.drawImage(image,0,0,canvas.width,canvas.height);const result=canvas.toDataURL("image/jpeg",.82);if(result.length>1800000){error.textContent="Энэ зураг localStorage-д хадгалахад том байна. Жижиг зураг сонгоно уу.";return}pendingProductImage=result;error.textContent="";renderProductEditorPreview()};image.onerror=()=>{error.textContent="Зургийг уншиж чадсангүй. Өөр зураг сонгоно уу."};image.src=reader.result};reader.onerror=()=>{error.textContent="Зургийг унших үед алдаа гарлаа."};reader.readAsDataURL(file)}
-function saveProduct(event){event.preventDefault();const type=$("productType").value,name=$("productName").value.trim(),description=$("productDescription").value.trim(),price=Number($("productPrice").value);if(!name||!description||!Number.isFinite(price)||price<=0)return toast("Нэр, тайлбар болон зөв үнийг бөглөнө үү.");const existing=adminProducts.find(x=>x.id===editingProductId),id=existing?.id||`${type==="flower"?"f":type==="coffee"?"d":"b"}-custom-${Date.now()}`,product={...(existing||{}),id,type,name,description,price,category:type==="flower"?$("productFlowerCategory").value:type==="coffee"?$("productCategory").value:"bundle",active:existing?.active!==false,available:$("productAvailable").checked,featured:$("productFeatured").checked,image:pendingProductImage};if(type==="flower")Object.assign(product,{kind:$("productFlowerKind").value,tone:Number($("productFlowerTone").value),flowerSize:$("productFlowerSize").value,freeCoffee:$("productFreeCoffee").checked});if(type==="coffee")Object.assign(product,{kind:existing?.kind??drinks.length,temperature:$("productTemperature").value,hasCoffee:$("productHasCoffee").checked,drinkSize:$("productDrinkSize").value,category:$("productHasCoffee").checked?$("productTemperature").value:"noncoffee"});if(type==="bundle"){const coffees=[...$("productBundleCoffee").selectedOptions].map(option=>option.value);Object.assign(product,{name:$("productBundleName").value.trim()||name,description:$("productBundleDescription").value.trim()||description,price:Number($("productBundlePrice").value)||price,flower:$("productBundleFlower").value,coffees,coffee:coffees.length,hasCard:$("productBundleCard").checked,wrapping:$("productBundleWrapping").checked,card:$("productBundleCard").checked?"Энгийн мэндчилгээ":""})}if(existing)Object.assign(existing,product);else{adminProducts.push(product);(type==="flower"?flowers:type==="coffee"?drinks:bundles).push(product)}extraState.availability[id]=product.available;if(!saveAdminProducts()){toast("localStorage дүүрсэн байна. Жижиг зураг ашиглан дахин оролдоно уу.");return}save("bloom_availability",extraState.availability);$("productType").disabled=false;close();render();renderAdminProducts();toast(existing?"Бүтээгдэхүүн шинэчлэгдлээ":"Бүтээгдэхүүн нэмэгдлээ")}
-function setAdminTab(tab){const titles={orders:"Захиалга <em>удирдах</em>",products:"Бүтээгдэхүүн <em>удирдах</em>",bundles:"Багц <em>удирдах</em>",delivery:"Хүргэлт <em>удирдах</em>",settings:"Тохиргоо <em>удирдах</em>"};document.querySelectorAll("[data-admin-tab]").forEach(button=>button.classList.toggle("active",button.dataset.adminTab===tab));$("adminSectionTitle").innerHTML=titles[tab]||titles.orders;$("adminProductPanel").classList.toggle("hidden",tab!=="products"&&tab!=="bundles");$("adminStats").classList.toggle("hidden",tab!=="orders");$("adminTools").classList.toggle("hidden",tab!=="orders");$("adminManagement").classList.toggle("hidden",tab!=="settings"&&tab!=="delivery");$("adminTable").closest(".table-wrap").classList.toggle("hidden",tab!=="orders");$("adminProductType").value=tab==="bundles"?"bundle":"all";if(tab==="products"||tab==="bundles")renderAdminProducts()}
-$("adminTools").id="adminTools";$("adminManagement").id="adminManagement";
-$("addProductButton").onclick=()=>openProductEditor(null,$("adminProductType").value==="bundle"?"bundle":"flower");$("productType").onchange=()=>{updateProductCategoryOptions();renderProductEditorPreview()};$("adminProductForm").onsubmit=saveProduct;$("productImageInput").onchange=e=>handleProductImage(e.target.files[0]);$("changeProductImage").onclick=()=>$("productImageInput").click();$("removeProductImage").onclick=()=>{pendingProductImage="";$("productImageInput").value="";$("productImageError").textContent="";renderProductEditorPreview()};$("adminProductForm").oninput=renderProductEditorPreview;$("adminProductForm").onchange=e=>{if(e.target.id==="productFlowerCategory")$("productCategory").value=e.target.value;if(e.target.id==="productCategory"&&$("productType").value==="flower")$("productFlowerCategory").value=e.target.value;if(e.target.id==="productName"&&$("productType").value==="coffee")$("productDrinkName").value=e.target.value;if(e.target.id==="productName"&&$("productType").value==="bundle")$("productBundleName").value=e.target.value;if(e.target.id==="productDescription"&&$("productType").value==="bundle")$("productBundleDescription").value=e.target.value;renderProductEditorPreview()};$("adminProductSearch").oninput=renderAdminProducts;$("adminProductType").onchange=renderAdminProducts;$("adminProductAvailability").onchange=renderAdminProducts;$("adminProductSort").onchange=renderAdminProducts;document.querySelector(".admin-tabs").onclick=e=>{const tab=e.target.closest("[data-admin-tab]");if(tab)setAdminTab(tab.dataset.adminTab)};
-$("adminProductList").onclick=e=>{if(e.target.closest("[data-admin-add-product]")){openProductEditor(null,$("adminProductType").value==="bundle"?"bundle":"flower");return}const edit=e.target.closest("[data-product-edit]"),toggle=e.target.closest("[data-product-active]"),remove=e.target.closest("[data-product-delete]");if(edit){const product=adminProducts.find(x=>x.id===edit.dataset.productEdit);if(product)openProductEditor(product)}if(toggle){const product=adminProducts.find(x=>x.id===toggle.dataset.productActive);if(product){product.active=product.active===false;saveAdminProducts();render();renderAdminProducts();toast(product.active?"Бүтээгдэхүүн идэвхжлээ":"Бүтээгдэхүүн идэвхгүй боллоо")}}if(remove&&confirm("Энэ бүтээгдэхүүнийг каталогоос бүрмөсөн устгах уу? Энэ demo-д үйлдлийг буцаах боломжгүй. Өмнөх захиалгын мэдээлэл хэвээр үлдэнэ.")){const product=adminProducts.find(x=>x.id===remove.dataset.productDelete);if(!product)return;[flowers,drinks,bundles].forEach(list=>{const index=list.findIndex(x=>x.id===product.id);if(index>=0)list.splice(index,1)});adminProducts.splice(adminProducts.indexOf(product),1);delete extraState.availability[product.id];saveAdminProducts();save("bloom_availability",extraState.availability);render();renderAdminProducts();toast("Бүтээгдэхүүн каталогоос устгагдлаа")}};
+const availableBundleImages = new Set();
+const adminProducts = [
+  ...new Map(
+    [
+      ...load("bloom_custom_products", [])
+        .filter((x) => x && x.id)
+        .map((x) => ({ ...x, type: "flower" })),
+      ...load("bloom_admin_products", []).filter((x) => x && x.id && x.type),
+    ].map((x) => [x.id, x]),
+  ).values(),
+];
+adminProducts.forEach((product) => {
+  const catalog =
+    product.type === "flower"
+      ? flowers
+      : product.type === "coffee"
+        ? drinks
+        : bundles;
+  if (product.type === "bundle") {
+    product.flower = product.flower || "f01";
+    product.coffee = product.coffees?.length || 0;
+  }
+  const existing = catalog.find((x) => x.id === product.id);
+  if (existing) Object.assign(existing, product);
+  else catalog.push(product);
+});
+const cardThemes = [
+    "Хайр",
+    "Төрсөн өдөр",
+    "Ээждээ",
+    "Баяр хүргэе",
+    "Энгийн мэндчилгээ",
+  ],
+  giftWrapPrice = 10000;
+const state = {
+  cart: load(KEYS.cart, []),
+  orders: load(KEYS.orders, []),
+  users: load(KEYS.users, []),
+  session: load(KEYS.session, null),
+  wishlist: load(KEYS.wishlist, []),
+  flowerFilter: "all",
+  drinkFilter: "all",
+  sort: "default",
+  selected: null,
+  timer: null,
+};
+const $ = (id) => document.getElementById(id),
+  money = (n) => Number(n).toLocaleString("mn-MN") + "₮",
+  esc = (s) =>
+    String(s ?? "").replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;",
+        })[c],
+    ),
+  statuses = {
+    confirmed: "Баталгаажсан",
+    preparing: "Бэлтгэж байна",
+    out: "Хүргэлтэд гарсан",
+    delivered: "Хүргэгдсэн",
+  },
+  steps = Object.keys(statuses);
+const extraState = {
+  availability: load("bloom_availability", {}),
+  coupon: null,
+  tracking: load("bloom_tracking_demo", true),
+  deliveryFees: load("bloom_delivery_fees", {
+    Төв: 0,
+    Ойролцоо: 5000,
+    Алслагдсан: 10000,
+  }),
+  selectedDetail: null,
+  search: "",
+  minPrice: 0,
+  maxPrice: 0,
+};
+function load(k, f) {
+  try {
+    return JSON.parse(localStorage.getItem(k)) ?? f;
+  } catch {
+    return f;
+  }
+}
+function save(k, v) {
+  try {
+    localStorage.setItem(k, JSON.stringify(v));
+  } catch {}
+}
+function persist() {
+  Object.entries({
+    [KEYS.cart]: state.cart,
+    [KEYS.orders]: state.orders,
+    [KEYS.users]: state.users,
+    [KEYS.session]: state.session,
+    [KEYS.wishlist]: state.wishlist,
+  }).forEach(([k, v]) => save(k, v));
+}
+function flowerSvg(f) {
+  let c = [
+      ["#e9a1b1", "#b94e70"],
+      ["#f3c2c4", "#d57c89"],
+      ["#f7e4d2", "#cf8b72"],
+      ["#d8e2d1", "#9bab88"],
+      ["#e8cbe0", "#aa6d9e"],
+    ][f.tone],
+    p = "",
+    n = f.kind === "tulip" ? 5 : f.kind === "daisy" ? 10 : 8;
+  for (let i = 0; i < n; i++)
+    p += `<ellipse cx="0" cy="-42" rx="${f.kind === "daisy" ? 10 : 18}" ry="34" fill="url(#g)" transform="rotate(${(i * 360) / n})"/>`;
+  return `<svg viewBox="0 0 300 250" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g"><stop stop-color="${c[0]}"/><stop offset="1" stop-color="${c[1]}"/></linearGradient></defs><path d="M145 220C130 165 145 105 150 65" stroke="#718b68" stroke-width="6" fill="none"/><path d="M145 160Q100 140 82 165Q120 178 145 168M150 130Q188 102 211 120Q186 143 150 140" fill="#9aaf8d"/><g transform="translate(150 70)">${p}<circle r="14" fill="#f2c86e"/><circle r="6" fill="#9b633e"/></g><path d="M90 220Q150 185 210 220L193 238H108Z" fill="#d8bdc8"/><path d="M96 219L204 219" stroke="#9d556e" stroke-width="4"/></svg>`;
+}
+function drinkSvg(d) {
+  let body =
+    d.category === "noncoffee"
+      ? d.kind === 7
+        ? "#96ad76"
+        : "#e9a9b1"
+      : d.kind === 1 || d.kind === 9
+        ? "#5a362d"
+        : "#b9825b";
+  return `<svg viewBox="0 0 300 250" xmlns="http://www.w3.org/2000/svg"><ellipse cx="150" cy="215" rx="85" ry="13" fill="#6c4c43" opacity=".13"/><path d="M92 65H208L195 202Q150 220 105 202Z" fill="${body}" stroke="#fff" stroke-width="5"/><ellipse cx="150" cy="65" rx="61" ry="14" fill="#f6eee4"/><ellipse cx="150" cy="65" rx="47" ry="9" fill="#8a5945"/><path d="M136 59q14 14 28 0M150 53v20" stroke="#f2d2c8" stroke-width="4" fill="none"/><circle cx="220" cy="170" r="9" fill="#765445"/><circle cx="236" cy="187" r="7" fill="#765445"/></svg>`;
+}
+function bundleSvg(bundle) {
+  const flower = item(bundle.flower);
+  return `<svg viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg"><rect x="42" y="92" width="216" height="47" rx="8" fill="#d8bdc8"/><path d="M50 96h200" stroke="#9d556e" stroke-width="5"/><g transform="translate(150 73) scale(.6)">${flowerSvg(flower).replace(/<svg[^>]*>|<\/svg>/g, "")}</g><path d="M222 56l28 20-28 20-28-20z" fill="#c77c8d"/><rect x="211" y="76" width="22" height="38" rx="3" fill="#fff8f1" transform="rotate(9 222 95)"/><circle cx="222" cy="77" r="4" fill="#5d2638"/><path d="M225 83q12-15 22-2" stroke="#5d2638" fill="none" stroke-width="3"/></svg>`;
+}
+function allCatalog() {
+  return [
+    ...flowers,
+    ...drinks,
+    ...bundles.map((x) => ({ ...x, id: x.id, category: "bundle" })),
+  ];
+}
+function matchesSearch(x) {
+  const query = extraState.search.trim().toLocaleLowerCase("mn-MN");
+  return (
+    (!query ||
+      `${x.name} ${x.description || ""}`
+        .toLocaleLowerCase("mn-MN")
+        .includes(query)) &&
+    (!extraState.minPrice || x.price >= extraState.minPrice) &&
+    (!extraState.maxPrice || x.price <= extraState.maxPrice)
+  );
+}
+function showDetail(id) {
+  const x = item(id);
+  if (!x) return;
+  const flower = productTypeOf(x) === "flower";
+  extraState.selectedDetail = id;
+  $("detailVisual").innerHTML = productVisual(
+    x,
+    flower ? flowerSvg(x) : drinkSvg(x),
+  );
+  $("detailCategory").textContent = flower
+    ? `Цэцгийн баглаа · ${x.category}`
+    : "Кофе ба ундаа";
+  $("detailName").textContent = x.name;
+  $("detailDescription").textContent = x.description;
+  $("detailPrice").textContent = money(x.price);
+  const limit = flower ? freeCoffeeLimit(x) : 0;
+  $("detailPromotion").textContent = limit
+    ? `${limit} кофе бэлэгтэй. Сонголтоо баталгаажуулахад builder нээгдэнэ.`
+    : "";
+  $("detailQuantity").value = 1;
+  layer("detailModal");
+}
+function add(id) {
+  let x = state.cart.find((a) => a.id === id);
+  x ? x.qty++ : state.cart.push({ id, qty: 1 });
+  persist();
+  renderCart();
+  toast(`${item(id).name} сагсанд нэмэгдлээ`);
+}
+function renderCart() {
+  let count = state.cart.reduce((n, x) => n + x.qty, 0),
+    total = state.cart.reduce((n, x) => n + item(x.id).price * x.qty, 0);
+  $("cartCount").textContent = count;
+  $("cartTotal").textContent = money(total);
+  $("cartItems").innerHTML = state.cart.length
+    ? state.cart
+        .map(
+          (x, i) =>
+            `<div class="cart-line"><div class="cart-thumb">${x.id[0] === "f" ? flowerSvg(item(x.id)) : drinkSvg(item(x.id))}</div><div><strong>${esc(item(x.id).name)}</strong><small>${money(item(x.id).price)}</small><div class="qty"><button data-qty="${i}" data-change="-1">−</button><span>${x.qty}</span><button data-qty="${i}" data-change="1">+</button></div><button class="remove" data-remove="${i}">Устгах</button></div><b>${money(item(x.id).price * x.qty)}</b></div>`,
+        )
+        .join("")
+    : `<div class="empty">Таны сагс одоогоор хоосон байна.</div>`;
+}
+function orders() {
+  return state.session?.role === "admin"
+    ? state.orders
+    : state.orders.filter((x) =>
+        state.session ? x.userId === state.session.email : x.userId === null,
+      );
+}
+function renderOrders() {
+  let os = orders();
+  if (!state.session) {
+    $("orderList").innerHTML =
+      `<div class="empty">Захиалгын түүхээ харахын тулд нэвтэрнэ үү.</div>`;
+    return;
+  }
+  $("orderList").innerHTML = os.length
+    ? os
+        .map(
+          (o) =>
+            `<article class="order-card"><div><small>Захиалгын дугаар</small><strong>${o.id}</strong><small>${new Date(o.createdAt).toLocaleString("mn-MN")}</small></div><p>${o.items.map((i) => `${esc(item(i.id).name)} ×${i.qty}`).join(", ")}<br><b>${money(o.total)}</b> · ${esc(o.payment)}</p><span class="status-pill">${statuses[o.status]}</span><button class="button ghost" data-track="${o.id}">Захиалга харах</button></article>`,
+        )
+        .join("")
+    : `<div class="empty">Одоогоор таны захиалга алга байна.</div>`;
+}
+function renderTracking() {
+  let o = orders().find((x) => x.id === state.selected) || orders()[0];
+  if (!o) {
+    $("tracking").innerHTML =
+      `<div class="empty">Одоогоор идэвхтэй захиалга алга байна.</div>`;
+    return;
+  }
+  state.selected = o.id;
+  let i = steps.indexOf(o.status);
+  $("tracking").innerHTML =
+    `<div class="tracking-card"><div class="tracking-head"><div><small>Захиалгын дугаар</small><strong>${o.id}</strong><small>${new Date(o.createdAt).toLocaleDateString("mn-MN")} · Хүргэлт 1–2 цаг</small></div><span class="status-pill">${statuses[o.status]}</span></div><div class="steps">${steps.map((s, n) => `<div class="step ${n <= i ? (n === i ? "current" : "done") : ""}">${statuses[s]}</div>`).join("")}</div><div class="progress"><span style="width:${(i + 1) * 25}%"></span></div></div>`;
+}
+function renderAdmin() {
+  if (state.session?.role !== "admin") return;
+  let q = $("adminSearch").value.toLowerCase(),
+    filter = $("adminStatusFilter").value,
+    os = state.orders.filter(
+      (o) =>
+        (filter === "all" || o.status === filter) &&
+        `${o.id} ${o.customer}`.toLowerCase().includes(q),
+    ),
+    sales = state.orders.reduce((n, o) => n + o.total, 0);
+  $("adminStats").innerHTML = [
+    ["Нийт захиалга", state.orders.length],
+    ["Нийт борлуулалт", money(sales)],
+    [
+      "Хүлээгдэж буй",
+      state.orders.filter((o) => o.status !== "delivered").length,
+    ],
+    ["Хүргэгдсэн", state.orders.filter((o) => o.status === "delivered").length],
+  ]
+    .map(
+      (x) =>
+        `<div class="stat"><small>${x[0]}</small><strong>${x[1]}</strong></div>`,
+    )
+    .join("");
+  $("adminTable").innerHTML =
+    os
+      .map(
+        (o) =>
+          `<tr><td>${o.id}</td><td>${esc(o.customer)}</td><td>${esc(o.phone)}</td><td>${new Date(o.createdAt).toLocaleDateString("mn-MN")}</td><td>${money(o.total)}</td><td><select data-status="${o.id}">${steps.map((s) => `<option value="${s}" ${s === o.status ? "selected" : ""}>${statuses[s]}</option>`).join("")}</select></td><td><button class="remove" data-delete-order="${o.id}">Устгах</button></td></tr>`,
+      )
+      .join("") || `<tr><td colspan="7">Одоогоор захиалга алга.</td></tr>`;
+}
+function render() {
+  persist();
+  renderProducts();
+  renderBundles();
+  renderCartEnhanced();
+  $("wishlistCount").textContent = state.wishlist.length;
+  $("authButton").textContent = state.session
+    ? `${state.session.role === "admin" ? "Админ" : "Сайн байна уу, " + state.session.name} · Гарах`
+    : "Нэвтрэх";
+  $("admin").classList.toggle("hidden", state.session?.role !== "admin");
+  renderOrdersBundleAware();
+  renderTracking();
+  renderAdmin();
+}
+function layer(id) {
+  $("overlay").classList.add("show");
+  $(id).classList.add("show");
+}
+function close() {
+  $("overlay").classList.remove("show");
+  document
+    .querySelectorAll(".drawer,.modal")
+    .forEach((x) => x.classList.remove("show"));
+}
+function order(data) {
+  let total =
+      data.finalTotal ??
+      state.cart.reduce((n, x) => n + cartPrice(x) * x.qty, 0),
+    o = {
+      id: `BLM-${Date.now().toString().slice(-8)}`,
+      createdAt: Date.now(),
+      userId: state.session?.email || null,
+      customer: data.customer,
+      phone: data.phone,
+      address: data.address,
+      deliveryDate: data.deliveryDate || "",
+      deliveryTime: data.deliveryTime || "",
+      deliveryArea: data.deliveryArea || "Төв",
+      surprise: Boolean(data.surprise),
+      note: data.note || "",
+      payment: data.payment,
+      coupon: data.coupon || null,
+      discount: data.discount || 0,
+      deliveryFee: data.deliveryFee || 0,
+      wrappingFee: data.wrappingFee || 0,
+      total,
+      items: state.cart.map((x) => ({
+        ...x,
+        unitPrice: cartPrice(x),
+        name: cartLabel(x),
+      })),
+      status: "confirmed",
+      manual: false,
+    };
+  state.orders.unshift(o);
+  state.cart = [];
+  state.selected = o.id;
+  render();
+  $("successText").textContent =
+    `Таны ${o.id} дугаартай захиалга бүртгэгдлээ. Төлөв: ${statuses[o.status]}.`;
+  layer("successModal");
+}
+function timer() {
+  clearInterval(state.timer);
+  if (!extraState.tracking) return;
+  state.timer = setInterval(() => {
+    if (!extraState.tracking) return;
+    let changed = false;
+    state.orders.forEach((o) => {
+      let i = steps.indexOf(o.status);
+      if (!o.manual && i < 3) {
+        o.status = steps[i + 1];
+        changed = true;
+      }
+    });
+    if (changed) render();
+    if (!state.orders.some((o) => !o.manual && o.status !== "delivered")) {
+      clearInterval(state.timer);
+      state.timer = null;
+    }
+  }, 5000);
+}
+function init() {
+  $("heroArt").innerHTML = flowerSvg(flowers[0]);
+  $("storyArt").innerHTML = drinkSvg(drinks[0]);
+  render();
+  timer();
+  document.addEventListener("click", (e) => {
+    let a = e.target.closest("[data-add]"),
+      w = e.target.closest("[data-wish]"),
+      q = e.target.closest("[data-qty]"),
+      r = e.target.closest("[data-remove]"),
+      t = e.target.closest("[data-track]"),
+      d = e.target.closest("[data-delete-order]");
+    if (a) return add(a.dataset.add);
+    if (w) {
+      state.wishlist = state.wishlist.includes(w.dataset.wish)
+        ? state.wishlist.filter((x) => x !== w.dataset.wish)
+        : [...state.wishlist, w.dataset.wish];
+      render();
+      return;
+    }
+    if (q) {
+      state.cart[+q.dataset.qty].qty += +q.dataset.change;
+      state.cart = state.cart.filter((x) => x.qty > 0);
+      persist();
+      renderCart();
+      return;
+    }
+    if (r) {
+      state.cart.splice(+r.dataset.remove, 1);
+      persist();
+      renderCart();
+      return;
+    }
+    if (t) {
+      state.selected = t.dataset.track;
+      renderTracking();
+      $("delivery").scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    if (d && confirm("Энэ захиалгыг устгах уу?")) {
+      state.orders = state.orders.filter((x) => x.id !== d.dataset.deleteOrder);
+      render();
+      return;
+    }
+    if (e.target.closest("[data-close]") || e.target.id === "overlay") close();
+  });
+  $("flowerTabs").onclick = (e) => {
+    let b = e.target.closest("button");
+    if (!b) return;
+    state.flowerFilter = b.dataset.flowerFilter;
+    document
+      .querySelectorAll("[data-flower-filter]")
+      .forEach((x) => x.classList.toggle("active", x === b));
+    renderProducts();
+  };
+  $("flowerSort").onchange = (e) => {
+    state.sort = e.target.value;
+    renderProducts();
+  };
+  $("drinkTabs").onclick = (e) => {
+    let b = e.target.closest("button");
+    if (!b) return;
+    state.drinkFilter = b.dataset.drinkFilter;
+    document
+      .querySelectorAll("[data-drink-filter]")
+      .forEach((x) => x.classList.toggle("active", x === b));
+    renderProducts();
+  };
+  $("cartButton").onclick = () => layer("cartDrawer");
+  $("wishlistButton").onclick = () =>
+    $("wishlist").scrollIntoView({ behavior: "smooth" });
+  $("menuToggle").onclick = () => {
+    const open = $("mainNav").classList.toggle("open");
+    $("menuToggle").setAttribute("aria-expanded", String(open));
+    $("menuToggle").setAttribute("aria-label", open ? "Цэс хаах" : "Цэс нээх");
+  };
+  $("mainNav").onclick = (e) => {
+    if (e.target.closest("a")) {
+      $("mainNav").classList.remove("open");
+      $("menuToggle").setAttribute("aria-expanded", "false");
+      $("menuToggle").setAttribute("aria-label", "Цэс нээх");
+    }
+  };
+  $("checkoutButton").onclick = () => {
+    if (!state.cart.length) return toast("Сагс хоосон байна");
+    $("checkoutSummary").textContent =
+      `${state.cart.reduce((n, x) => n + x.qty, 0)} бүтээгдэхүүн · ${$("cartTotal").textContent}`;
+    layer("checkoutModal");
+  };
+  $("authButton").onclick = () => {
+    if (state.session) {
+      state.session = null;
+      render();
+      toast("Системээс гарлаа");
+    } else layer("authModal");
+  };
+  document.querySelectorAll("[data-auth-tab]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        document
+          .querySelectorAll("[data-auth-tab]")
+          .forEach((x) => x.classList.toggle("active", x === b));
+        $("loginForm").classList.toggle(
+          "hidden",
+          b.dataset.authTab !== "login",
+        );
+        $("registerForm").classList.toggle(
+          "hidden",
+          b.dataset.authTab !== "register",
+        );
+      }),
+  );
+  $("loginForm").onsubmit = (e) => {
+    e.preventDefault();
+    let email = $("loginEmail").value.trim().toLowerCase(),
+      pass = $("loginPassword").value,
+      u =
+        email === ADMIN.email && pass === ADMIN.password
+          ? { name: "Админ", email, role: "admin" }
+          : state.users.find((x) => x.email === email && x.password === pass);
+    if (!u)
+      return ($("loginError").textContent =
+        "И-мэйл эсвэл нууц үг буруу байна.");
+    state.session = u;
+    close();
+    render();
+    timer();
+    toast("Амжилттай нэвтэрлээ");
+  };
+  $("registerForm").onsubmit = (e) => {
+    e.preventDefault();
+    let name = $("registerName").value.trim(),
+      email = $("registerEmail").value.trim().toLowerCase(),
+      pass = $("registerPassword").value;
+    if (pass !== $("registerConfirm").value)
+      return ($("registerError").textContent = "Нууц үг таарахгүй байна.");
+    if (email === ADMIN.email || state.users.some((x) => x.email === email))
+      return ($("registerError").textContent =
+        "Энэ и-мэйл аль хэдийн бүртгэлтэй байна.");
+    state.users.push({ name, email, password: pass, role: "user" });
+    state.session = state.users.at(-1);
+    close();
+    render();
+    toast("Бүртгэл амжилттай үүслээ");
+  };
+  $("checkoutForm").onsubmit = (e) => {
+    e.preventDefault();
+    let phone = $("customerPhone").value.replace(/\s/g, "");
+    if (!/^\d{8}$/.test(phone))
+      return ($("checkoutError").textContent =
+        "Утасны дугаар 8 оронтой байна уу.");
+    order({
+      customer: $("customerName").value.trim(),
+      phone,
+      address: $("customerAddress").value.trim(),
+      note: $("customerNote").value.trim(),
+      payment: document.querySelector("[name=payment]:checked").value,
+    });
+    e.target.reset();
+  };
+  $("adminSearch").oninput = renderAdmin;
+  $("adminStatusFilter").onchange = renderAdmin;
+  $("adminTable").onchange = (e) => {
+    if (!e.target.dataset.status) return;
+    let o = state.orders.find((x) => x.id === e.target.dataset.status);
+    o.status = e.target.value;
+    o.manual = true;
+    render();
+    toast("Захиалгын төлөв шинэчлэгдлээ");
+  };
+  document.onkeydown = (e) => {
+    if (e.key === "Escape") {
+      close();
+      $("mainNav").classList.remove("open");
+      $("menuToggle").setAttribute("aria-expanded", "false");
+      $("menuToggle").setAttribute("aria-label", "Цэс нээх");
+    }
+  };
+}
+let editingProductId = null,
+  pendingProductImage = "",
+  bloomToastTimer = null;
+function toast(message) {
+  const element = $("toast");
+  element.textContent = message;
+  element.classList.add("show");
+  clearTimeout(bloomToastTimer);
+  bloomToastTimer = setTimeout(() => element.classList.remove("show"), 2200);
+}
+function item(id) {
+  return (
+    flowers.find((x) => x.id === id) ||
+    drinks.find((x) => x.id === id) ||
+    bundles.find((x) => x.id === id)
+  );
+}
+addBundle = function (bundle, custom = {}) {
+  const flower = item(bundle.flower),
+    limit = freeCoffeeLimit(flower),
+    coffees =
+      bundle.type === "bundle"
+        ? custom.coffees || bundle.coffees || []
+        : (custom.coffees || []).slice(0, limit),
+    entry = {
+      id: `${bundle.id}-${Date.now()}`,
+      kind: "bundle",
+      name: bundle.name,
+      price: bundle.price,
+      qty: 1,
+      flowerId: bundle.flower,
+      coffees,
+      card:
+        custom.card ||
+        bundle.card ||
+        (bundle.hasCard === false ? "Картгүй" : "Энгийн мэндчилгээ"),
+      recipient: custom.recipient || "",
+      message: custom.message || "",
+      wrapping: Boolean(custom.wrapping || bundle.wrapping),
+      freeCoffees: coffees.map((id) => ({ id, price: 0 })),
+    };
+  state.cart.push(entry);
+  persist();
+  renderCartEnhanced();
+  toast(`${bundle.name} сагсанд нэмэгдлээ`);
+};
+function saveProductWithRollback(event) {
+  const existing = adminProducts.find((x) => x.id === editingProductId),
+    previous = existing ? { ...existing } : null,
+    stored = localStorage.getItem("bloom_admin_products"),
+    availability = { ...extraState.availability },
+    catalogIds = new Set([...flowers, ...drinks, ...bundles].map((x) => x.id));
+  saveProduct(event);
+  if (
+    $("productModal").classList.contains("show") &&
+    localStorage.getItem("bloom_admin_products") === stored
+  ) {
+    if (existing) Object.assign(existing, previous);
+    else {
+      for (let i = adminProducts.length - 1; i >= 0; i--)
+        if (!catalogIds.has(adminProducts[i].id)) adminProducts.splice(i, 1);
+      [flowers, drinks, bundles].forEach((list) => {
+        for (let i = list.length - 1; i >= 0; i--)
+          if (!catalogIds.has(list[i].id)) list.splice(i, 1);
+      });
+    }
+    Object.keys(extraState.availability).forEach((id) => {
+      if (!(id in availability)) delete extraState.availability[id];
+    });
+    Object.assign(extraState.availability, availability);
+  }
+}
+function productTypeOf(product) {
+  return (
+    product.type ||
+    (product.id[0] === "f"
+      ? "flower"
+      : product.id[0] === "d"
+        ? "coffee"
+        : "bundle")
+  );
+}
+function setHeroImage(containerId, src, alt, fallback) {
+  const container = $(containerId),
+    image = document.createElement("img");
+  image.className = "hero-photo";
+  image.src = src;
+  image.alt = alt;
+  image.addEventListener(
+    "error",
+    () => {
+      container.innerHTML = fallback;
+    },
+    { once: true },
+  );
+  container.replaceChildren(image);
+}
+function renderHeroImages() {
+  setHeroImage(
+    "heroArt",
+    "assets/hero/hero-flower-bouquet.jpg",
+    "Bloom-ийн ягаан цэцгийн баглаа",
+    flowerSvg(flowers[0]),
+  );
+  setHeroImage(
+    "storyArt",
+    "assets/hero/coffee-hero.jpg",
+    "Bloom-ийн latte кофе",
+    drinkSvg(drinks[0]),
+  );
+}
+function productVisual(product, fallback, fallbackImage = "") {
+  const type = product ? productTypeOf(product) : "",
+    flowerImage =
+      fallbackImage || (type === "bundle" ? item(product.flower)?.image : ""),
+    missingBundleImage =
+      type === "bundle" &&
+      product.image?.startsWith("assets/products/bundles/") &&
+      !availableBundleImages.has(product.image),
+    image = missingBundleImage ? flowerImage : product?.image;
+  if (!image) return fallback;
+  return `<img class="product-image" src="${esc(image)}" alt="${esc(product.name)}" data-fallback-svg="${encodeURIComponent(fallback)}" data-fallback-image="${esc(flowerImage)}">`;
+}
+document.addEventListener(
+  "error",
+  (event) => {
+    const image = event.target;
+    if (
+      !(image instanceof HTMLImageElement) ||
+      !image.classList.contains("product-image")
+    )
+      return;
+    if (image.dataset.fallbackImage) {
+      image.src = image.dataset.fallbackImage;
+      image.dataset.fallbackImage = "";
+      return;
+    }
+    const fallback = document.createElement("template");
+    fallback.innerHTML = decodeURIComponent(image.dataset.fallbackSvg || "");
+    image.replaceWith(fallback.content);
+  },
+  true,
+);
+const renderCartBase = renderCartEnhanced;
+function renderCartWithImages() {
+  renderCartBase();
+  document.querySelectorAll("#cartItems .cart-line").forEach((line, index) => {
+    const entry = state.cart[index];
+    if (!entry) return;
+    const bundle = entry.kind === "bundle",
+      catalogProduct = bundle
+        ? bundles.find((product) => product.id === entry.id.split("-")[0]) ||
+          entry
+        : item(entry.id),
+      product = bundle
+        ? {
+            ...catalogProduct,
+            ...entry,
+            image: entry.image || catalogProduct.image,
+            flower: entry.flowerId,
+          }
+        : catalogProduct,
+      fallback = bundle
+        ? bundleSvg({ flower: entry.flowerId })
+        : productTypeOf(product) === "flower"
+          ? flowerSvg(product)
+          : drinkSvg(product);
+    line.querySelector(".cart-thumb").innerHTML = productVisual(
+      product,
+      fallback,
+      bundle ? item(entry.flowerId)?.image : "",
+    );
+  });
+}
+renderCartEnhanced = renderCartWithImages;
+renderCart = renderCartWithImages;
+renderCartWithImages();
+function freeCoffeeLimit(flower) {
+  if (flower?.freeCoffee === true)
+    return Math.max(1, flower.price >= 150000 ? 2 : 1);
+  if (flower?.freeCoffee === false) return 0;
+  return flower.price >= 150000 ? 2 : flower.price >= 100000 ? 1 : 0;
+}
+function isAvailable(id) {
+  const product = item(id);
+  return Boolean(
+    product &&
+    product.active !== false &&
+    product.available !== false &&
+    extraState.availability[id] !== false,
+  );
+}
+function card(product) {
+  const flower = productTypeOf(product) === "flower",
+    liked = state.wishlist.includes(product.id),
+    limit = flower ? freeCoffeeLimit(product) : 0,
+    available = product.preview
+      ? product.available !== false
+      : isAvailable(product.id),
+    visual = productVisual(
+      product,
+      flower ? flowerSvg(product) : drinkSvg(product),
+    ),
+    categoryLabel =
+      { hot: "Халуун", cold: "Хүйтэн", noncoffee: "Кафенгүй" }[
+        product.category
+      ] || "Кофе";
+  return `<article class="product-card ${available ? "" : "unavailable"}" data-detail="${esc(product.id)}"><div class="product-visual">${visual}<span class="product-category">${esc(product.featured ? "Онцлох" : flower ? "Цэцэг" : categoryLabel)}</span><button class="favorite ${liked ? "active" : ""}" type="button" data-wish="${esc(product.id)}" aria-label="Хүслийн жагсаалтад ${liked ? "хасах" : "нэмэх"}">${liked ? "♥" : "♡"}</button></div><div class="product-info"><h3>${esc(product.name)}</h3><p>${esc(product.description)}</p>${limit ? `<span class="promo-badge">${limit} кофе бэлэгтэй</span>` : ""}${available ? "" : `<span class="promo-badge unavailable-label">${product.active === false ? "Идэвхгүй" : "Түр дууссан"}</span>`}<div class="product-meta"><span>${money(product.price)}</span><button class="add" type="button" data-add="${esc(product.id)}" ${available ? "" : "disabled"}>${available ? "Сагсанд нэмэх" : "Боломжгүй"}</button></div></div></article>`;
+}
+function bundleCard(bundle) {
+  const visual = productVisual(
+      bundle,
+      bundleSvg({ ...bundle, flower: bundle.flower || "f01" }),
+      item(bundle.flower)?.image,
+    ),
+    available = bundle.preview
+      ? bundle.available !== false
+      : isAvailable(bundle.id),
+    liked = state.wishlist.includes(bundle.id);
+  return `<article class="bundle-card ${available ? "" : "unavailable"}"><div class="bundle-art">${visual}<button class="favorite ${liked ? "active" : ""}" type="button" data-wish="${esc(bundle.id)}" aria-label="Хүслийн жагсаалтад ${liked ? "хасах" : "нэмэх"}">${liked ? "♥" : "♡"}</button></div><span class="product-category">${esc(bundle.featured ? "Онцлох" : "Бэлгийн багц")}</span><h3>${esc(bundle.name)}</h3><p>${esc(bundle.description)}</p>${bundle.coffee ? `<span class="bundle-badge">${bundle.coffee} кофе багтсан</span>` : ""}${available ? "" : `<span class="promo-badge unavailable-label">${bundle.active === false ? "Идэвхгүй" : "Түр дууссан"}</span>`}<div class="bundle-price"><span>${money(bundle.price)}</span><button class="button dark" type="button" data-bundle="${esc(bundle.id)}" ${available ? "" : "disabled"}>${available ? "Сонгох" : "Боломжгүй"}</button></div></article>`;
+}
+function renderProducts() {
+  const visibleFlowers = flowers
+      .filter(
+        (x) =>
+          x.active !== false &&
+          (state.flowerFilter === "all" ||
+            x.category === state.flowerFilter ||
+            (state.flowerFilter === "featured" && x.featured)) &&
+          matchesSearch(x),
+      )
+      .sort((a, b) =>
+        state.sort === "low"
+          ? a.price - b.price
+          : state.sort === "high"
+            ? b.price - a.price
+            : state.sort === "name"
+              ? a.name.localeCompare(b.name, "mn")
+              : 0,
+      ),
+    visibleDrinks = drinks.filter(
+      (x) =>
+        x.active !== false &&
+        matchesSearch(x) &&
+        (state.drinkFilter === "all" || x.category === state.drinkFilter),
+    );
+  $("flowerGrid").innerHTML = visibleFlowers.length
+    ? visibleFlowers.map(card).join("")
+    : `<div class="empty" style="grid-column:1/-1">Тохирох цэцэг олдсонгүй.</div>`;
+  $("flowerCount").textContent = `${visibleFlowers.length} төрлийн баглаа`;
+  $("drinkGrid").innerHTML = visibleDrinks.length
+    ? visibleDrinks.map(card).join("")
+    : `<div class="empty" style="grid-column:1/-1">Тохирох ундаа олдсонгүй.</div>`;
+  const wish = state.wishlist.map(item).filter((x) => x && x.active !== false);
+  $("wishlistGrid").innerHTML = wish.length
+    ? wish
+        .map((x) => (productTypeOf(x) === "bundle" ? bundleCard(x) : card(x)))
+        .join("")
+    : `<div class="empty" style="grid-column:1/-1">Таны хүслийн жагсаалт одоогоор хоосон байна.</div>`;
+}
+function renderBundles() {
+  const visible = bundles.filter((x) => x.active !== false && matchesSearch(x));
+  $("bundleGrid").innerHTML = visible.length
+    ? visible.map(bundleCard).join("")
+    : `<div class="empty" style="grid-column:1/-1">Тохирох бэлгийн багц олдсонгүй.</div>`;
+}
+function saveAdminProducts() {
+  try {
+    localStorage.setItem("bloom_admin_products", JSON.stringify(adminProducts));
+    return true;
+  } catch {
+    return false;
+  }
+}
+function renderAdminProducts() {
+  if (state.session?.role !== "admin") return;
+  const query = $("adminProductSearch").value.trim().toLocaleLowerCase("mn-MN"),
+    typeFilter = $("adminProductType").value,
+    availability = $("adminProductAvailability").value,
+    sort = $("adminProductSort").value,
+    isBundleTab = typeFilter === "bundle",
+    catalog = isBundleTab
+      ? [
+          ...bundles,
+          ...adminProducts.filter(
+            (product) =>
+              productTypeOf(product) === "bundle" &&
+              !bundles.some((bundle) => bundle.id === product.id),
+          ),
+        ]
+      : adminProducts.filter((product) => productTypeOf(product) !== "bundle");
+  let entries = catalog.filter((product) => {
+    const type = productTypeOf(product),
+      matchesType = typeFilter === "all" || type === typeFilter,
+      matchesQuery =
+        !query ||
+        `${product.name} ${product.description || ""}`
+          .toLocaleLowerCase("mn-MN")
+          .includes(query),
+      matchesAvailability =
+        availability === "all" || availability === "inactive"
+          ? availability === "all" || product.active === false
+          : availability === "available"
+            ? isAvailable(product.id)
+            : !isAvailable(product.id);
+    return matchesType && matchesQuery && matchesAvailability;
+  });
+  entries.sort((a, b) =>
+    sort === "price-asc"
+      ? a.price - b.price
+      : sort === "price-desc"
+        ? b.price - a.price
+        : a.name.localeCompare(b.name, "mn"),
+  );
+  $("adminProductListTitle").textContent = isBundleTab
+    ? "Бэлгийн багцын жагсаалт"
+    : "Бүтээгдэхүүний жагсаалт";
+  $("addProductButton").textContent = isBundleTab
+    ? "Багц нэмэх"
+    : "Бүтээгдэхүүн нэмэх";
+  $("adminProductList").innerHTML = entries.length
+    ? entries
+        .map((product) => {
+          const type = productTypeOf(product),
+            builtIn =
+              isBundleTab && bundles.some((bundle) => bundle.id === product.id),
+            visual = productVisual(
+              product,
+              type === "flower"
+                ? flowerSvg(product)
+                : type === "coffee"
+                  ? drinkSvg(product)
+                  : bundleSvg({ ...product, flower: product.flower || "f01" }),
+            ),
+            actions = builtIn
+              ? `<span class="admin-built-in-label">Үндсэн багц</span>`
+              : `<button type="button" class="button ghost" data-product-edit="${esc(product.id)}">Засах</button><button type="button" class="button ghost" data-product-active="${esc(product.id)}">${product.active === false ? "Идэвхжүүлэх" : "Идэвхгүй болгох"}</button><button type="button" class="button ghost" data-product-delete="${esc(product.id)}">Устгах</button>`;
+          return `<article class="admin-product-row"><div class="admin-product-thumb">${visual}</div><div class="admin-product-copy"><strong>${esc(product.name)}</strong><span>${{ flower: "Цэцэг", coffee: "Кофе", bundle: "Бэлгийн багц" }[type]} · ${money(product.price)}</span><span>${product.active === false ? "Идэвхгүй" : isAvailable(product.id) ? "Бэлэн" : "Бэлэн биш"} · ${product.featured ? "Онцлох" : "Энгийн"}</span></div><div class="admin-product-actions">${actions}</div></article>`;
+        })
+        .join("")
+    : `<div class="admin-empty-state"><strong>${query ? `“${esc(query)}” хайлтад тохирох ${isBundleTab ? "багц" : "бүтээгдэхүүн"} олдсонгүй.` : isBundleTab ? "Одоогоор бэлгийн багц нэмээгүй байна." : "Одоогоор бүтээгдэхүүн нэмээгүй байна."}</strong><p>${isBundleTab ? "Админ хэсгээс анхны бэлгийн багцаа үүсгэнэ үү." : "Бүтээгдэхүүн нэмэх товчоор каталог үүсгэж эхлээрэй."}</p><button class="button dark" type="button" data-admin-add-product>${isBundleTab ? "Багц нэмэх" : "Бүтээгдэхүүн нэмэх"}</button></div>`;
+}
+function updateProductCategoryOptions(selected) {
+  const type = $("productType").value,
+    options =
+      type === "flower"
+        ? [
+            ["romance", "Хайртдаа"],
+            ["birthday", "Төрсөн өдөрт"],
+            ["mom", "Ээждээ"],
+            ["mini", "Бяцхан баглаа"],
+            ["featured", "Онцлох"],
+          ]
+        : type === "coffee"
+          ? [
+              ["hot", "Халуун"],
+              ["cold", "Хүйтэн"],
+              ["noncoffee", "Кофегүй"],
+            ]
+          : [["bundle", "Бэлгийн багц"]];
+  $("productCategory").innerHTML = options
+    .map(([value, label]) => `<option value="${value}">${label}</option>`)
+    .join("");
+  if (options.some(([value]) => value === selected))
+    $("productCategory").value = selected;
+  $("flowerFields").classList.toggle("hidden", type !== "flower");
+  $("coffeeFields").classList.toggle("hidden", type !== "coffee");
+  $("bundleFields").classList.toggle("hidden", type !== "bundle");
+}
+function fillBundleOptions() {
+  $("productBundleFlower").innerHTML = flowers
+    .map((x) => `<option value="${esc(x.id)}">${esc(x.name)}</option>`)
+    .join("");
+  $("productBundleCoffee").innerHTML = drinks
+    .map((x) => `<option value="${esc(x.id)}">${esc(x.name)}</option>`)
+    .join("");
+}
+function renderProductEditorPreview() {
+  const type = $("productType").value,
+    preview = {
+      id:
+        editingProductId ||
+        `${type === "flower" ? "f" : type === "coffee" ? "d" : "b"}-preview`,
+      type,
+      name: $("productName").value || "Бүтээгдэхүүний нэр",
+      description: $("productDescription").value || "Тайлбар",
+      price: Number($("productPrice").value) || 0,
+      category:
+        type === "flower"
+          ? $("productFlowerCategory").value
+          : $("productCategory").value,
+      kind: $("productFlowerKind").value,
+      tone: Number($("productFlowerTone").value) || 0,
+      freeCoffee: $("productFreeCoffee").checked,
+      available: $("productAvailable").checked,
+      active: true,
+      featured: $("productFeatured").checked,
+      preview: true,
+      image: pendingProductImage,
+      flower: $("productBundleFlower").value || "f01",
+      coffee: $("productBundleCoffee").selectedOptions.length,
+    };
+  const fallback =
+    type === "flower"
+      ? flowerSvg(preview)
+      : type === "coffee"
+        ? drinkSvg(preview)
+        : bundleSvg(preview);
+  $("productImagePreview").innerHTML = productVisual(preview, fallback);
+  $("productLivePreview").innerHTML =
+    type === "bundle"
+      ? bundleCard({ ...preview, id: "preview" })
+      : card(preview);
+}
+function openProductEditor(product = null, newType = "flower") {
+  editingProductId = product?.id || null;
+  pendingProductImage = product?.image || "";
+  $("adminProductForm").reset();
+  $("productType").disabled = Boolean(product);
+  $("productFormTitle").textContent = product
+    ? "Бүтээгдэхүүн засах"
+    : newType === "bundle"
+      ? "Багц нэмэх"
+      : "Бүтээгдэхүүн нэмэх";
+  $("productType").value = product ? productTypeOf(product) : newType;
+  $("productName").value = product?.name || "";
+  $("productDescription").value = product?.description || "";
+  $("productPrice").value = product?.price || "";
+  $("productAvailable").checked = product ? isAvailable(product.id) : true;
+  $("productFeatured").checked = Boolean(product?.featured);
+  $("productFlowerKind").value = product?.kind || "rose";
+  $("productFlowerCategory").value = product?.category || "romance";
+  $("productFlowerTone").value = String(product?.tone ?? 0);
+  $("productFlowerSize").value = product?.flowerSize || "Medium";
+  $("productFreeCoffee").checked = Boolean(product?.freeCoffee);
+  $("productDrinkName").value = product?.name || "";
+  $("productTemperature").value =
+    product?.temperature || product?.category || "hot";
+  $("productDrinkSize").value = product?.drinkSize || "Medium";
+  $("productHasCoffee").checked = product?.hasCoffee !== false;
+  $("productBundleName").value = product?.name || "";
+  $("productBundleDescription").value = product?.description || "";
+  $("productBundlePrice").value = product?.price || "";
+  $("productBundleCard").checked = product?.hasCard !== false;
+  $("productBundleWrapping").checked = Boolean(product?.wrapping);
+  fillBundleOptions();
+  $("productBundleFlower").value = product?.flower || "f01";
+  [...$("productBundleCoffee").options].forEach(
+    (option) =>
+      (option.selected = (product?.coffees || []).includes(option.value)),
+  );
+  updateProductCategoryOptions(product?.category);
+  $("productCategory").value = product?.category || $("productCategory").value;
+  $("productImageInput").value = "";
+  $("productImageError").textContent = "";
+  renderProductEditorPreview();
+  layer("productModal");
+}
+function handleProductImage(file) {
+  const error = $("productImageError"),
+    validTypes = ["image/png", "image/jpeg", "image/webp"];
+  if (!file) return;
+  if (
+    !validTypes.includes(file.type) ||
+    !/\.(png|jpe?g|webp)$/i.test(file.name)
+  ) {
+    error.textContent = "PNG, JPG, JPEG эсвэл WEBP зураг сонгоно уу.";
+    $("productImageInput").value = "";
+    return;
+  }
+  if (file.size > 8 * 1024 * 1024) {
+    error.textContent = "Зургийн хэмжээ 8MB-аас бага байх ёстой.";
+    $("productImageInput").value = "";
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const image = new Image();
+    image.onload = () => {
+      const scale = Math.min(1, 1200 / Math.max(image.width, image.height)),
+        canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(image.width * scale));
+      canvas.height = Math.max(1, Math.round(image.height * scale));
+      const context = canvas.getContext("2d");
+      context.fillStyle = "#fff";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      const result = canvas.toDataURL("image/jpeg", 0.82);
+      if (result.length > 1800000) {
+        error.textContent =
+          "Энэ зураг localStorage-д хадгалахад том байна. Жижиг зураг сонгоно уу.";
+        return;
+      }
+      pendingProductImage = result;
+      error.textContent = "";
+      renderProductEditorPreview();
+    };
+    image.onerror = () => {
+      error.textContent = "Зургийг уншиж чадсангүй. Өөр зураг сонгоно уу.";
+    };
+    image.src = reader.result;
+  };
+  reader.onerror = () => {
+    error.textContent = "Зургийг унших үед алдаа гарлаа.";
+  };
+  reader.readAsDataURL(file);
+}
+function saveProduct(event) {
+  event.preventDefault();
+  const type = $("productType").value,
+    name = $("productName").value.trim(),
+    description = $("productDescription").value.trim(),
+    price = Number($("productPrice").value);
+  if (!name || !description || !Number.isFinite(price) || price <= 0)
+    return toast("Нэр, тайлбар болон зөв үнийг бөглөнө үү.");
+  const existing = adminProducts.find((x) => x.id === editingProductId),
+    id =
+      existing?.id ||
+      `${type === "flower" ? "f" : type === "coffee" ? "d" : "b"}-custom-${Date.now()}`,
+    product = {
+      ...(existing || {}),
+      id,
+      type,
+      name,
+      description,
+      price,
+      category:
+        type === "flower"
+          ? $("productFlowerCategory").value
+          : type === "coffee"
+            ? $("productCategory").value
+            : "bundle",
+      active: existing?.active !== false,
+      available: $("productAvailable").checked,
+      featured: $("productFeatured").checked,
+      image: pendingProductImage,
+    };
+  if (type === "flower")
+    Object.assign(product, {
+      kind: $("productFlowerKind").value,
+      tone: Number($("productFlowerTone").value),
+      flowerSize: $("productFlowerSize").value,
+      freeCoffee: $("productFreeCoffee").checked,
+    });
+  if (type === "coffee")
+    Object.assign(product, {
+      kind: existing?.kind ?? drinks.length,
+      temperature: $("productTemperature").value,
+      hasCoffee: $("productHasCoffee").checked,
+      drinkSize: $("productDrinkSize").value,
+      category: $("productHasCoffee").checked
+        ? $("productTemperature").value
+        : "noncoffee",
+    });
+  if (type === "bundle") {
+    const coffees = [...$("productBundleCoffee").selectedOptions].map(
+      (option) => option.value,
+    );
+    Object.assign(product, {
+      name: $("productBundleName").value.trim() || name,
+      description: $("productBundleDescription").value.trim() || description,
+      price: Number($("productBundlePrice").value) || price,
+      flower: $("productBundleFlower").value,
+      coffees,
+      coffee: coffees.length,
+      hasCard: $("productBundleCard").checked,
+      wrapping: $("productBundleWrapping").checked,
+      card: $("productBundleCard").checked ? "Энгийн мэндчилгээ" : "",
+    });
+  }
+  if (existing) Object.assign(existing, product);
+  else {
+    adminProducts.push(product);
+    (type === "flower" ? flowers : type === "coffee" ? drinks : bundles).push(
+      product,
+    );
+  }
+  extraState.availability[id] = product.available;
+  if (!saveAdminProducts()) {
+    toast("localStorage дүүрсэн байна. Жижиг зураг ашиглан дахин оролдоно уу.");
+    return;
+  }
+  save("bloom_availability", extraState.availability);
+  $("productType").disabled = false;
+  close();
+  render();
+  renderAdminProducts();
+  toast(existing ? "Бүтээгдэхүүн шинэчлэгдлээ" : "Бүтээгдэхүүн нэмэгдлээ");
+}
+function setAdminTab(tab) {
+  const titles = {
+    orders: "Захиалга <em>удирдах</em>",
+    products: "Бүтээгдэхүүн <em>удирдах</em>",
+    bundles: "Багц <em>удирдах</em>",
+    delivery: "Хүргэлт <em>удирдах</em>",
+    about: "Бидний тухай <em>засах</em>",
+    profile: "Миний мэдээлэл",
+    settings: "Тохиргоо <em>удирдах</em>",
+  };
+  document
+    .querySelectorAll("[data-admin-tab]")
+    .forEach((button) =>
+      button.classList.toggle("active", button.dataset.adminTab === tab),
+    );
+  $("adminSectionTitle").innerHTML = titles[tab] || titles.orders;
+  $("adminProductPanel").classList.toggle(
+    "hidden",
+    tab !== "products" && tab !== "bundles",
+  );
+  $("adminAboutPanel").classList.toggle("hidden", tab !== "about");
+  $("adminStats").classList.toggle("hidden", tab !== "orders");
+  $("adminTools").classList.toggle("hidden", tab !== "orders");
+  $("adminManagement").classList.toggle(
+    "hidden",
+    tab !== "settings" && tab !== "delivery",
+  );
+  $("adminTable")
+    .closest(".table-wrap")
+    .classList.toggle("hidden", tab !== "orders");
+  $("adminProductType").value = tab === "bundles" ? "bundle" : "all";
+  if (tab === "products" || tab === "bundles") renderAdminProducts();
+}
+$("adminTools").id = "adminTools";
+$("adminManagement").id = "adminManagement";
+$("addProductButton").onclick = () =>
+  openProductEditor(
+    null,
+    $("adminProductType").value === "bundle" ? "bundle" : "flower",
+  );
+$("productType").onchange = () => {
+  updateProductCategoryOptions();
+  renderProductEditorPreview();
+};
+$("adminProductForm").onsubmit = saveProduct;
+$("productImageInput").onchange = (e) => handleProductImage(e.target.files[0]);
+$("changeProductImage").onclick = () => $("productImageInput").click();
+$("removeProductImage").onclick = () => {
+  pendingProductImage = "";
+  $("productImageInput").value = "";
+  $("productImageError").textContent = "";
+  renderProductEditorPreview();
+};
+$("adminProductForm").oninput = renderProductEditorPreview;
+$("adminProductForm").onchange = (e) => {
+  if (e.target.id === "productFlowerCategory")
+    $("productCategory").value = e.target.value;
+  if (e.target.id === "productCategory" && $("productType").value === "flower")
+    $("productFlowerCategory").value = e.target.value;
+  if (e.target.id === "productName" && $("productType").value === "coffee")
+    $("productDrinkName").value = e.target.value;
+  if (e.target.id === "productName" && $("productType").value === "bundle")
+    $("productBundleName").value = e.target.value;
+  if (
+    e.target.id === "productDescription" &&
+    $("productType").value === "bundle"
+  )
+    $("productBundleDescription").value = e.target.value;
+  renderProductEditorPreview();
+};
+$("adminProductSearch").oninput = renderAdminProducts;
+$("adminProductType").onchange = renderAdminProducts;
+$("adminProductAvailability").onchange = renderAdminProducts;
+$("adminProductSort").onchange = renderAdminProducts;
+document.querySelector(".admin-tabs").onclick = (e) => {
+  const tab = e.target.closest("[data-admin-tab]");
+  if (tab) setAdminTab(tab.dataset.adminTab);
+};
+$("adminProductList").onclick = (e) => {
+  if (e.target.closest("[data-admin-add-product]")) {
+    openProductEditor(
+      null,
+      $("adminProductType").value === "bundle" ? "bundle" : "flower",
+    );
+    return;
+  }
+  const edit = e.target.closest("[data-product-edit]"),
+    toggle = e.target.closest("[data-product-active]"),
+    remove = e.target.closest("[data-product-delete]");
+  if (edit) {
+    const product = adminProducts.find(
+      (x) => x.id === edit.dataset.productEdit,
+    );
+    if (product) openProductEditor(product);
+  }
+  if (toggle) {
+    const product = adminProducts.find(
+      (x) => x.id === toggle.dataset.productActive,
+    );
+    if (product) {
+      product.active = product.active === false;
+      saveAdminProducts();
+      render();
+      renderAdminProducts();
+      toast(
+        product.active
+          ? "Бүтээгдэхүүн идэвхжлээ"
+          : "Бүтээгдэхүүн идэвхгүй боллоо",
+      );
+    }
+  }
+  if (
+    remove &&
+    confirm(
+      "Энэ бүтээгдэхүүнийг каталогоос бүрмөсөн устгах уу? Энэ demo-д үйлдлийг буцаах боломжгүй. Өмнөх захиалгын мэдээлэл хэвээр үлдэнэ.",
+    )
+  ) {
+    const product = adminProducts.find(
+      (x) => x.id === remove.dataset.productDelete,
+    );
+    if (!product) return;
+    [flowers, drinks, bundles].forEach((list) => {
+      const index = list.findIndex((x) => x.id === product.id);
+      if (index >= 0) list.splice(index, 1);
+    });
+    adminProducts.splice(adminProducts.indexOf(product), 1);
+    delete extraState.availability[product.id];
+    saveAdminProducts();
+    save("bloom_availability", extraState.availability);
+    render();
+    renderAdminProducts();
+    toast("Бүтээгдэхүүн каталогоос устгагдлаа");
+  }
+};
 init();
+const mobileSearchButton = $("mobileSearchButton"),
+  mobileCartButton = $("mobileCartButton"),
+  mobileAuthButton = $("mobileAuthButton"),
+  mobileMoreButton = $("mobileMoreButton");
+mobileSearchButton.onclick = () => {
+  $("flowers").scrollIntoView({ behavior: "smooth", block: "start" });
+  window.setTimeout(
+    () => $("productSearch").focus({ preventScroll: true }),
+    350,
+  );
+};
+mobileCartButton.onclick = () => $("cartButton").click();
+mobileAuthButton.onclick = () => $("authButton").click();
+mobileMoreButton.onclick = () => $("menuToggle").click();
+$("mainNav").addEventListener("click", (event) => {
+  if (event.target.closest("a"))
+    mobileMoreButton.setAttribute("aria-expanded", "false");
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape")
+    mobileMoreButton.setAttribute("aria-expanded", "false");
+});
+const mobileMenuObserver = new MutationObserver(() =>
+  mobileMoreButton.setAttribute(
+    "aria-expanded",
+    String($("mainNav").classList.contains("open")),
+  ),
+);
+mobileMenuObserver.observe($("mainNav"), {
+  attributes: true,
+  attributeFilter: ["class"],
+});
+const mobileAuthObserver = new MutationObserver(() => {
+  const loggedIn = $("authButton").textContent.trim() !== "Нэвтрэх";
+  $("mobileAuthLabel").textContent = loggedIn ? "Гарах" : "Нэвтрэх";
+  mobileAuthButton.setAttribute(
+    "aria-label",
+    loggedIn ? "Системээс гарах" : "Нэвтрэх",
+  );
+});
+mobileAuthObserver.observe($("authButton"), {
+  childList: true,
+  characterData: true,
+  subtree: true,
+});
+const mobileCartObserver = new MutationObserver(
+  () => ($("mobileCartCount").textContent = $("cartCount").textContent),
+);
+mobileCartObserver.observe($("cartCount"), {
+  childList: true,
+  characterData: true,
+  subtree: true,
+});
+const mobileWishlistObserver = new MutationObserver(
+  () => ($("mobileWishlistCount").textContent = $("wishlistCount").textContent),
+);
+mobileWishlistObserver.observe($("wishlistCount"), {
+  childList: true,
+  characterData: true,
+  subtree: true,
+});
+$("mobileCartCount").textContent = $("cartCount").textContent;
+$("mobileWishlistCount").textContent = $("wishlistCount").textContent;
+const initiallyLoggedIn = $("authButton").textContent.trim() !== "Нэвтрэх";
+$("mobileAuthLabel").textContent = initiallyLoggedIn ? "Гарах" : "Нэвтрэх";
+mobileAuthButton.setAttribute(
+  "aria-label",
+  initiallyLoggedIn ? "Системээс гарах" : "Нэвтрэх",
+);
 renderHeroImages();
-renderBuilder();renderCart=renderCartEnhanced;
-function addRegular(id){let existing=state.cart.find(x=>x.id===id&&!x.kind),flower=item(id),limit=productTypeOf(flower)==="flower"?freeCoffeeLimit(flower):0;if(limit){renderBuilder();$("builderFlower").value=id;updateBuilder();layer("builderModal");return}if(existing)existing.qty++;else state.cart.push({id,qty:1});persist();renderCartEnhanced();toast(`${item(id).name} сагсанд нэмэгдлээ`)}
-function addAvailable(id,quantity=1){if(!isAvailable(id)){toast("Энэ бүтээгдэхүүн одоогоор бэлэн биш байна.");return}for(let i=0;i<quantity;i++)addRegular(id)}
-add=addRegular;
-$("builderButton").onclick=()=>{renderBuilder();layer("builderModal")};$("builderFlower").onchange=updateBuilder;$("builderCard").onchange=updateBuilderSummary;$("builderRecipient").oninput=updateBuilderSummary;$("builderMessage").oninput=updateBuilderSummary;$("builderWrapping").onchange=updateBuilderSummary;
-$("bundleGrid").addEventListener("click",e=>{const button=e.target.closest("[data-bundle]");if(!button)return;const preset=bundles.find(x=>x.id===button.dataset.bundle);if(preset)addBundle(preset,{coffees:preset.type==="bundle"?preset.coffees:drinks.slice(0,preset.coffee).map(x=>x.id),card:preset.hasCard===false?"Картгүй":preset.card})});
-$("builderForm").onsubmit=e=>{e.preventDefault();const flower=item($("builderFlower").value),limit=freeCoffeeLimit(flower),coffees=[...document.querySelectorAll("[data-builder-coffee]:checked")].map(x=>x.value).slice(0,limit),customBundle={id:`custom-${Date.now()}`,name:"Өөрийн бэлгийн багц",description:"Таны сонгосон цэцэг, кофе, мэндчилгээ",price:Math.round(flower.price/1000)*1000+($("builderWrapping").checked?giftWrapPrice:0),flower:flower.id};addBundle(customBundle,{coffees,card:$("builderCard").value,recipient:$("builderRecipient").value.trim(),message:$("builderMessage").value.trim(),wrapping:$("builderWrapping").checked});close()};
-$("checkoutButton").onclick=()=>{if(!state.cart.length)return toast("Сагс хоосон байна");const promotions=state.cart.reduce((n,x)=>n+(x.kind==="bundle"?x.freeCoffees?.length||0:x.promoLimit||0)*x.qty,0);$("checkoutSummary").innerHTML=`${state.cart.map(x=>`${esc(cartLabel(x))} ×${x.qty}${x.kind==="bundle"?`<br><small>${bundleDetails(x)}</small>`:""}`).join("<br>")}<hr><strong>Нийт: ${$("cartTotal").textContent}</strong>${promotions?`<br><span class="free-line">${promotions} complimentary кофе 0₮-өөр багтсан</span>`:""}`;layer("checkoutModal")};
-$("checkoutButton").onclick=()=>{if(!state.cart.length)return toast("Сагс хоосон байна");const promotions=state.cart.reduce((n,x)=>n+(x.kind==="bundle"?x.freeCoffees?.length||0:x.promoLimit||0)*x.qty,0);$("checkoutSummary").innerHTML=`${state.cart.map(x=>`${esc(cartLabel(x))} ×${x.qty}${x.kind==="bundle"?`<br><small>${bundleDetails(x)}</small>`:""}`).join("<br>")}<hr><strong>Нийт: ${$("cartTotal").textContent}</strong>${promotions?`<br><span class="free-line">${promotions} complimentary кофе 0₮-өөр багтсан</span>`:""}`;renderBreakdown();layer("checkoutModal")};
-const baseCartRenderer=renderCartEnhanced;function cleanUnavailableCart(){state.cart=state.cart.filter(x=>x.kind==="bundle"||isAvailable(x.id));persist()}renderCartEnhanced=()=>{cleanUnavailableCart();baseCartRenderer()};
-$("configureDelivery").onclick=()=>{Object.keys(extraState.deliveryFees).forEach(area=>{const value=prompt(`${area} бүсийн хүргэлтийн төлбөр`,String(extraState.deliveryFees[area]));if(value!==null&&Number(value)>=0)extraState.deliveryFees[area]=Number(value)});save("bloom_delivery_fees",extraState.deliveryFees);toast("Хүргэлтийн тариф хадгалагдлаа")};
-function flowerSubtotal(){return state.cart.reduce((n,x)=>n+((x.kind?0:(x.id?.[0]==="f"?item(x.id)?.price:0))*x.qty),0)}function checkoutTotals(){const items=state.cart.reduce((n,x)=>n+cartPrice(x)*x.qty,0),discount=extraState.coupon==="BLOOM10"?Math.min(items,Math.round(flowerSubtotal()*.1)):0,fee=extraState.deliveryFees[$("deliveryArea")?.value||"Төв"]||0,wrapping=state.cart.reduce((n,x)=>n+(x.kind==="bundle"&&x.wrapping?giftWrapPrice*x.qty:0),0),final=Math.max(0,items-discount+fee+wrapping);return {items,discount,fee,wrapping,final}}
-function renderBreakdown(){const t=checkoutTotals();$("priceBreakdown").innerHTML=`Барааны дүн: <strong>${money(t.items)}</strong><br>Хөнгөлөлт: <strong>−${money(t.discount)}</strong><br>Хүргэлтийн төлбөр: <strong>${money(t.fee)}</strong><br>Сав баглаа боодлын нэмэлт төлбөр: <strong>${money(t.wrapping)}</strong><hr>Эцсийн төлөх дүн: <strong>${money(t.final)}</strong>`}
-$("deliveryArea").onchange=renderBreakdown;$("applyCoupon").onclick=()=>{const code=$("couponInput").value.trim().toUpperCase();if(extraState.coupon){$("checkoutError").textContent="Купон аль хэдийн хэрэглэгдсэн байна.";return}if(code!=="BLOOM10"){$("checkoutError").textContent="Купон хүчингүй байна.";return}extraState.coupon=code;$("checkoutError").textContent="BLOOM10 хэрэглэгдлээ: цэцгийн бүтээгдэхүүнд 10% хөнгөлөлт.";renderBreakdown()};
-$("checkoutForm").onsubmit=e=>{e.preventDefault();const phone=$("customerPhone").value.replace(/\s/g,"");if(!/^\d{8}$/.test(phone))return $("checkoutError").textContent="Утасны дугаар 8 оронтой байна уу.";const totals=checkoutTotals();order({customer:$("customerName").value.trim(),phone,address:$("customerAddress").value.trim(),note:$("customerNote").value.trim(),deliveryDate:$("deliveryDate").value,deliveryTime:$("deliveryTime").value,deliveryArea:$("deliveryArea").value,surprise:Boolean($("surpriseGift").checked),coupon:extraState.coupon,discount:totals.discount,deliveryFee:totals.fee,wrappingFee:totals.wrapping,payment:document.querySelector("[name=payment]:checked").value,finalTotal:totals.final});extraState.coupon=null;e.target.reset()};
-add=addAvailable;
-document.addEventListener("click",e=>{const detail=e.target.closest("[data-detail]");if(detail&&!e.target.closest("button"))showDetail(detail.dataset.detail);const lookup=e.target.closest("[data-lookup-result]");if(lookup){state.selected=lookup.dataset.lookupResult;renderTracking();$("delivery").scrollIntoView({behavior:"smooth"})}});
-$("detailAdd").onclick=()=>{const id=extraState.selectedDetail,product=item(id),quantity=Math.max(1,Math.min(20,Number($("detailQuantity").value)||1));if(product&&productTypeOf(product)==="flower"&&freeCoffeeLimit(product)){close();renderBuilder();$("builderFlower").value=id;updateBuilder();layer("builderModal");return}addAvailable(id,quantity);close()};
-function refreshSearch(){extraState.search=$("productSearch").value;extraState.minPrice=Number($("minPrice").value)||0;extraState.maxPrice=Number($("maxPrice").value)||0;renderProducts();renderBundles()}$("productSearch").oninput=refreshSearch;$("minPrice").oninput=refreshSearch;$("maxPrice").oninput=refreshSearch;$("clearFilters").onclick=()=>{$("productSearch").value="";$(`minPrice`).value="";$(`maxPrice`).value="";extraState.search="";extraState.minPrice=0;extraState.maxPrice=0;renderProducts();renderBundles()};
-function renderAvailability(){if(state.session?.role!=="admin")return;const list=[...flowers,...drinks,...bundles];$("availabilityList").innerHTML=list.map(x=>`<label class="availability-row"><span>${esc(x.name)}</span><input type="checkbox" data-availability="${x.id}" ${isAvailable(x.id)?"checked":""}> Бэлэн</label>`).join("")}
-$("manageAvailability").onclick=()=>{renderAvailability();$("availabilityList").classList.toggle("show")};$("availabilityList").onchange=e=>{if(!e.target.dataset.availability)return;extraState.availability[e.target.dataset.availability]=e.target.checked;save("bloom_availability",extraState.availability);renderProducts();renderAvailability();toast("Бүтээгдэхүүний бэлэн байдал хадгалагдлаа")};$("addDemoProduct").onclick=()=>{const name=prompt("Бүтээгдэхүүний нэр");if(!name)return;const price=Number(prompt("Үнэ"));if(!price)return;const product={id:`custom-${Date.now()}`,name,price,description:"Шинээр нэмэгдсэн Bloom бүтээгдэхүүн",category:"featured",kind:"mixed",tone:0};flowers.push(product);save("bloom_custom_products",flowers.filter(x=>x.id.startsWith("custom-")));renderProducts();renderAvailability();toast("Шинэ бүтээгдэхүүн нэмэгдлээ")};
-$("toggleTracking").onclick=()=>{extraState.tracking=!extraState.tracking;save("bloom_tracking_demo",extraState.tracking);$("toggleTracking").textContent=`Демо tracking: ${extraState.tracking?"асаалттай":"унтраалттай"}`;if(extraState.tracking)timer();else{clearInterval(state.timer);state.timer=null}};$("advanceOrder").onclick=()=>{const o=state.orders.find(x=>x.id===state.selected)||state.orders[0];if(!o)return toast("Ахиулах захиалга алга байна.");const index=steps.indexOf(o.status);if(index<3){o.status=steps[index+1];o.manual=true;persist();render();toast("Захиалгын төлөв гараар шинэчлэгдлээ")}};
-$("lookupButton").onclick=()=>{const id=$("lookupOrderId").value.trim(),phone=$("lookupPhone").value.replace(/\s/g,"");const found=state.orders.find(o=>o.id===id&&o.phone===phone);if(!found){$("lookupError").textContent="Захиалгын дугаар болон утас таарахгүй байна.";return}$("lookupError").innerHTML=`Захиалга олдлоо: <button class="text-button" data-lookup-result="${found.id}">${found.id} харах</button>`};
-$("adminProductForm").onsubmit=saveProductWithRollback;
-$("productDrinkName").oninput=()=>{$("productName").value=$("productDrinkName").value;renderProductEditorPreview()};$("productBundleName").oninput=()=>{$("productName").value=$("productBundleName").value;renderProductEditorPreview()};$("productBundleDescription").oninput=()=>{$("productDescription").value=$("productBundleDescription").value;renderProductEditorPreview()};
-$("addDemoProduct").onclick=()=>openProductEditor();
-$("productPrice").oninput=()=>{if($("productType").value==="bundle")$("productBundlePrice").value=$("productPrice").value;renderProductEditorPreview()};$("productBundlePrice").oninput=()=>{$("productPrice").value=$("productBundlePrice").value;renderProductEditorPreview()};$("productTemperature").onchange=()=>{if($("productHasCoffee").checked)$("productCategory").value=$("productTemperature").value;renderProductEditorPreview()};$("productHasCoffee").onchange=()=>{$("productCategory").value=$("productHasCoffee").checked?$("productTemperature").value:"noncoffee";renderProductEditorPreview()};$("productCategory").onchange=()=>{if($("productType").value==="coffee"){const coffeeIncluded=$("productCategory").value!=="noncoffee";$("productHasCoffee").checked=coffeeIncluded;if(coffeeIncluded)$("productTemperature").value=$("productCategory").value}renderProductEditorPreview()};
+renderBuilder();
+renderCart = renderCartEnhanced;
+function addRegular(id) {
+  let existing = state.cart.find((x) => x.id === id && !x.kind),
+    flower = item(id),
+    limit = productTypeOf(flower) === "flower" ? freeCoffeeLimit(flower) : 0;
+  if (limit) {
+    renderBuilder();
+    $("builderFlower").value = id;
+    updateBuilder();
+    layer("builderModal");
+    return;
+  }
+  if (existing) existing.qty++;
+  else state.cart.push({ id, qty: 1 });
+  persist();
+  renderCartEnhanced();
+  toast(`${item(id).name} сагсанд нэмэгдлээ`);
+}
+function addAvailable(id, quantity = 1) {
+  if (!isAvailable(id)) {
+    toast("Энэ бүтээгдэхүүн одоогоор бэлэн биш байна.");
+    return;
+  }
+  for (let i = 0; i < quantity; i++) addRegular(id);
+}
+add = addRegular;
+$("builderButton").onclick = () => {
+  renderBuilder();
+  layer("builderModal");
+};
+$("builderFlower").onchange = updateBuilder;
+$("builderCard").onchange = updateBuilderSummary;
+$("builderRecipient").oninput = updateBuilderSummary;
+$("builderMessage").oninput = updateBuilderSummary;
+$("builderWrapping").onchange = updateBuilderSummary;
+$("bundleGrid").addEventListener("click", (e) => {
+  const button = e.target.closest("[data-bundle]");
+  if (!button) return;
+  const preset = bundles.find((x) => x.id === button.dataset.bundle);
+  if (preset)
+    addBundle(preset, {
+      coffees:
+        preset.type === "bundle"
+          ? preset.coffees
+          : drinks.slice(0, preset.coffee).map((x) => x.id),
+      card: preset.hasCard === false ? "Картгүй" : preset.card,
+    });
+});
+$("builderForm").onsubmit = (e) => {
+  e.preventDefault();
+  const flower = item($("builderFlower").value),
+    limit = freeCoffeeLimit(flower),
+    coffees = [...document.querySelectorAll("[data-builder-coffee]:checked")]
+      .map((x) => x.value)
+      .slice(0, limit),
+    customBundle = {
+      id: `custom-${Date.now()}`,
+      name: "Өөрийн бэлгийн багц",
+      description: "Таны сонгосон цэцэг, кофе, мэндчилгээ",
+      price:
+        Math.round(flower.price / 1000) * 1000 +
+        ($("builderWrapping").checked ? giftWrapPrice : 0),
+      flower: flower.id,
+    };
+  addBundle(customBundle, {
+    coffees,
+    card: $("builderCard").value,
+    recipient: $("builderRecipient").value.trim(),
+    message: $("builderMessage").value.trim(),
+    wrapping: $("builderWrapping").checked,
+  });
+  close();
+};
+$("checkoutButton").onclick = () => {
+  if (!state.cart.length) return toast("Сагс хоосон байна");
+  const promotions = state.cart.reduce(
+    (n, x) =>
+      n +
+      (x.kind === "bundle" ? x.freeCoffees?.length || 0 : x.promoLimit || 0) *
+        x.qty,
+    0,
+  );
+  $("checkoutSummary").innerHTML =
+    `${state.cart.map((x) => `${esc(cartLabel(x))} ×${x.qty}${x.kind === "bundle" ? `<br><small>${bundleDetails(x)}</small>` : ""}`).join("<br>")}<hr><strong>Нийт: ${$("cartTotal").textContent}</strong>${promotions ? `<br><span class="free-line">${promotions} complimentary кофе 0₮-өөр багтсан</span>` : ""}`;
+  layer("checkoutModal");
+};
+$("checkoutButton").onclick = () => {
+  if (!state.cart.length) return toast("Сагс хоосон байна");
+  const promotions = state.cart.reduce(
+    (n, x) =>
+      n +
+      (x.kind === "bundle" ? x.freeCoffees?.length || 0 : x.promoLimit || 0) *
+        x.qty,
+    0,
+  );
+  $("checkoutSummary").innerHTML =
+    `${state.cart.map((x) => `${esc(cartLabel(x))} ×${x.qty}${x.kind === "bundle" ? `<br><small>${bundleDetails(x)}</small>` : ""}`).join("<br>")}<hr><strong>Нийт: ${$("cartTotal").textContent}</strong>${promotions ? `<br><span class="free-line">${promotions} complimentary кофе 0₮-өөр багтсан</span>` : ""}`;
+  renderBreakdown();
+  layer("checkoutModal");
+};
+const baseCartRenderer = renderCartEnhanced;
+function cleanUnavailableCart() {
+  state.cart = state.cart.filter(
+    (x) => x.kind === "bundle" || isAvailable(x.id),
+  );
+  persist();
+}
+renderCartEnhanced = () => {
+  cleanUnavailableCart();
+  baseCartRenderer();
+};
+$("configureDelivery").onclick = () => {
+  Object.keys(extraState.deliveryFees).forEach((area) => {
+    const value = prompt(
+      `${area} бүсийн хүргэлтийн төлбөр`,
+      String(extraState.deliveryFees[area]),
+    );
+    if (value !== null && Number(value) >= 0)
+      extraState.deliveryFees[area] = Number(value);
+  });
+  save("bloom_delivery_fees", extraState.deliveryFees);
+  toast("Хүргэлтийн тариф хадгалагдлаа");
+};
+function flowerSubtotal() {
+  return state.cart.reduce(
+    (n, x) =>
+      n + (x.kind ? 0 : x.id?.[0] === "f" ? item(x.id)?.price : 0) * x.qty,
+    0,
+  );
+}
+function checkoutTotals() {
+  const items = state.cart.reduce((n, x) => n + cartPrice(x) * x.qty, 0),
+    discount =
+      extraState.coupon === "BLOOM10"
+        ? Math.min(items, Math.round(flowerSubtotal() * 0.1))
+        : 0,
+    fee = extraState.deliveryFees[$("deliveryArea")?.value || "Төв"] || 0,
+    wrapping = state.cart.reduce(
+      (n, x) =>
+        n + (x.kind === "bundle" && x.wrapping ? giftWrapPrice * x.qty : 0),
+      0,
+    ),
+    final = Math.max(0, items - discount + fee + wrapping);
+  return { items, discount, fee, wrapping, final };
+}
+function renderBreakdown() {
+  const t = checkoutTotals();
+  $("priceBreakdown").innerHTML =
+    `Барааны дүн: <strong>${money(t.items)}</strong><br>Хөнгөлөлт: <strong>−${money(t.discount)}</strong><br>Хүргэлтийн төлбөр: <strong>${money(t.fee)}</strong><br>Сав баглаа боодлын нэмэлт төлбөр: <strong>${money(t.wrapping)}</strong><hr>Эцсийн төлөх дүн: <strong>${money(t.final)}</strong>`;
+}
+$("deliveryArea").onchange = renderBreakdown;
+$("applyCoupon").onclick = () => {
+  const code = $("couponInput").value.trim().toUpperCase();
+  if (extraState.coupon) {
+    $("checkoutError").textContent = "Купон аль хэдийн хэрэглэгдсэн байна.";
+    return;
+  }
+  if (code !== "BLOOM10") {
+    $("checkoutError").textContent = "Купон хүчингүй байна.";
+    return;
+  }
+  extraState.coupon = code;
+  $("checkoutError").textContent =
+    "BLOOM10 хэрэглэгдлээ: цэцгийн бүтээгдэхүүнд 10% хөнгөлөлт.";
+  renderBreakdown();
+};
+$("checkoutForm").onsubmit = (e) => {
+  e.preventDefault();
+  const phone = $("customerPhone").value.replace(/\s/g, "");
+  if (!/^\d{8}$/.test(phone))
+    return ($("checkoutError").textContent =
+      "Утасны дугаар 8 оронтой байна уу.");
+  const totals = checkoutTotals();
+  order({
+    customer: $("customerName").value.trim(),
+    phone,
+    address: $("customerAddress").value.trim(),
+    note: $("customerNote").value.trim(),
+    deliveryDate: $("deliveryDate").value,
+    deliveryTime: $("deliveryTime").value,
+    deliveryArea: $("deliveryArea").value,
+    surprise: Boolean($("surpriseGift").checked),
+    coupon: extraState.coupon,
+    discount: totals.discount,
+    deliveryFee: totals.fee,
+    wrappingFee: totals.wrapping,
+    payment: document.querySelector("[name=payment]:checked").value,
+    finalTotal: totals.final,
+  });
+  extraState.coupon = null;
+  e.target.reset();
+};
+add = addAvailable;
+document.addEventListener("click", (e) => {
+  const detail = e.target.closest("[data-detail]");
+  if (detail && !e.target.closest("button")) showDetail(detail.dataset.detail);
+  const lookup = e.target.closest("[data-lookup-result]");
+  if (lookup) {
+    state.selected = lookup.dataset.lookupResult;
+    renderTracking();
+    $("delivery").scrollIntoView({ behavior: "smooth" });
+  }
+});
+$("detailAdd").onclick = () => {
+  const id = extraState.selectedDetail,
+    product = item(id),
+    quantity = Math.max(
+      1,
+      Math.min(20, Number($("detailQuantity").value) || 1),
+    );
+  if (
+    product &&
+    productTypeOf(product) === "flower" &&
+    freeCoffeeLimit(product)
+  ) {
+    close();
+    renderBuilder();
+    $("builderFlower").value = id;
+    updateBuilder();
+    layer("builderModal");
+    return;
+  }
+  addAvailable(id, quantity);
+  close();
+};
+function refreshSearch() {
+  extraState.search = $("productSearch").value;
+  extraState.minPrice = Number($("minPrice").value) || 0;
+  extraState.maxPrice = Number($("maxPrice").value) || 0;
+  renderProducts();
+  renderBundles();
+}
+$("productSearch").oninput = refreshSearch;
+$("minPrice").oninput = refreshSearch;
+$("maxPrice").oninput = refreshSearch;
+$("clearFilters").onclick = () => {
+  $("productSearch").value = "";
+  $(`minPrice`).value = "";
+  $(`maxPrice`).value = "";
+  extraState.search = "";
+  extraState.minPrice = 0;
+  extraState.maxPrice = 0;
+  renderProducts();
+  renderBundles();
+};
+function renderAvailability() {
+  if (state.session?.role !== "admin") return;
+  const list = [...flowers, ...drinks, ...bundles];
+  $("availabilityList").innerHTML = list
+    .map(
+      (x) =>
+        `<label class="availability-row"><span>${esc(x.name)}</span><input type="checkbox" data-availability="${x.id}" ${isAvailable(x.id) ? "checked" : ""}> Бэлэн</label>`,
+    )
+    .join("");
+}
+$("manageAvailability").onclick = () => {
+  renderAvailability();
+  $("availabilityList").classList.toggle("show");
+};
+$("availabilityList").onchange = (e) => {
+  if (!e.target.dataset.availability) return;
+  extraState.availability[e.target.dataset.availability] = e.target.checked;
+  save("bloom_availability", extraState.availability);
+  renderProducts();
+  renderAvailability();
+  toast("Бүтээгдэхүүний бэлэн байдал хадгалагдлаа");
+};
+$("addDemoProduct").onclick = () => {
+  const name = prompt("Бүтээгдэхүүний нэр");
+  if (!name) return;
+  const price = Number(prompt("Үнэ"));
+  if (!price) return;
+  const product = {
+    id: `custom-${Date.now()}`,
+    name,
+    price,
+    description: "Шинээр нэмэгдсэн Bloom бүтээгдэхүүн",
+    category: "featured",
+    kind: "mixed",
+    tone: 0,
+  };
+  flowers.push(product);
+  save(
+    "bloom_custom_products",
+    flowers.filter((x) => x.id.startsWith("custom-")),
+  );
+  renderProducts();
+  renderAvailability();
+  toast("Шинэ бүтээгдэхүүн нэмэгдлээ");
+};
+$("toggleTracking").onclick = () => {
+  extraState.tracking = !extraState.tracking;
+  save("bloom_tracking_demo", extraState.tracking);
+  $("toggleTracking").textContent =
+    `Демо tracking: ${extraState.tracking ? "асаалттай" : "унтраалттай"}`;
+  if (extraState.tracking) timer();
+  else {
+    clearInterval(state.timer);
+    state.timer = null;
+  }
+};
+$("advanceOrder").onclick = () => {
+  const o =
+    state.orders.find((x) => x.id === state.selected) || state.orders[0];
+  if (!o) return toast("Ахиулах захиалга алга байна.");
+  const index = steps.indexOf(o.status);
+  if (index < 3) {
+    o.status = steps[index + 1];
+    o.manual = true;
+    persist();
+    render();
+    toast("Захиалгын төлөв гараар шинэчлэгдлээ");
+  }
+};
+$("lookupButton").onclick = () => {
+  const id = $("lookupOrderId").value.trim(),
+    phone = $("lookupPhone").value.replace(/\s/g, "");
+  const found = state.orders.find((o) => o.id === id && o.phone === phone);
+  if (!found) {
+    $("lookupError").textContent =
+      "Захиалгын дугаар болон утас таарахгүй байна.";
+    return;
+  }
+  $("lookupError").innerHTML =
+    `Захиалга олдлоо: <button class="text-button" data-lookup-result="${found.id}">${found.id} харах</button>`;
+};
+$("adminProductForm").onsubmit = saveProductWithRollback;
+$("productDrinkName").oninput = () => {
+  $("productName").value = $("productDrinkName").value;
+  renderProductEditorPreview();
+};
+$("productBundleName").oninput = () => {
+  $("productName").value = $("productBundleName").value;
+  renderProductEditorPreview();
+};
+$("productBundleDescription").oninput = () => {
+  $("productDescription").value = $("productBundleDescription").value;
+  renderProductEditorPreview();
+};
+$("addDemoProduct").onclick = () => openProductEditor();
+$("productPrice").oninput = () => {
+  if ($("productType").value === "bundle")
+    $("productBundlePrice").value = $("productPrice").value;
+  renderProductEditorPreview();
+};
+$("productBundlePrice").oninput = () => {
+  $("productPrice").value = $("productBundlePrice").value;
+  renderProductEditorPreview();
+};
+$("productTemperature").onchange = () => {
+  if ($("productHasCoffee").checked)
+    $("productCategory").value = $("productTemperature").value;
+  renderProductEditorPreview();
+};
+$("productHasCoffee").onchange = () => {
+  $("productCategory").value = $("productHasCoffee").checked
+    ? $("productTemperature").value
+    : "noncoffee";
+  renderProductEditorPreview();
+};
+$("productCategory").onchange = () => {
+  if ($("productType").value === "coffee") {
+    const coffeeIncluded = $("productCategory").value !== "noncoffee";
+    $("productHasCoffee").checked = coffeeIncluded;
+    if (coffeeIncluded)
+      $("productTemperature").value = $("productCategory").value;
+  }
+  renderProductEditorPreview();
+};
+
+window.bloomUpdateDemoPassword = function (email, password) {
+  const users = state.users.map((user) =>
+    user.email === email ? { ...user, password } : user,
+  );
+  if (!users.some((user) => user.email === email))
+    throw new Error("Demo бүртгэл олдсонгүй. Нууц үг шинэчлэгдсэнгүй.");
+  localStorage.setItem(KEYS.users, JSON.stringify(users));
+  state.users = users;
+};

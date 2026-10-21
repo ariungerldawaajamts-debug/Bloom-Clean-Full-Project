@@ -13,21 +13,26 @@
 
 </div>
 <header class="site-header">
+        <button class="menu-toggle" id="menuToggle" type="button" aria-label="Цэс нээх" aria-controls="mainNav" aria-expanded="false">☰</button>
     <a class="brand" href="#home">
         <span class="brand-mark">✿</span>
         <span><b>Bloom</b><small>Coffee House</small></span></a>
-        <button class="menu-toggle" id="menuToggle" type="button" aria-label="Цэс нээх" aria-controls="mainNav" aria-expanded="false">☰</button>
+        <button class="mobile-search-button" id="mobileSearchButton" type="button" aria-label="Бүтээгдэхүүн хайх">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.6"></circle><path d="m16 16 4.2 4.2"></path></svg>
+        </button>
         <nav id="mainNav"><a href="#home">Нүүр</a>
             <a href="#flowers">Цэцэг</a><a href="#coffee">Кофе</a>
             <a href="#about">Бидний тухай</a>
+            <a class="mobile-only-nav" href="#bundles">Бэлгийн багц</a>
+            <a class="mobile-only-nav" href="#wishlist">Хүслийн жагсаалт <i id="mobileWishlistCount">0</i></a>
         </nav><div class="header-actions">
-            <button class="text-button" id="authButton">Нэвтрэх</button>
-            <a class="text-button hidden" id="userOrdersLink" href="#account/orders">Миний захиалга</a>
-            <a class="text-button hidden" id="userWishlistLink" href="#account/wishlist">Хүслийн жагсаалт</a>
-            <a class="text-button hidden" id="adminDashboardButton" href="#admin/orders">Админ удирдлага</a>
+            <button class="text-button header-btn" id="authButton">Нэвтрэх</button>
+            <a class="text-button header-btn hidden" id="userOrdersLink" href="#account/orders">Миний захиалга</a>
+            <a class="text-button header-btn hidden" id="userWishlistLink" href="#account/wishlist">Хүслийн жагсаалт</a>
+            <a class="text-button header-btn hidden" id="adminDashboardButton" href="#admin/orders">Админ удирдлага</a>
             <button class="round-button" id="wishlistButton">♡<i id="wishlistCount">0</i>
             </button><button class="cart-button" id="cartButton">Сагс <i id="cartCount">0</i>
-            </button></div></header>
+            </button></div><nav id="headerAdminTabs" class="header-tabs" aria-label="Админ хэсгүүд"></nav></header>
 <main id="home">
 <section class="hero">
     <div class="hero-copy">
@@ -67,6 +72,9 @@
 </label>
 <div class="advanced-search"><input id="productSearch" type="search" placeholder="Цэцэг, кофе, бэлгийн багц хайх"><input id="minPrice" type="number" min="0" placeholder="Доод үнэ"><input id="maxPrice" type="number" min="0" placeholder="Дээд үнэ"><button id="clearFilters" type="button">Шүүлтүүр цэвэрлэх</button></div><p class="result-count" id="flowerCount"></p>
 <div class="product-grid" id="flowerGrid"></div>
+<div class="product-grid" id="flowerGrid"></div>
+</div>
+</section>
 </section>
 <section class="story">
     <div><p class="eyebrow">Нэг аяга кофе, нэг нандин баглаа</p>
@@ -133,7 +141,18 @@
         <p class="eyebrow">Хувийн мэдээлэл</p>
         <h2>Миний <em>мэдээлэл</em></h2>
     </div></div>
-    <div class="profile-card"><p><span>Нэр</span><strong id="profileName"></strong></p><p><span>И-мэйл</span><strong id="profileEmail"></strong></p><small>Энэ demo бүртгэлийн мэдээлэл зөвхөн энэ browser-ийн localStorage-д хадгалагдана.</small></div>
+    <div class="profile-card">
+        <p><span>Нэр</span><strong id="profileName"></strong><input id="profileNameInput" class="hidden" aria-label="Нэр"></p>
+        <p><span>И-мэйл</span><strong id="profileEmail"></strong></p>
+        <p id="profileRoleRow" class="hidden"><span>Эрх</span><strong id="profileRole"></strong></p>
+        <p id="profileEditError" class="form-error hidden" role="alert"></p>
+        <div class="profile-actions">
+            <button class="button ghost" id="editProfileName" type="button">Засах</button>
+            <button class="button dark hidden" id="saveProfileName" type="button">Хадгалах</button>
+            <button class="button ghost hidden" id="cancelProfileName" type="button">Болих</button>
+        </div>
+        <small>Энэ demo бүртгэлийн мэдээлэл зөвхөн энэ browser-ийн localStorage-д хадгалагдана.</small>
+    </div>
 </section>
 </section>
 <section class="admin-section hidden" id="admin">
@@ -142,13 +161,15 @@
         <h2 id="adminSectionTitle">Захиалга <em>удирдах</em></h2>
     </div></div>
     <nav class="admin-tabs aligned-content" aria-label="Админ хэсгүүд">
-        <button class="active" type="button" data-admin-tab="orders">Захиалга</button>
-        <button type="button" data-admin-tab="products">Бүтээгдэхүүн</button>
-        <button type="button" data-admin-tab="bundles">Багц</button>
-        <button type="button" data-admin-tab="delivery">Хүргэлт</button>
-        <button type="button" data-admin-tab="settings">Тохиргоо</button>
+        <button class="header-btn active" type="button" data-admin-tab="orders">Захиалга</button>
+        <button class="header-btn" type="button" data-admin-tab="products">Бүтээгдэхүүн</button>
+        <button class="header-btn" type="button" data-admin-tab="bundles">Багц</button>
+        <button class="header-btn" type="button" data-admin-tab="delivery">Хүргэлт</button>
+        <button class="header-btn" type="button" data-admin-tab="about">Бидний тухай</button>
+        <button class="header-btn" type="button" data-admin-tab="profile">Миний мэдээлэл</button>
+        <button class="header-btn" type="button" data-admin-tab="settings">Тохиргоо</button>
     </nav>
-    <p class="admin-demo-note">Энэ нь frontend demo систем бөгөөд мэдээллийг зөвхөн тухайн төхөөрөмжийн localStorage-д хадгална.</p>
+    <p class="admin-demo-note">Энэ нь frontend demo систем бөгөөд мэдээллийг зөвхөн тухайн төхөөрөмжийн localStorage-д хадгална. “Бидний тухай” засвар зөвхөн энэ браузер дээр хадгалагдана.</p>
     <section class="admin-product-panel hidden" id="adminProductPanel">
         <div class="admin-product-heading"><h3 id="adminProductListTitle">Бүтээгдэхүүний жагсаалт</h3><button class="button dark" id="addProductButton" type="button">Бүтээгдэхүүн нэмэх</button></div>
         <div class="admin-product-filters">
@@ -187,6 +208,19 @@
                     <tbody id="adminDeliveryTable"></tbody>
                 </table></div>
         </div>
+        <section class="admin-about-panel hidden" id="adminAboutPanel" aria-labelledby="adminAboutHeading">
+            <h3 id="adminAboutHeading">“Бидний тухай” хэсгийг засах</h3>
+            <label for="editAbout1">Эхний догол мөр</label>
+            <textarea id="editAbout1" rows="5"></textarea>
+            <label for="editAbout2">Хоёр дахь догол мөр</label>
+            <textarea id="editAbout2" rows="5"></textarea>
+            <label for="editAboutContact">Холбоо барих мэдээлэл</label>
+            <textarea id="editAboutContact" rows="3"></textarea>
+            <div class="admin-about-actions">
+                <button class="button dark" id="saveAbout" type="button">Хадгалах</button>
+                <button class="button ghost" id="resetAbout" type="button">Анхны төлөвт буцаах</button>
+            </div>
+        </section>
     </section>
 <section class="about" id="about">
     <div>
@@ -194,14 +228,39 @@
         <h2>Бэлэг бүрт <em>сэтгэл</em> бий.</h2>
     </div>
     <div>
-        <p>Bloom Coffee House бол цэцэг ба кофег нэгэн орон зайд хослуулсан Дархан хотын жижигхэн булан юм. Бид таны өдөр тутмын баяр, талархал, дурсамж бүрийг илүү үзэсгэлэнтэй болгохыг хүсдэг.
+        <p id="aboutText1">Bloom Coffee House бол цэцэг ба кофег нэгэн орон зайд хослуулсан Дархан хотын жижигхэн булан юм. Бид таны өдөр тутмын баяр, талархал, дурсамж бүрийг илүү үзэсгэлэнтэй болгохыг хүсдэг.
 
         </p>
-        <p>Баглаа бүрийг шинэхэн цэцгээр анхааралтай бэлтгэж, кофены буланд аяга бүрийг тайван мөчид тохируулан урладаг. Таны илгээх бэлэг дулаан, бодолтой, мартагдашгүй байг.</p>
-        <p class="contact">Дархан хот, Дархан-Уул аймаг · Өдөр бүр 09:00–21:00<br>9987 3899 · hello@bloom.mn</p>
+        <p id="aboutText2">Баглаа бүрийг шинэхэн цэцгээр анхааралтай бэлтгэж, кофены буланд аяга бүрийг тайван мөчид тохируулан урладаг. Таны илгээх бэлэг дулаан, бодолтой, мартагдашгүй байг.</p>
+        <p class="contact" id="aboutContact">Дархан хот, Дархан-Уул аймаг · Өдөр бүр 09:00–21:00<br>9987 3899 · hello@bloom.mn</p>
     </div>
 </section>
 </main>
+<nav class="mobile-bottom-nav" aria-label="Гар утасны үндсэн цэс">
+    <a class="mobile-nav-item" href="#home" aria-label="Нүүр">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"></path></svg>
+        <span>Нүүр</span>
+    </a>
+    <a class="mobile-nav-item" href="#flowers" aria-label="Бараа">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+        <span>Бараа</span>
+    </a>
+    <button class="mobile-nav-item" id="mobileCartButton" type="button" aria-label="Сагс">
+        <span class="mobile-nav-icon">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 4h2l2.2 11.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H6"></path><circle cx="10" cy="20" r="1"></circle><circle cx="18" cy="20" r="1"></circle></svg>
+            <i id="mobileCartCount">0</i>
+        </span>
+        <span>Сагс</span>
+    </button>
+    <button class="mobile-nav-item" id="mobileAuthButton" type="button" aria-label="Нэвтрэх">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path></svg>
+        <span id="mobileAuthLabel">Нэвтрэх</span>
+    </button>
+    <button class="mobile-nav-item" id="mobileMoreButton" type="button" aria-label="Бусад цэс" aria-controls="mainNav" aria-expanded="false">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle></svg>
+        <span>Бусад</span>
+    </button>
+</nav>
 <footer>
     <div class="brand">
         <span class="brand-mark">✿</span>
@@ -224,33 +283,57 @@
         <button class="button dark full" id="checkoutButton" type="button">Захиалга баталгаажуулах</button>
     </div>
 </aside>
-<div class="modal" id="authModal">
+<div class="modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle" aria-hidden="true">
     <div class="modal-card">
-        <button class="close" data-close>×</button>
-        <p class="eyebrow">Bloom-д тавтай морил</p>
+        <button class="close" type="button" data-close aria-label="Нэвтрэх цонх хаах">×</button>
+        <p class="eyebrow" id="authModalTitle">Bloom-д тавтай морил</p>
         <div class="auth-tabs">
-            <button class="active" data-auth-tab="login">Нэвтрэх
+            <button class="active" type="button" data-auth-tab="login">Нэвтрэх
             </button>
-            <button data-auth-tab="register">Бүртгүүлэх</button>
+            <button type="button" data-auth-tab="register">Бүртгүүлэх</button>
         </div>
         <form id="loginForm">
-            <label>И-мэйл<input id="loginEmail" type="email" required>
+            <label for="loginEmail">И-мэйл<input id="loginEmail" type="email" autocomplete="email" required>
             </label>
-            <label>Нууц үг<input id="loginPassword" type="password" required>
+            <label for="loginPassword">Нууц үг<input id="loginPassword" type="password" autocomplete="current-password" required>
             </label>
             <p class="form-error" id="loginError">
             </p>
-            <button class="button dark full">Нэвтрэх</button>
+            <button class="button dark full" type="submit">Нэвтрэх</button>
+            <button class="forgot-password-link" id="forgotPasswordLink" type="button">Нууц үгээ мартсан уу?</button>
+            <p class="form-status" id="loginStatus" role="status" aria-live="polite"></p>
         </form>
         <form id="registerForm" class="hidden">
-            <label>Нэр<input id="registerName" required>
+            <label for="registerName">Нэр<input id="registerName" autocomplete="name" required>
             </label>
-            <label>И-мэйл<input id="registerEmail" type="email" required>
+            <label for="registerEmail">И-мэйл<input id="registerEmail" type="email" autocomplete="email" required>
             </label><label>Нууц үг<input id="registerPassword" type="password" minlength="6" required>
             </label><label>Нууц үг давтах<input id="registerConfirm" type="password" required></label>
             <p class="form-error" id="registerError">
             </p><button class="button dark full">Бүртгэл үүсгэх</button>
-        </form><small class="security-note">Энэ бол демо нэвтрэлт. localStorage дахь энгийн нууц үг бодит хэрэглэгчийн мэдээлэлд аюулгүй биш.</small>
+        </form>
+        <section class="password-recovery hidden" id="passwordRecovery" aria-labelledby="recoveryTitle">
+            <h2 id="recoveryTitle">Нууц үг сэргээх</h2>
+            <p class="recovery-demo-note" id="recoveryDemoNote">Демо горим: имэйл илгээх үйлчилгээ холбогдоогүй. Доорх үйлдэл зөвхөн энэ төхөөрөмжийн demo бүртгэлийн нууц үгийг өөрчилнө; таны бүртгэлийг баталгаажуулахгүй.</p>
+            <button class="recovery-back-link" id="recoveryBackButton" type="button">← Нэвтрэх хэсэг рүү буцах</button>
+            <form id="passwordResetRequestForm" novalidate>
+                <label for="recoveryEmail">Бүртгэлтэй и-мэйл хаяг</label>
+                <input id="recoveryEmail" type="email" autocomplete="email" aria-describedby="recoveryEmailError">
+                <p class="form-error" id="recoveryEmailError" role="alert" aria-live="polite"></p>
+                <p class="form-status" id="recoveryRequestStatus" role="status" aria-live="polite"></p>
+                <button class="button dark full" type="submit">Үргэлжлүүлэх</button>
+            </form>
+            <form class="hidden" id="passwordResetForm" novalidate>
+                <p class="recovery-demo-note" id="recoveryResetNote"></p>
+                <label for="newPassword">Шинэ нууц үг</label>
+                <input id="newPassword" type="password" autocomplete="new-password" aria-describedby="passwordResetError" minlength="8">
+                <label for="confirmNewPassword">Шинэ нууц үгээ давтах</label>
+                <input id="confirmNewPassword" type="password" autocomplete="new-password" aria-describedby="passwordResetError">
+                <p class="form-error" id="passwordResetError" role="alert" aria-live="polite"></p>
+                <button class="button dark full" type="submit">Нууц үг шинэчлэх</button>
+            </form>
+        </section>
+        <small class="security-note" id="authSecurityNote">Энэ бол демо нэвтрэлт. localStorage дахь энгийн нууц үг бодит хэрэглэгчийн мэдээлэлд аюулгүй биш.</small>
     </div>
 </div>
 <div class="modal" id="checkoutModal">
@@ -391,4 +474,5 @@
         
     </div>
 <script src="script.js"></script>
-<script src="dashboard.js"></script></body></html>
+<script src="dashboard.js"></script>
+<script src="password-recovery.js"></script></body></html>
